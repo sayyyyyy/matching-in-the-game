@@ -8,6 +8,7 @@ import urllib.parse
 import json
 import base64
 
+# プルリク追加
 
 app = Flask(__name__)
 
