@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block main %}
+<p><a href="/profile">戻る</a></p>
+<p>{{ user_profile }}</p>
+<p>{{ user_game_title }}</p>
+<form action ="/edit" method ="POST">
+    <div class ="flex">
+        <img src ="{{ user_profile[5] }}" class ="is-circle">
+        <div>
+            <input readonly id ="nickname" type ="text" name ="nickname" value="{{ user_profile[1] }}">
+            <button type ="button" onclick="edit('nickname')">編集する</button>
+            <input readonly id ="email" type ="text" name ="email" value="{{ user_profile[3] }}">
+            <button type ="button" onclick="edit('email')">編集する</button>
+            <input readonly id ="password" type ="text" name ="password" value="{{ user_profile[2] }}">
+            <button type ="button" onclick="edit('password')">編集する</button>
+        </div>
+    </div>
+    <input type="submit" value ="保存">
+    <table>
+        <thead>
+            <tr>
+                <td>ゲーム</td>
+                <td>スキル</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <select name ="game1">
+                        <option disabled selected>ゲームを選択してください</option>
+                        {% for i in games %}
+                        <option>{{ i[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <input type ="number" name ="skill1" placeholder ="スキルレベル 0 ~ 3" min ="0" max ="3">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <select name ="game2">
+                        <option disabled selected>ゲームを選択してください</option>
+                        {% for i in games %}
+                        <option>{{ i[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <input type ="number" name ="skill2" placeholder ="スキルレベル 0 ~ 3" min ="0" max ="3">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <select name ="game3">
+                        <option disabled selected>ゲームを選択してください</option>
+                        {% for i in games %}
+                        <option>{{ i[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <input type ="number" name ="skill3" placeholder ="スキルレベル 0 ~ 3" min ="0" max ="3">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p>コメント</p>
+    <textarea readonly id ="comment" name ="comment" rows ="5">{{ user_profile[4] }}</textarea>
+    <button type ="button" onclick="edit('comment')">編集する</button>
+</form>
+{% endblock %}

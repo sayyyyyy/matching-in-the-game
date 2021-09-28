@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Profile
+{% endblock %}
+
+
+
+{% block main %}
+
+
+<div class ="nav">
+    <p>戻る</p>
+    <p><a href ="edit">編集</a></p>
+</div>
+<form action ="/profile" method ="POST" enctype="multipart/form-data">
+    <div class ="flex">
+        <img src ="{{ user_profile[5] }}" class ="is-circle">
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <td>ゲーム</td>
+                        <td>スキル</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>アイコン</td>
+                        <td>{{ game_name1 }}</td>
+                        {% if games[0][1] is not none %}
+                        <td>
+                        {% for i in range(games[0][1]) %}
+                            ☆
+                        {% endfor %}
+                        </td>
+                        {% else %}
+                        <td>No</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <td>アイコン</td>
+                        <td>{{ game_name2 }}</td>
+                        {% if games[1][1] is not none %}
+                        <td>
+                            {% for i in range(games[1][1]) %}
+                                ☆
+                            {% endfor %}
+                        </td>
+                        {% else %}
+                        <td>No</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <td>アイコン</td>
+                        <td>{{ game_name3 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class ="flex">
+                <p>フォロー</p> 
+                <p>フォロワー</p>
+            </div>
+        </div>
+    </div>
+    <div class ="flex">
+        <div>
+            <p>ニックネーム</p>
+            <input readonly type ="text" name ="nickname" value="{{ user_profile[1] }}">
+            <div class ="flex">
+                <p>フォロー</p>
+                <p>トーク</p>
+            </div>
+        </div>
+        <p>コメント</p>
+        <textarea readonly name ="comment" rows ="5">{{ user_profile[4] }}</textarea>
+    </div>
+    <input type =file name =up_file>
+    <input type ="submit">
+</form>
+{% endblock %}
