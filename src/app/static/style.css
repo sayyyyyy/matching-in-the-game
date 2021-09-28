@@ -1,0 +1,24 @@
+.is-circle {
+    width:  180px;       /* ※縦横を同値に */
+    height: 180px;       /* ※縦横を同値に */
+    border-radius: 50%;  /* 角丸半径を50%にする(=円形にする) */
+    background-position: left top;  /* 横長画像の左上を基準に表示 */
+    display: inline-block;
+    border: solid 3px black;       
+}
+
+.nav {
+    display: flex;
+}
+
+.nav > p {
+    margin-left: 30px;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex > p {
+    margin-right: 30px;
+}

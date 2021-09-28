@@ -1,7 +1,9 @@
 version: '3.8'
 services:
   db:
-    build: mysql
+    build: ./mysql/
+    volumes:
+      - ./mysql/sqls/:/docker-entrypoint-initdb.d/
     ports:
       - 3306:3306
     environment:
@@ -10,7 +12,7 @@ services:
       MYSQL_ROOT_HOST: '%'
   appserver:
     build:
-      context: src
+      context: ./src/
     ports:
       - 5000:5000
     volumes:

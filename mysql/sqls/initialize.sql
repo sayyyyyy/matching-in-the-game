@@ -1,45 +1,46 @@
 CREATE DATABASE IF NOT EXISTS app;
-use app;
+USE app;
 
-CREATE TABLE Profiles (
-  id int PRIMARY KEY AUTO_INCREMENT,
-  nickname varchar(20) NOT NULL,
-  password varchar(20) NOT NULL,
-  email varchar(30) NOT NULL,
-  comment varchar(500) DEFAULT "Hello",
+
+CREATE TABLE IF NOT EXISTS Profiles (
+  id int PRIMARY KEY AUTO_INCREMENT, 
+  nickname varchar(20) NOT NULL, 
+  password varchar(20) NOT NULL, 
+  email varchar(30) NOT NULL, 
+  comment varchar(500) DEFAULT "Hello", 
   icon varchar(100) DEFAULT "static/default_user_icon.png"
 );
 
 
-CREATE TABLE Game_names (
+CREATE TABLE IF NOT EXISTS Game_names (
   id int PRIMARY KEY AUTO_INCREMENT,
   game_name varchar(30)
 );
 
-CREATE TABLE Games (
-  id int PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS Games (
+  id int PRIMARY KEY AUTO_INCREMENT, 
   user_id int NOT NULL,
   game_id int NOT NULL,
-  FOREIGN KEY(user_id) REFERENCES Profiles(id),
-  FOREIGN KEY(game_id) REFERENCES Game_names(id),
+  FOREIGN KEY(user_id) REFERENCES Profiles(id), 
+  FOREIGN KEY(game_id) REFERENCES Game_names(id), 
   game_level int DEFAULT 0
 );
 
-CREATE TABLE Follows (
-  id int PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS Follows (
+  id int PRIMARY KEY AUTO_INCREMENT, 
   follow_id int NOT NULL,
-  followes_id int NOT NULL,
+  followed_id int NOT NULL,
   FOREIGN KEY(follow_id) REFERENCES Profiles(id),
   FOREIGN KEY(followed_id) REFERENCES Profiles(id)
 );
 
-CREATE TABLE Groups (
-  id int PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS Groups (
+  id int PRIMARY KEY AUTO_INCREMENT, 
   group_name varchar(20),
   group_icon varchar(100)
 );
 
-CREATE TABLE Members (
+CREATE TABLE IF NOT EXISTS Members (
   id int PRIMARY KEY AUTO_INCREMENT,
   member_id int NOT NULL,
   flag_join boolean DEFAULT false,
@@ -48,9 +49,9 @@ CREATE TABLE Members (
   FOREIGN KEY(group_id) REFERENCES Groups(id)
 );
 
-CREATE TABLE Messages (
+CREATE TABLE IF NOT EXISTS Messages (
   id int PRIMARY KEY AUTO_INCREMENT,
-  user_id int NOT NULL,
+  member_id int NOT NULL,
   group_id int NOT NULL,
   message varchar(500),
   time timestamp,
@@ -58,3 +59,13 @@ CREATE TABLE Messages (
   FOREIGN KEY(group_id) REFERENCES Groups(id)
 );
 
+INSERT INTO Profiles (nickname, password, email) VALUES("test_user1", "password", "test1@email.com");
+INSERT INTO Profiles (nickname, password, email) VALUES("test_user2", "password", "test2@email.com");
+
+INSERT INTO Game_names (game_name) VALUES("APEX LEGENDS");
+INSERT INTO Game_names (game_name) VALUES("Minecraft");
+INSERT INTO Game_names (game_name) VALUES("Pokemon");
+INSERT INTO Game_names (game_name) VALUES("Fortnite");
+
+INSERT INTO Games (user_id, game_id, game_level) VALUES(1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level) VALUES(1, 3, 2);
