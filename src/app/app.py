@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, url_for
+from datetime import timedelta
 import mysql.connector
 import re
 import MySQLdb.cursors
@@ -14,11 +15,13 @@ import os
 
 app = Flask(__name__)
 
-app.secret_key = ''
+app.secret_key = 'aaa'
 client_id = ''
 client_secret = ''
 redirect_uri = ''
 state = ''
+app.permanent_session_lifetime = timedelta(minutes=10)
+
 
 # ファイルアップロード設定
 UPLOAD_FOLDER ='./static/images/'
@@ -41,24 +44,29 @@ def main():
     return render_template("index.html", users=cursor.fetchall())
 
 
-@app.route('/login/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     msg = ''
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
-        username = request.form['username']
+    if request.method == 'POST' and 'nickname' in request.form and 'password' in request.form:
+        nickname = request.form['nickname']
         password = request.form['password']
         cnx = mysql.connector.connect(user='root', password='password',
                                       host='db', port='3306', database='app')
         cursor = cnx.cursor()
-        cursor.execute('SELECT * FROM Profiles WHERE username=%s AND password=%s', (username, password))
+        cursor.execute('SELECT * FROM Profiles WHERE nickname=%s AND password=%s', (nickname, password))
         account = cursor.fetchone()
+
         if account:
-#            session['loggedin'] = True
-#            session['id'] = account['id']
-#            session['username'] = account['username']
-            return "logged in successfully"
+            session.permanent = True
+            user = request.form['nickname']
+            session['user'] = user
+            return render_template('main.html', session=user)
+
+        elif 'user' in session:
+            return render_template('main.html', session=session['user'])
+
         else:
-            msg = 'incorrecr username or password'
+            msg = 'incorrect username or password'
 
         return render_template("login.html", msg=msg)
 
@@ -96,6 +104,13 @@ def check():
     id_token = json.loads(id_token.decode('ascii'))
 
     return 'success!<br>hello, {}.'.format(id_token['email'])
+
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('/'))
+
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
