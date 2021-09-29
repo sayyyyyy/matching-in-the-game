@@ -15,12 +15,10 @@ import os
 
 app = Flask(__name__)
 
-app.secret_key = 'aaa'
 client_id = ''
 client_secret = ''
 redirect_uri = ''
 state = ''
-app.permanent_session_lifetime = timedelta(minutes=10)
 
 
 # ファイルアップロード設定
@@ -44,7 +42,7 @@ def main():
     return render_template("index.html", users=cursor.fetchall())
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
     msg = ''
     if request.method == 'POST' and 'nickname' in request.form and 'password' in request.form:
@@ -58,6 +56,7 @@ def login():
 
         if account:
             session.permanent = True
+            app.permanent_session_lifetime = timedelta(minutes=10)
             user = request.form['nickname']
             session['user'] = user
             return render_template('main.html', session=user)
