@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, session, url_for
-from flask_login import login_user, logout_user
 from datetime import timedelta
 import mysql.connector
 import re
@@ -12,22 +11,22 @@ import base64
 from werkzeug.utils import secure_filename
 import os
 
-# プルリク追加
-
 app = Flask(__name__)
 
+# セッション設定
+app.secret_key = 'user_id'
+app.config['SECRET_KEY'] = b'aaalllaa' # これが暗号化／復号のための鍵になる
+
+# Googleの設定
 client_id = ''
 client_secret = ''
 redirect_uri = ''
 state = ''
 
-
 # ファイルアップロード設定
 UPLOAD_FOLDER ='./static/images/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# セッション設定
-app.secret_key = 'user_id'
 
 @app.route("/")
 def main():
@@ -57,13 +56,17 @@ def login():
 
         if account:
             session.permanent = True
-            app.permanent_session_lifetime = timedelta(minutes=10)
+            app.permanent_session_lifetime = timedelta(minutes=3)
+            session.modified = True
             user = request.form['nickname']
             session['user'] = user
-            return render_template('main.html', session=user)
+            session['loggedin'] = True
+            session['user_id'] = account[0]
+            return render_template('main.html', session=user, session_id=session['user_id'], account=account, log=session['loggedin'], user=user)
 
-        elif 'user' in session:
-            return render_template('main.html', session=session['user'])
+        # elif 'user' in session:
+        #     return render_template('main.html', session=session['user'])
+        #もしこれをコメントアウトしないとログインの記入画面でnicknameとpasswordが間違っていてもmain画面を開いてしまう
 
         else:
             msg = 'incorrect username or password'
@@ -71,6 +74,12 @@ def login():
         return render_template("login.html", msg=msg)
 
     return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 
 @app.route('/google')
@@ -102,75 +111,72 @@ def check():
     id_token = id_token + '=' * (4 - len(id_token)//4)  # パディングが足りなかったりするっぽいので補う
     id_token = base64.b64decode(id_token)
     id_token = json.loads(id_token.decode('ascii'))
-
     return 'success!<br>hello, {}.'.format(id_token['email'])
-
-
-@app.route('/logout')
-def logout():
-    session.pop('user', None)
-    return redirect(url_for('/'))
 
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
-  session['user_id'] = 1
+    if 'loggedin' in session:
+        session['user_id'] = session['user_id']
 
-  if request.method == "POST":
+        if request.method == "POST":
 
-    img_file = request.files['up_file']
-    filename = secure_filename(img_file.filename)
-    img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    img_file.save(img_url)
+            img_file = request.files['up_file']
+            filename = secure_filename(img_file.filename)
+            img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            img_file.save(img_url)
 
-    db = mysql.connector.connect(
-        user ='root',
-        password = 'password',
-        host ='db',
-        database ='app'
-    )
-    cursor = db.cursor()
-    cursor.execute("UPDATE Profiles SET icon = %s WHERE id = %s", (UPLOAD_FOLDER + filename, session['user_id']))
-    db.commit()
-    return redirect("/")
-    
-  else:
-    db = mysql.connector.connect(
-        user ='root',
-        password = 'password',
-        host ='db',
-        database ='app'
-    )
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM Profiles")
-    user_profile = cursor.fetchall()[0]
+            db = mysql.connector.connect(
+                user ='root',
+                password = 'password',
+                host ='db',
+                database ='app'
+            )
+            cursor = db.cursor()
+            cursor.execute("UPDATE Profiles SET icon = %s WHERE id = %s", (UPLOAD_FOLDER + filename, session['user_id']))
+            db.commit()
+            return redirect("/")
 
-    game_list = db.cursor()
-    game_list.execute("SELECT game_id, game_level FROM Games WHERE user_id = %s", (session['user_id'],))
-    games = game_list.fetchall()
+        else:
+            db = mysql.connector.connect(
+                user ='root',
+                password = 'password',
+                host ='db',
+                database ='app')
+            cursor = db.cursor()
+            cursor.execute("SELECT * FROM Profiles")
+            user_profile = cursor.fetchall() #ここがユーザーの名前が変わらない原因...1に変えるとtest_user2になる(0がuser1)
+            game_list = db.cursor()
+            game_list.execute("SELECT game_id, game_level FROM Games WHERE user_id = %s", (session['user_id'],))
+            games = game_list.fetchall()
 
-    try:
-      game1 = db.cursor()
-      game1.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[0][0], ))
-      game_name1 = game1.fetchall()[0][0]
-    except:
-      game_name1 = "ゲームが選択されていません"
+            try:
+              game1 = db.cursor()
+              game1.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[0][0], ))
+              game_name1 = game1.fetchall()[0][0]
+            except:
+              game_name1 = "ゲームが選択されていません"
 
-    try:
-      game2 = db.cursor()
-      game2.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[1][0], ))
-      game_name2 = game2.fetchall()[0][0]
-    except:
-      game_name2 = "ゲームが選択されていません"
+            try:
+              game2 = db.cursor()
+              game2.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[1][0], ))
+              game_name2 = game2.fetchall()[0][0]
+            except:
+              game_name2 = "ゲームが選択されていません"
 
-    try:
-      game3 = db.cursor()
-      game3.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[2][0], ))
-      game_name3 = game3.fetchall()[0][0]
-    except:
-      game_name3 = "ゲームが選択されていません"
+            try:
+                game3 = db.cursor()
+                game3.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[2][0], ))
+                game_name3 = game3.fetchall()[0][0]
+            except:
+              game_name3 = "ゲームが選択されていません"
 
-    return render_template("profile.html", user_profile=user_profile, games=games, game_name1=game_name1, game_name2=game_name2, game_name3=game_name3)
+        return render_template("profile.html", user_profile=user_profile,
+                               games=games, game_name1=game_name1, game_name2=game_name2,
+                               game_name3=game_name3)
+
+    return redirect(url_for('login'))
+
 
 @app.route("/edit", methods=["GET", "POST"])
 def edit():
@@ -204,6 +210,7 @@ def edit():
     games = game_list.fetchall()
 
     return render_template("edit.html", user_profile=user_profile, games=games)
+
 
 if __name__ == '__main__':
   app.run()
