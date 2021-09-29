@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 from datetime import timedelta
 import mysql.connector
 import re
@@ -6,10 +6,12 @@ import MySQLdb.cursors
 import flask
 import urllib.request
 import urllib.parse
+import urllib.parse as parse
 import json
 import base64
 from werkzeug.utils import secure_filename
 import os
+from requests_oauthlib import OAuth1Session
 
 app = Flask(__name__)
 
@@ -22,6 +24,16 @@ client_id = ''
 client_secret = ''
 redirect_uri = ''
 state = ''
+
+# Twitterでのログイン認証
+api_key = ""
+api_secret = ""
+
+# Twitter Endpoint
+twitter_base_url = ''
+authorization_endpoint = twitter_base_url + ''
+request_token_endpoint = twitter_base_url + ''
+token_endpoint = twitter_base_url + ''
 
 # ファイルアップロード設定
 UPLOAD_FOLDER ='./static/images/'
@@ -114,6 +126,48 @@ def check():
     return 'success!<br>hello, {}.'.format(id_token['email'])
 
 
+@app.route("/twitter")
+def twitter():
+    # 1.リクエストトークンを取得する。
+    # (Step 1: Obtaining a request token:https://developer.twitter.com/en/docs/authentication/guides/log-in-with-twitter)
+    twitter = OAuth1Session(api_key, api_secret)
+    oauth_callback = request.args.get('oauth_callback')
+    res = twitter.post(request_token_endpoint, params={
+        'oauth_callback': oauth_callback})
+    request_token = dict(parse.parse_qsl(res.content.decode("utf-8")))
+    oauth_token = request_token['oauth_token']
+
+    # 2.リクエストトークンを指定してTwitterへ認可リクエスト(Authorization Request)を行う。
+    # (Step 2: Redirecting the user:https://developer.twitter.com/en/docs/authentication/guides/log-in-with-twitter#tab2)
+    return redirect(authorization_endpoint+'?{}'.format(parse.urlencode({
+        'oauth_token': oauth_token
+    })))
+
+
+@app.route("/callback_twitter")
+def callback():
+    # 3.ユーザー認証/同意を行い、認可レスポンスを受け取る。
+    oauth_verifier = request.args.get('oauth_verifier')
+    oauth_token = request.args.get('oauth_token')
+
+    # 4.認可レスポンスを使ってトークンリクエストを行う。
+    # (Step 3: Converting the request token to an access token:https://developer.twitter.com/en/docs/authentication/guides/log-in-with-twitter#tab3)
+    twitter = OAuth1Session(
+        api_key,
+        api_secret,
+        oauth_token
+    )
+
+    res = twitter.post(
+        token_endpoint,
+        params={'oauth_verifier': oauth_verifier}
+    )
+
+    access_token = dict(parse.parse_qsl(res.content.decode("utf-8")))
+
+    return jsonify(access_token)
+
+
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     if 'loggedin' in session:
@@ -144,32 +198,32 @@ def profile():
                 host ='db',
                 database ='app')
             cursor = db.cursor()
-            cursor.execute("SELECT * FROM Profiles")
-            user_profile = cursor.fetchall() #ここがユーザーの名前が変わらない原因...1に変えるとtest_user2になる(0がuser1)
+            cursor.execute("SELECT * FROM Profiles WHERE id=%s", (session['user_id'], ))
+            user_profile = cursor.fetchall()[0]
             game_list = db.cursor()
             game_list.execute("SELECT game_id, game_level FROM Games WHERE user_id = %s", (session['user_id'],))
             games = game_list.fetchall()
 
             try:
-              game1 = db.cursor()
-              game1.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[0][0], ))
-              game_name1 = game1.fetchall()[0][0]
+                game1 = db.cursor()
+                game1.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[0][0], ))
+                game_name1 = game1.fetchall()[0][0]
             except:
-              game_name1 = "ゲームが選択されていません"
+                game_name1 = "ゲームが選択されていません"
 
             try:
-              game2 = db.cursor()
-              game2.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[1][0], ))
-              game_name2 = game2.fetchall()[0][0]
+                game2 = db.cursor()
+                game2.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[1][0], ))
+                game_name2 = game2.fetchall()[0][0]
             except:
-              game_name2 = "ゲームが選択されていません"
+                game_name2 = "ゲームが選択されていません"
 
             try:
                 game3 = db.cursor()
                 game3.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[2][0], ))
                 game_name3 = game3.fetchall()[0][0]
             except:
-              game_name3 = "ゲームが選択されていません"
+                game_name3 = "ゲームが選択されていません"
 
         return render_template("profile.html", user_profile=user_profile,
                                games=games, game_name1=game_name1, game_name2=game_name2,
@@ -180,36 +234,39 @@ def profile():
 
 @app.route("/edit", methods=["GET", "POST"])
 def edit():
-  if request.method == "POST":
-    db = mysql.connector.connect(
-    user ='root',
-    password = 'password',
-    host ='db',
-    database ='app'
-    )
-    set_prof = db.cursor()
-    set_prof.execute("UPDATE Profiles SET nickname = %s, password = %s, email = %s, comment = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("password"), request.form.get("email"), request.form.get("comment"), session['user_id']))
-    db.commit()
+    if 'loggedin' in session:
+        session['user_id'] = session['user_id']
+        if request.method == "POST":
+            db = mysql.connector.connect(
+            user ='root',
+            password = 'password',
+            host ='db',
+            database ='app'
+            )
+            set_prof = db.cursor()
+            set_prof.execute("UPDATE Profiles SET nickname = %s, password = %s, email = %s, comment = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("password"), request.form.get("email"), request.form.get("comment"), session['user_id']))
+            db.commit()
 
-    #set_game = db.cursor()
-    #set_game.execute("UPDATE Games SET game_id = %s WHERE user_id = %s", ( ,session['user_id']))
-    return redirect("/edit")
-  else:
-    db = mysql.connector.connect(
-    user ='root',
-    password = 'password',
-    host ='db',
-    database ='app'
-    )
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM Profiles")
-    user_profile = cursor.fetchall()[0]
+            #set_game = db.cursor()
+            #set_game.execute("UPDATE Games SET game_id = %s WHERE user_id = %s", ( ,session['user_id']))
+            return redirect("/edit")
+        else:
+            db = mysql.connector.connect(
+            user ='root',
+            password = 'password',
+            host ='db',
+            database ='app'
+            )
+            cursor = db.cursor()
+            cursor.execute("SELECT * FROM Profiles")
+            user_profile = cursor.fetchall()[0]
 
-    game_list = db.cursor()
-    game_list.execute("SELECT game_name FROM Game_names")
-    games = game_list.fetchall()
+            game_list = db.cursor()
+            game_list.execute("SELECT game_name FROM Game_names")
+            games = game_list.fetchall()
 
-    return render_template("edit.html", user_profile=user_profile, games=games)
+            return render_template("edit.html", user_profile=user_profile, games=games)
+    return redirect(url_for('login'))
 
 
 if __name__ == '__main__':
