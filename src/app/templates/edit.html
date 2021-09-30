@@ -6,6 +6,7 @@ Home
 
 {% block main %}
 <p><a href="/profile">戻る</a></p>
+<p>{{gameaaa}}</p>
 <p>{{ user_profile }}</p>
 <p>{{ user_game_title }}</p>
 <form action ="/edit" method ="POST" enctype="multipart/form-data">
@@ -77,4 +78,7 @@ Home
     <input type =file name =up_file>
     <input type ="submit">
 </form>
+
+<p>フォロー</p>
+<p>フォロワー</p>
 {% endblock %}

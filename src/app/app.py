@@ -176,21 +176,6 @@ def profile():
         session['user_id'] = session['user_id']
 
         if request.method == "POST":
-
-            img_file = request.files['up_file']
-            filename = secure_filename(img_file.filename)
-            img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            img_file.save(img_url)
-
-            db = mysql.connector.connect(
-                user ='root',
-                password = 'password',
-                host ='db',
-                database ='app'
-            )
-            cursor = db.cursor()
-            cursor.execute("UPDATE Profiles SET icon = %s WHERE id = %s", (UPLOAD_FOLDER + filename, session['user_id']))
-            db.commit()
             return redirect("/")
 
         else:
@@ -239,6 +224,7 @@ def profile():
 def edit():
     if 'loggedin' in session:
       session['user_id'] = session['user_id']
+
       if request.method == "POST":
         db = mysql.connector.connect(
         user ='root',
@@ -247,6 +233,7 @@ def edit():
         database ='app'
         )
 
+        # 画像変更
         if request.form.get("up_file"):
           img_file = request.files['up_file']
           filename = secure_filename(img_file.filename)
@@ -257,43 +244,80 @@ def edit():
           cursor.execute("UPDATE Profiles SET icon = %s WHERE id = %s", (UPLOAD_FOLDER + filename, session['user_id']))
           db.commit()
 
-        set_prof = db.cursor()
-        set_prof.execute("UPDATE Profiles SET nickname = %s, password = %s, email = %s, comment = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("password"), request.form.get("email"), request.form.get("comment"), session['user_id']))
-        db.commit()
-
+        # ゲーム変更
         if request.form.get("game1"):
           edit_game1 = db.cursor()
           edit_game1.execute("SELECT id FROM Game_names WHERE game_name = %s", (request.form.get("game1"),))
           game_name_1 = edit_game1.fetchall()[0][0]
-          set_game1 = db.cursor()
-          try:
-            set_game1.execute("UPDATE Games SET game_id = %s WHERE user_id = %s AND game_order = 1", (game_name_1 ,session['user_id']))
-          except:
-            set_game1.execute("INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES (%s, %s, %s, %s)" (session['user_id'], game_name_1, 1, 1))
+          
+          set_game1 = db.cursor(buffered=True)
+          contain_game1 = db.cursor(buffered=True)
+          contain_game1.execute("SELECT * FROM Games WHERE user_id = %s AND game_order = %s", (session['user_id'], 1))
+          is_contain1 = contain_game1.fetchall()
+          if is_contain1:
+            set_game1.execute("UPDATE Games SET game_id = %s WHERE user_id = %s AND game_order = %s", (game_name_1 ,session['user_id'], 1))
+          else:
+            set_game1.execute("INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES (%s, %s, %s, %s)", (session['user_id'], game_name_1, 1, 1))
           db.commit()
+
+        if request.form.get("skill1"):
+          try:
+            star1 = db.cursor()
+            star1.execute("UPDATE Games SET game_level = %s WHERE user_id = %s AND game_order = %s", (request.form.get("skill1"), session['user_id'], 1))
+            db.commit()
+          except:
+            pass
 
         if request.form.get("game2"):
           edit_game2 = db.cursor()
           edit_game2.execute("SELECT id FROM Game_names WHERE game_name = %s", (request.form.get("game2"),))
           game_name_2 = edit_game2.fetchall()[0][0]
-          set_game2 = db.cursor()
-          try:
-            set_game2.execute("UPDATE Games SET game_id = %s WHERE user_id = %s AND game_order = 2", (game_name_2 ,session['user_id']))
-          except:
-            set_game2.execute("INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES (%s, %s, %s, %s)" (session['user_id'], game_name_2, 1, 2))
+          
+          set_game2 = db.cursor(buffered=True)
+          contain_game2 = db.cursor(buffered=True)
+          contain_game2.execute("SELECT * FROM Games WHERE user_id = %s AND game_order = %s", (session['user_id'], 2))
+          is_contain2 = contain_game2.fetchall()
+          if is_contain2:
+            set_game2.execute("UPDATE Games SET game_id = %s WHERE user_id = %s AND game_order = %s", (game_name_2 ,session['user_id'], 2))
+          else:
+            set_game2.execute("INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES (%s, %s, %s, %s)", (session['user_id'], game_name_2, 1, 2))
           db.commit()
 
-        if request.form.get("game3"):
-          edit_game3 = db.cursor()
-          edit_game3.execute("SELECT id FROM Game_names WHERE game_name = %s", (request.form.get("game1"),))
-          game_name_3 = edit_game3.fetchall()[0][0]
-          set_game3 = db.cursor()
+        if request.form.get("skill2"):
           try:
-            set_game3.execute("UPDATE Games SET game_id = %s WHERE user_id = %s AND game_order = 3", (game_name_3 ,session['user_id']))
+            star2 = db.cursor()
+            star2.execute("UPDATE Games SET game_level = %s WHERE user_id = %s AND game_order = %s", (request.form.get("skill2"), session['user_id'], 2))
+            db.commit()
           except:
-            set_game3.execute("INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES (%s, %s, %s, %s)" (session['user_id'], game_name_3, 1, 3))
+            pass
+
+        if request.form.get("game3"):
+          edit_game3 = db.cursor(buffered=True)
+          edit_game3.execute("SELECT id FROM Game_names WHERE game_name = %s", (request.form.get("game3"),))
+          game_name_3 = edit_game3.fetchall()[0][0]
+
+          set_game3 = db.cursor(buffered=True)
+          contain_game3 = db.cursor(buffered=True)
+          contain_game3.execute("SELECT * FROM Games WHERE user_id = %s AND game_order = %s", (session['user_id'], 3))
+          is_contain3 = contain_game3.fetchall()
+          if is_contain3:
+            set_game3.execute("UPDATE Games SET game_id = %s WHERE user_id = %s AND game_order = %s", (game_name_3 ,session['user_id'], 3))
+          else:
+            set_game3.execute("INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES (%s, %s, %s, %s)", (session['user_id'], game_name_3, 1, 3))
           db.commit()    
 
+        if request.form.get("skill3"):
+          try:
+            star3 = db.cursor()
+            star3.execute("UPDATE Games SET game_level = %s WHERE user_id = %s AND game_order = %s", (request.form.get("skill3"), session['user_id'], 3))
+            db.commit()
+          except:
+            pass
+
+        # その他変更
+        set_prof = db.cursor()
+        set_prof.execute("UPDATE Profiles SET nickname = %s, password = %s, email = %s, comment = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("password"), request.form.get("email"), request.form.get("comment"), session['user_id']))
+        db.commit()
         return redirect("/edit")
       else:
         db = mysql.connector.connect(
@@ -309,6 +333,12 @@ def edit():
         game_list = db.cursor()
         game_list.execute("SELECT game_name FROM Game_names")
         games = game_list.fetchall()
+
+        game_all = db.cursor()
+        game_all.execute("SELECT * FROM Games")
+        gameaaa = game_all.fetchall()
+
+        return render_template("edit.html", games=games, user_profile=user_profile, gameaaa=gameaaa)
     else:
       return redirect(url_for('login'))
 
