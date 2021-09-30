@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS Games (
   game_id int NOT NULL,
   FOREIGN KEY(user_id) REFERENCES Profiles(id), 
   FOREIGN KEY(game_id) REFERENCES Game_names(id), 
-  game_level int DEFAULT 0
+  game_level int DEFAULT 0,
+  game_order int DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS Follows (
@@ -67,5 +68,5 @@ INSERT INTO Game_names (game_name) VALUES("Minecraft");
 INSERT INTO Game_names (game_name) VALUES("Pokemon");
 INSERT INTO Game_names (game_name) VALUES("Fortnite");
 
-INSERT INTO Games (user_id, game_id, game_level) VALUES(1, 1, 1);
-INSERT INTO Games (user_id, game_id, game_level) VALUES(1, 3, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(1, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(1, 3, 2, 2);

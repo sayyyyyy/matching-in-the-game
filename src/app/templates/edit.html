@@ -8,7 +8,7 @@ Home
 <p><a href="/profile">戻る</a></p>
 <p>{{ user_profile }}</p>
 <p>{{ user_game_title }}</p>
-<form action ="/edit" method ="POST">
+<form action ="/edit" method ="POST" enctype="multipart/form-data">
     <div class ="flex">
         <img src ="{{ user_profile[5] }}" class ="is-circle">
         <div>
@@ -73,5 +73,8 @@ Home
     <p>コメント</p>
     <textarea readonly id ="comment" name ="comment" rows ="5">{{ user_profile[4] }}</textarea>
     <button type ="button" onclick="edit('comment')">編集する</button>
+
+    <input type =file name =up_file>
+    <input type ="submit">
 </form>
 {% endblock %}
