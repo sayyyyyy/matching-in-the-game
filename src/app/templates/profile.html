@@ -41,7 +41,7 @@ Profile
                     <tr>
                         <td>アイコン</td>
                         <td>{{ game_name2 }}</td>
-                        {% if games[1][1] is not none %}
+                        {% if games[1][1] %}
                         <td>
                             {% for i in range(games[1][1]) %}
                                 ☆
@@ -54,9 +54,13 @@ Profile
                     <tr>
                         <td>アイコン</td>
                         <td>{{ game_name3 }}</td>
+                        {% if games[2][1] %}
                         <td>
-              
+                            {% for i in range(games[1][1]) %}
+                                ☆
+                            {% endfor %}              
                         </td>
+                        {% endif %}
                     </tr>
                 </tbody>
             </table>
