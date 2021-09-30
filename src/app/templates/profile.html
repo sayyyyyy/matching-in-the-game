@@ -10,10 +10,10 @@ Profile
 
 
 <div class ="nav">
-    <p>戻る</p>
+    <p><a href ="/">戻る</a></p>
     <p><a href ="edit">編集</a></p>
 </div>
-<form action ="/profile" method ="POST" enctype="multipart/form-data">
+<form action ="/profile" method ="POST">
     <div class ="flex">
         <img src ="{{ user_profile[5] }}" class ="is-circle">
         <div>
@@ -75,7 +75,6 @@ Profile
         <p>コメント</p>
         <textarea readonly name ="comment" rows ="5">{{ user_profile[4] }}</textarea>
     </div>
-    <input type =file name =up_file>
-    <input type ="submit">
+
 </form>
 {% endblock %}
