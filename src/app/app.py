@@ -128,122 +128,6 @@ def check():
     id_token = json.loads(id_token.decode('ascii'))
     return 'success!<br>hello, {}.'.format(id_token['email'])
 
-@app.route('/profile')
-def profile():
-  if request.method == "POST":
-    return redirect("/profile")
-    
-  else:
-    db = mysql.connector.connect(
-        user ='root',
-        password = 'password',
-        host ='db',
-        database ='app'
-    )
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM Profiles")
-    user_profile = cursor.fetchall()[0]
-
-    game_list = db.cursor()
-    game_list.execute("SELECT game_id, game_level, game_order FROM Games WHERE user_id = %s", (session['user_id'],))
-    games = game_list.fetchall()
-
-    try:
-      game1 = db.cursor()
-      game1.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[0][0], ))
-      game_name1 = game1.fetchall()[0][0]
-    except:
-      game_name1 = "ゲームが選択されていません"
-
-    try:
-      game2 = db.cursor()
-      game2.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[1][0], ))
-      game_name2 = game2.fetchall()[0][0]
-    except:
-      game_name2 = "ゲームが選択されていません"
-
-    try:
-      game3 = db.cursor()
-      game3.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[2][0], ))
-      game_name3 = game3.fetchall()[0][0]
-    except:
-      game_name3 = "ゲームが選択されていません"
-
-    return render_template("profile.html", user_profile=user_profile, games=games, game_name1=game_name1, game_name2=game_name2, game_name3=game_name3)
-
-@app.route("/edit", methods=["GET", "POST"])
-def edit():
-  if request.method == "POST":
-    db = mysql.connector.connect(
-    user ='root',
-    password = 'password',
-    host ='db',
-    database ='app'
-    )
-
-    if request.form.get("up_file"):
-      img_file = request.files['up_file']
-      filename = secure_filename(img_file.filename)
-      img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-      img_file.save(img_url)
-
-      cursor = db.cursor()
-      cursor.execute("UPDATE Profiles SET icon = %s WHERE id = %s", (UPLOAD_FOLDER + filename, session['user_id']))
-      db.commit()
-
-    set_prof = db.cursor()
-    set_prof.execute("UPDATE Profiles SET nickname = %s, password = %s, email = %s, comment = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("password"), request.form.get("email"), request.form.get("comment"), session['user_id']))
-    db.commit()
-
-    if request.form.get("game1"):
-      edit_game1 = db.cursor()
-      edit_game1.execute("SELECT id FROM Game_names WHERE game_name = %s", (request.form.get("game1"),))
-      game_name_1 = edit_game1.fetchall()[0][0]
-      set_game1 = db.cursor()
-      try:
-        set_game1.execute("UPDATE Games SET game_id = %s WHERE user_id = %s AND game_order = 1", (game_name_1 ,session['user_id']))
-      except:
-        set_game1.execute("INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES (%s, %s, %s, %s)" (session['user_id'], game_name_1, 1, 1))
-      db.commit()
-
-    if request.form.get("game2"):
-      edit_game2 = db.cursor()
-      edit_game2.execute("SELECT id FROM Game_names WHERE game_name = %s", (request.form.get("game2"),))
-      game_name_2 = edit_game2.fetchall()[0][0]
-      set_game2 = db.cursor()
-      try:
-        set_game2.execute("UPDATE Games SET game_id = %s WHERE user_id = %s AND game_order = 2", (game_name_2 ,session['user_id']))
-      except:
-        set_game2.execute("INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES (%s, %s, %s, %s)" (session['user_id'], game_name_2, 1, 2))
-      db.commit()
-
-    if request.form.get("game3"):
-      edit_game3 = db.cursor()
-      edit_game3.execute("SELECT id FROM Game_names WHERE game_name = %s", (request.form.get("game1"),))
-      game_name_3 = edit_game3.fetchall()[0][0]
-      set_game3 = db.cursor()
-      try:
-        set_game3.execute("UPDATE Games SET game_id = %s WHERE user_id = %s AND game_order = 3", (game_name_3 ,session['user_id']))
-      except:
-        set_game3.execute("INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES (%s, %s, %s, %s)" (session['user_id'], game_name_3, 1, 3))
-      db.commit()    
-
-    return redirect("/edit")
-  else:
-    db = mysql.connector.connect(
-    user ='root',
-    password = 'password',
-    host ='db',
-    database ='app'
-    )
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM Profiles")
-    user_profile = cursor.fetchall()[0]
-
-    game_list = db.cursor()
-    game_list.execute("SELECT game_name FROM Game_names")
-    games = game_list.fetchall()
-
 @app.route("/twitter")
 def twitter():
     # 1.リクエストトークンを取得する。
@@ -318,8 +202,9 @@ def profile():
             cursor = db.cursor()
             cursor.execute("SELECT * FROM Profiles WHERE id=%s", (session['user_id'], ))
             user_profile = cursor.fetchall()[0]
+            
             game_list = db.cursor()
-            game_list.execute("SELECT game_id, game_level FROM Games WHERE user_id = %s", (session['user_id'],))
+            game_list.execute("SELECT game_id, game_level, game_order FROM Games WHERE user_id = %s", (session['user_id'],))
             games = game_list.fetchall()
 
             try:
@@ -353,38 +238,79 @@ def profile():
 @app.route("/edit", methods=["GET", "POST"])
 def edit():
     if 'loggedin' in session:
-        session['user_id'] = session['user_id']
-        if request.method == "POST":
-            db = mysql.connector.connect(
-            user ='root',
-            password = 'password',
-            host ='db',
-            database ='app'
-            )
-            set_prof = db.cursor()
-            set_prof.execute("UPDATE Profiles SET nickname = %s, password = %s, email = %s, comment = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("password"), request.form.get("email"), request.form.get("comment"), session['user_id']))
-            db.commit()
+      session['user_id'] = session['user_id']
+      if request.method == "POST":
+        db = mysql.connector.connect(
+        user ='root',
+        password = 'password',
+        host ='db',
+        database ='app'
+        )
 
-            #set_game = db.cursor()
-            #set_game.execute("UPDATE Games SET game_id = %s WHERE user_id = %s", ( ,session['user_id']))
-            return redirect("/edit")
-        else:
-            db = mysql.connector.connect(
-            user ='root',
-            password = 'password',
-            host ='db',
-            database ='app'
-            )
-            cursor = db.cursor()
-            cursor.execute("SELECT * FROM Profiles")
-            user_profile = cursor.fetchall()[0]
+        if request.form.get("up_file"):
+          img_file = request.files['up_file']
+          filename = secure_filename(img_file.filename)
+          img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+          img_file.save(img_url)
 
-            game_list = db.cursor()
-            game_list.execute("SELECT game_name FROM Game_names")
-            games = game_list.fetchall()
+          cursor = db.cursor()
+          cursor.execute("UPDATE Profiles SET icon = %s WHERE id = %s", (UPLOAD_FOLDER + filename, session['user_id']))
+          db.commit()
 
-            return render_template("edit.html", user_profile=user_profile, games=games)
-    return redirect(url_for('login'))
+        set_prof = db.cursor()
+        set_prof.execute("UPDATE Profiles SET nickname = %s, password = %s, email = %s, comment = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("password"), request.form.get("email"), request.form.get("comment"), session['user_id']))
+        db.commit()
+
+        if request.form.get("game1"):
+          edit_game1 = db.cursor()
+          edit_game1.execute("SELECT id FROM Game_names WHERE game_name = %s", (request.form.get("game1"),))
+          game_name_1 = edit_game1.fetchall()[0][0]
+          set_game1 = db.cursor()
+          try:
+            set_game1.execute("UPDATE Games SET game_id = %s WHERE user_id = %s AND game_order = 1", (game_name_1 ,session['user_id']))
+          except:
+            set_game1.execute("INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES (%s, %s, %s, %s)" (session['user_id'], game_name_1, 1, 1))
+          db.commit()
+
+        if request.form.get("game2"):
+          edit_game2 = db.cursor()
+          edit_game2.execute("SELECT id FROM Game_names WHERE game_name = %s", (request.form.get("game2"),))
+          game_name_2 = edit_game2.fetchall()[0][0]
+          set_game2 = db.cursor()
+          try:
+            set_game2.execute("UPDATE Games SET game_id = %s WHERE user_id = %s AND game_order = 2", (game_name_2 ,session['user_id']))
+          except:
+            set_game2.execute("INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES (%s, %s, %s, %s)" (session['user_id'], game_name_2, 1, 2))
+          db.commit()
+
+        if request.form.get("game3"):
+          edit_game3 = db.cursor()
+          edit_game3.execute("SELECT id FROM Game_names WHERE game_name = %s", (request.form.get("game1"),))
+          game_name_3 = edit_game3.fetchall()[0][0]
+          set_game3 = db.cursor()
+          try:
+            set_game3.execute("UPDATE Games SET game_id = %s WHERE user_id = %s AND game_order = 3", (game_name_3 ,session['user_id']))
+          except:
+            set_game3.execute("INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES (%s, %s, %s, %s)" (session['user_id'], game_name_3, 1, 3))
+          db.commit()    
+
+        return redirect("/edit")
+      else:
+        db = mysql.connector.connect(
+        user ='root',
+        password = 'password',
+        host ='db',
+        database ='app'
+        )
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM Profiles")
+        user_profile = cursor.fetchall()[0]
+
+        game_list = db.cursor()
+        game_list.execute("SELECT game_name FROM Game_names")
+        games = game_list.fetchall()
+    else:
+      return redirect(url_for('login'))
 
 
 if __name__ == '__main__':
