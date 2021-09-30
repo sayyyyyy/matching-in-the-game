@@ -2,7 +2,7 @@ CREATE DATABASE IF NOT EXISTS app;
 USE app;
 
 
-CREATE TABLE IF NOT EXISTS Profiles (
+CREATE TABLE IF NOT EXISTS Profiles(
   id int PRIMARY KEY AUTO_INCREMENT, 
   nickname varchar(20) NOT NULL, 
   password varchar(20) NOT NULL, 
@@ -70,3 +70,9 @@ INSERT INTO Game_names (game_name) VALUES("Fortnite");
 
 INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(1, 1, 1, 1);
 INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(1, 3, 2, 2);
+
+INSERT INTO Games (user_id, game_id, game_level) VALUES(2, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level) VALUES(2, 1, 3);
+
+INSERT INTO Follows (follow_id, followed_id) VALUES(1, 2);
+INSERT INTO Follows (follow_id, followed_id) VALUES(2, 1);
