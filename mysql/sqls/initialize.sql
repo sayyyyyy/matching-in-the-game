@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS Profiles(
   nickname varchar(20) NOT NULL, 
   password varchar(20) NOT NULL, 
   email varchar(30) NOT NULL, 
-  comment varchar(500) DEFAULT "よろしくお願いします。", 
+  comment varchar(500) DEFAULT "Hello World!", 
   icon varchar(100) DEFAULT "static/default_user_icon.png"
 );
 
