@@ -5,3 +5,4 @@ mysqlclient
 SQLAlchemy
 mysql-connector-python
 requests_oauthlib
+Flask-SocketIO
