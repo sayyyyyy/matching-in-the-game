@@ -11,7 +11,8 @@ Home
 <p>{{ user_game_title }}</p>
 <form action ="/edit" method ="POST" enctype="multipart/form-data">
     <div class ="flex">
-        <img src ="{{ user_profile[5] }}" class ="is-circle">
+        <img id="icon" src ="{{ user_profile[5] }}" class ="is-circle">
+        <input type ="file" id="up_file" name ="up_file" accept="image/*" onchange="setImage(this)">
         <div>
             <input readonly id ="nickname" type ="text" name ="nickname" value="{{ user_profile[1] }}">
             <button type ="button" onclick="edit('nickname')">編集する</button>
@@ -74,9 +75,6 @@ Home
     <p>コメント</p>
     <textarea readonly id ="comment" name ="comment" rows ="5">{{ user_profile[4] }}</textarea>
     <button type ="button" onclick="edit('comment')">編集する</button>
-
-    <input type =file name =up_file>
-    <input type ="submit">
 </form>
 
 <p>フォロー</p>
