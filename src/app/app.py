@@ -108,6 +108,84 @@ def logout():
   session.clear()
   return redirect(url_for('login'))
 
+# @app.route("/register", methods=["GET", "POST"])
+# def register():
+#   """登録フォーム"""
+#   if (request.method == "POST"):
+#     nickname = request.form.get('nickname')
+#     print(nickname)
+#     password = request.form.get('password')
+#     confirm = request.form.get('confirm')
+#     email = request.form.get('email')
+#
+#     if not nickname:
+#         return 'user_nickname is required!'
+#     elif not password:
+#         return 'user_password is not required!'
+#     elif not confirm:
+#         return 'user_confirm is not required!'
+#     elif not email:
+#         return 'user_mail is not required!'
+#
+#     if password != confirm:
+#         return 'Passwords do not match!'
+#
+#
+#     cnx = mysql.connector.connect(user='root', password='password', host='db', port='3306', database='app')
+#     cursor = cnx.cursor()
+#
+# #    account = cursor.fetchone()
+# #    if account:
+# #            session['loggedin'] = True
+# #            session['id'] = account['id']
+# #            session['username'] = account['username']
+# #      return "Register in successfully"
+#
+#
+#     cursor.execute("INSERT INTO Profiles (nickname, password, email) values (%s, %s, %s)", (nickname, password, email,))
+#     cnx.commit()
+#   return render_template('register.html')
+
+
+@app.route('/register2', methods=['GET', 'POST'])
+def register2():
+  msg = ''
+  if request.method == 'POST' and 'nickname' in request.form \
+          and 'password' in request.form and 'email' in request.form:
+    nickname = request.form['nickname']
+    password = request.form['password']
+    email = request.form['email']
+    db = mysql.connector.connect(user='root', password='password',
+                                  host='db', port='3306', database='app')
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM Profiles WHERE nickname=%s AND password=%s',
+                   (nickname, password))
+    account = cursor.fetchone()
+
+    if account:
+      return render_template('login.html')
+
+    else:
+      cursor = db.cursor()
+      cursor.execute("INSERT INTO Profiles (nickname, password, email) values (%s, %s, %s)",(nickname, password, email,))
+      db.commit()
+
+      cursor = db.cursor()
+      cursor.execute('SELECT * FROM Profiles WHERE nickname=%s AND password=%s',(nickname, password))
+      account_new = cursor.fetchone()
+
+      session.permanent = True
+      app.permanent_session_lifetime = timedelta(minutes=3)
+      session.modified = True
+      session['user'] = nickname
+      session['loggedin'] = True
+      session['user_id'] = account_new[0]
+
+      return render_template('main.html')
+
+  else:
+    return render_template('register2.html')
+
 
 @app.route('/google')
 def google():
