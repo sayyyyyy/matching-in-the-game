@@ -148,7 +148,11 @@ Profile
             <p>ニックネーム</p>
             <input readonly type ="text" name ="nickname" value="{{ user_profile[1] }}">
             <div class ="flex">
-                <input type="submit" name="follow" value="フォロー">
+                {% if isFollow2 == 0 %}
+                    <input type="submit" name="follow" value="フォロー">
+                {% else %}
+                    <input type="submit" name="unfollow" value="フォローをやめる">
+                {% endif %}
                 <input type="submit" name="talk" value="トーク">
             </div>
         </div>

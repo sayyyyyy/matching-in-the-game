@@ -16,7 +16,7 @@ Home
         <div>
             <input readonly id ="nickname" type ="text" name ="nickname" value="{{ user_profile[1] }}">
             <button type ="button" onclick="edit('nickname')">編集する</button>
-            <input readonly id ="email" type ="text" name ="email" value="{{ user_profile[3] }}">
+            <input readonly id ="email" type ="email" name ="email" value="{{ user_profile[3] }}">
             <button type ="button" onclick="edit('email')">編集する</button>
             <input readonly id ="password" type ="text" name ="password" value="{{ user_profile[2] }}">
             <button type ="button" onclick="edit('password')">編集する</button>
@@ -78,5 +78,11 @@ Home
 </form>
 
 <p>フォロー</p>
+{% for i in follow_id_list %}
+    <p>{{ i[0] }}</p>
+{% endfor %}
 <p>フォロワー</p>
+{% for j in followed_id_list %}
+    <p>{{ j[0] }}</p>
+{% endfor %}
 {% endblock %}
