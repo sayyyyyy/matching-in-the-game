@@ -41,15 +41,19 @@ token_endpoint = twitter_base_url + ''
 UPLOAD_FOLDER ='./static/images/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-
-@app.route("/")
-def main():
+#データベース
+def cdb():
   db = mysql.connector.connect(
       user='root',
       password='password',
       host='db',
       database='app'
   )
+  return db
+
+@app.route("/")
+def main():
+  db = cdb()
   cursor = db.cursor(buffered=True)
   cursor.execute("SELECT * FROM Profiles")
 
@@ -65,8 +69,7 @@ def login():
   if request.method == 'POST' and 'nickname' in request.form and 'password' in request.form:
     nickname = request.form['nickname']
     password = request.form['password']
-    cnx = mysql.connector.connect(user='root', password='password',
-                                  host='db', port='3306', database='app')
+    cnx = cdb()
     cursor = cnx.cursor()
     cursor.execute('SELECT * FROM Profiles WHERE nickname=%s AND password=%s', (nickname, password))
     account = cursor.fetchone()
@@ -95,8 +98,7 @@ def login():
 
 @app.route('/main')
 def main1():
-  cnx = mysql.connector.connect(user='root', password='password',
-                                host='db', port='3306', database='app')
+  cnx = cdb()
   cursor = cnx.cursor()
   cursor.execute("SELECT * FROM Profiles WHERE id = %s", (session['user_id'],))
   account = cursor.fetchone()
@@ -155,8 +157,7 @@ def register2():
     nickname = request.form['nickname']
     password = request.form['password']
     email = request.form['email']
-    db = mysql.connector.connect(user='root', password='password',
-                                  host='db', port='3306', database='app')
+    db = cdb()
     cursor = db.cursor()
     cursor.execute('SELECT * FROM Profiles WHERE nickname=%s AND password=%s',
                    (nickname, password))
@@ -221,8 +222,7 @@ def check():
   email = id_token['email']
   password = 'password'
 
-  cnx = mysql.connector.connect(user='root', password='password',
-                               host='db', port='3306', database='app')
+  cnx = cdb()
   cursor = cnx.cursor()
   cursor.execute('SELECT * FROM Profiles WHERE nickname=%s AND email=%s', (nick_name, email,))
   account = cursor.fetchone()
@@ -239,7 +239,7 @@ def check():
      return render_template('main.html')
 
   else:
-     cnx = mysql.connector.connect(user='root', password='password', host='db', database='app')
+     cnx = cdb()
      cursor = cnx.cursor()
      cursor.execute("INSERT INTO Profiles (nickname, password, email) values (%s, %s, %s)", (nick_name, password, email, ))
      cnx.commit()
@@ -305,7 +305,7 @@ def callback():
   password = nick_name
   email = nick_name
 
-  cnx = mysql.connector.connect(user='root', password='password', host='db', database='app')
+  cnx = cdb()
   cursor = cnx.cursor()
   cursor.execute('SELECT * FROM Profiles WHERE nickname=%s AND email=%s', (nick_name, email))
   account = cursor.fetchone()
@@ -320,7 +320,7 @@ def callback():
      return render_template('main.html')
 
   else:
-     cnx = mysql.connector.connect(user='root', password='password', host='db', database='app')
+     cnx = cdb()
      cursor = cnx.cursor()
      cursor.execute("INSERT INTO Profiles (nickname, password, email) values (%s, %s, %s)", (nick_name, password, email, ))
      cnx.commit()
@@ -343,13 +343,7 @@ def profile():
         #session['user_id'] = session['user_id']
         session['profile_id'] = 1
 
-        db = mysql.connector.connect(
-        user='root',
-        password='password',
-        host='db',
-        database='app'
-        
-        )
+        db = cdb()
         if request.method == "POST":
           if request.form.get("follow") == "フォロー":
             user_follow = db.cursor()
@@ -430,12 +424,7 @@ def profile():
 def edit():
     if 'loggedin' in session:
       session['user_id'] = session['user_id']
-      db = mysql.connector.connect(
-      user='root',
-      password='password',
-      host='db',
-      database='app'
-      )
+      db = cdb()
 
       if request.method == "POST":
         # 画像変更
