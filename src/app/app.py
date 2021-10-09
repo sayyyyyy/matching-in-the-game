@@ -77,7 +77,8 @@ def login():
             session['user'] = user
             session['loggedin'] = True
             session['user_id'] = account[0]
-            return render_template('main.html', session=user, session_id=session['user_id'], account=account, log=session['loggedin'], user=user)
+            return redirect('/top')
+            #return render_template('main.html', session=user, session_id=session['user_id'], account=account, log=session['loggedin'], user=user)
 
         # elif 'user' in session:
         #     return render_template('main.html', session=session['user'])
@@ -176,8 +177,47 @@ def profile():
         session['user_id'] = session['user_id']
 
         if request.method == "POST":
-            return redirect("/")
 
+            db = mysql.connector.connect(
+                user ='root',
+                password = 'password',
+                host ='db',
+                database ='app')
+
+            each_id = request.form.get("friend_id")
+            cursor = db.cursor()
+            cursor.execute("SELECT * FROM Profiles WHERE id=%s", (each_id, ))
+            user_profile = cursor.fetchall()[0]
+            
+            game_list = db.cursor()
+            game_list.execute("SELECT game_id, game_level, game_order FROM Games WHERE user_id = %s", (each_id,))
+            games = game_list.fetchall()
+
+            try:
+                game1 = db.cursor()
+                game1.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[0][0], ))
+                game_name1 = game1.fetchall()[0][0]
+            except:
+                game_name1 = "ゲームが選択されていません"
+
+            try:
+                game2 = db.cursor()
+                game2.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[1][0], ))
+                game_name2 = game2.fetchall()[0][0]
+            except:
+                game_name2 = "ゲームが選択されていません"
+
+            try:
+                game3 = db.cursor()
+                game3.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[2][0], ))
+                game_name3 = game3.fetchall()[0][0]
+            except:
+                game_name3 = "ゲームが選択されていません"
+            
+            #ログインユーザーじゃないため編集ボタンを表示しないようにする
+
+            user_flag = 1
+            return render_template("profile.html", user_profile=user_profile, games=games, game_name1=game_name1, game_name2=game_name2, game_name3=game_name3, user_flag=user_flag)
         else:
             db = mysql.connector.connect(
                 user ='root',
@@ -213,9 +253,7 @@ def profile():
             except:
                 game_name3 = "ゲームが選択されていません"
 
-        return render_template("profile.html", user_profile=user_profile,
-                               games=games, game_name1=game_name1, game_name2=game_name2,
-                               game_name3=game_name3)
+        return render_template("profile.html", user_profile=user_profile, games=games, game_name1=game_name1, game_name2=game_name2, game_name3=game_name3)
 
     return redirect(url_for('login'))
 
@@ -341,6 +379,151 @@ def edit():
         return render_template("edit.html", games=games, user_profile=user_profile, gameaaa=gameaaa)
     else:
       return redirect(url_for('login'))
+
+
+@app.route("/top", methods=["GET", "POST"])
+def top():
+
+   if 'loggedin' in session:
+       session['user_id'] = session['user_id']
+       
+       if request.method == "GET":
+
+          db = mysql.connector.connect(
+            user ='root',
+            password = 'password',
+            host ='db',
+            database ='app'
+            )
+        #相互フォローの友達のアイコントニックネームを表示
+
+        #ログインユーザーがフォローしている人
+          follow_id = db.cursor(buffered=True)
+          follow_id.execute("SELECT followed_id from Follows where follow_id = %s", (session['user_id'],))
+      #ログインユーザーをフォローしている人
+          followed_id = db.cursor(buffered=True)
+          followed_id.execute("SELECT follow_id from Follows where followed_id = %s", (session['user_id'],))
+
+          follow_f = follow_id.fetchall()
+          followed_f = followed_id.fetchall()
+
+          follow_li = [i[0] for i in follow_f]
+          
+          followed_li = [i[0] for i in followed_f]
+        #共通する部分をリスト化
+          Mutuals = tuple(set(follow_li) & set(followed_li))
+          
+          Mutual_friends = []
+
+          for Mutual in Mutuals:
+            list_friends = db.cursor(buffered=True)
+            list_friends.execute("SELECT icon, nickname, id from Profiles where id = %s", (Mutual,))
+            m = list_friends.fetchall()
+            Mutual_friends.append(m)
+
+          
+          return render_template('top.html', user_id=session['user_id'], Mutuals=Mutuals, Mutual_friends=Mutual_friends)
+
+@app.route("/talk", methods=["GET", "POST"])
+def each():
+  if 'loggedin' in session:
+       session['user_id'] = session['user_id']
+       
+       if request.method == "POST":
+
+          db = mysql.connector.connect(
+                  user ='root',
+                  password = 'password',
+                  host ='db',
+                  database ='app'
+                  )
+
+          each_id = request.form.get("talk_id")
+
+          return render_template("talk.html", each_id=each_id, login_user=session['user_id'])
+
+       else:
+          return redirect("/")
+
+
+@app.route('/search', methods=["GET", "POST"])
+def search():
+  if 'loggedin' in session:
+      session['user_id'] = session['user_id']
+
+      if request.method == "GET":
+        db = mysql.connector.connect(
+                user ='root',
+                password = 'password',
+                host ='db',
+                database ='app'
+                )
+
+        game_names = db.cursor(buffered=True)
+        game_names.execute("SELECT game_name from Game_names")
+
+        return render_template('search.html', game_names=game_names)
+
+      else:
+        if request.form.get("game_name") and request.form.get("game_level"):
+          game_name = request.form.get("game_name")
+          game_level = request.form.get("game_level")
+
+          db = mysql.connector.connect(
+                user ='root',
+                password = 'password',
+                host ='db',
+                database ='app'
+                )
+          
+          game_names = db.cursor(buffered=True)
+          game_names.execute("SELECT game_name from Game_names")
+
+          #ゲーム名とレベルで検索し、該当するIDを取得
+          game_search = db.cursor(buffered=True)
+          game_search.execute("SELECT user_id FROM Games INNER JOIN Game_names on Games.game_id = Game_names.id WHERE game_name = %s AND game_level = %s", (game_name, game_level, ))
+          id_search = game_search.fetchall()
+
+          #取得したIDの中でログインユーザーとログインユーザーがフォローしている人のIDを抜き取る
+          follow_id = db.cursor(buffered=True)
+          follow_id.execute("SELECT followed_id from Follows where follow_id = %s", (session['user_id'],))
+          follow_f = follow_id.fetchall()
+
+          id_list = [i[0] for i in id_search]
+          follow_list = [i[0] for i in follow_f]
+          follow_list.append(session['user_id'])
+
+          results = tuple(set(id_list) - set(follow_list))
+
+          search_result = []
+
+          for result in results:
+            game_list = []
+            profile_search = db.cursor(buffered=True)
+            profile_search.execute("SELECT P.id, P.nickname, P.icon, P.comment from Profiles as P where P.id = %s", (result,))
+            p = profile_search.fetchall()
+            p = list(p[0])
+            
+            for i in range(1, 4):
+
+              game_search = db.cursor(buffered=True)
+              game_search.execute("SELECT G.game_order, G.game_level, N.Game_name from Games as G INNER JOIN Game_names as N ON G.game_id = N.id where G.user_id = %s and G.game_order = %s", (result, i,))
+              g_list = game_search.fetchall()
+              g_list = list(g_list[0])
+
+              #search_result.append(g_list)
+              for g in g_list:
+                p.append(g)
+            
+            search_result.append(p)
+
+          return render_template('search.html', game_names = game_names, id_search = search_result)
+
+
+        
+
+
+
 
 
 if __name__ == '__main__':

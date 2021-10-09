@@ -62,6 +62,10 @@ CREATE TABLE IF NOT EXISTS Messages (
 
 INSERT INTO Profiles (nickname, password, email) VALUES("test_user1", "password", "test1@email.com");
 INSERT INTO Profiles (nickname, password, email) VALUES("test_user2", "password", "test2@email.com");
+INSERT INTO Profiles (nickname, password, email) VALUES("test_user3", "password", "test3@email.com");
+INSERT INTO Profiles (nickname, password, email) VALUES("test_user4", "password", "test4@email.com");
+INSERT INTO Profiles (nickname, password, email) VALUES("test_user5", "password", "test5@email.com");
+INSERT INTO Profiles (nickname, password, email) VALUES("test_user6", "password", "test6@email.com");
 
 INSERT INTO Game_names (game_name) VALUES("APEX LEGENDS");
 INSERT INTO Game_names (game_name) VALUES("Minecraft");
@@ -73,3 +77,5 @@ INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(1, 3, 2, 2);
 
 INSERT INTO Follows (follow_id, followed_id) VALUES(1, 2);
 INSERT INTO Follows (follow_id, followed_id) VALUES(2, 1);
+
+

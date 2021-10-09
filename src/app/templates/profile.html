@@ -11,8 +11,13 @@ Profile
 
 <div class ="nav">
     <p><a href ="/">戻る</a></p>
-    <p><a href ="edit">編集</a></p>
+    {% if user_flag == 1 %}
+    <p></p>
+    {% else %}
+    <p class="edit"><a href ="edit">編集</a></p>
+    {% endif %}
 </div>
+
 <form action ="/profile" method ="POST">
     <div class ="flex">
         <img src ="{{ user_profile[5] }}" class ="is-circle">
@@ -54,9 +59,15 @@ Profile
                     <tr>
                         <td>アイコン</td>
                         <td>{{ game_name3 }}</td>
+                        {% if games[1][1] is not none %}
                         <td>
-              
+                            {% for i in range(games[1][1]) %}
+                                ☆
+                            {% endfor %}
                         </td>
+                        {% else %}
+                        <td>No</td>
+                        {% endif %}
                     </tr>
                 </tbody>
             </table>
