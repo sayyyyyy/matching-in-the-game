@@ -48,3 +48,8 @@
     margin: 10px;
     font-size: 10px;
 }
+
+.right_info {
+    display: flex;
+    flex-direction: column;
+}

@@ -372,7 +372,8 @@ def profile():
 
         db = cdb()
         if request.method == "POST":
-
+          
+          #ほかの人のプロフィールを見るとき
           if request.form.get("friend_id"):
             each_id = request.form.get("friend_id")
 
@@ -422,7 +423,7 @@ def profile():
             except:
                 game_name3 = "ゲームが選択されていません"
 
-
+            Not_edit_flag = 1
             # follow = db.cursor()
             # follow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s", (session['profile_id'], ))
             # follow_count = follow.fetchall()[0][0]
@@ -433,7 +434,7 @@ def profile():
 
             return render_template("profile.html", user_profile=user_profile,
                                star1=star1, star2=star2, star3=star3, game_name1=game_name1, game_name2=game_name2,
-                               game_name3=game_name3)
+                               game_name3=game_name3, Not_edit_flag=Not_edit_flag)
 
 
           elif request.form.get("follow") == "フォロー":
@@ -768,6 +769,44 @@ def search():
             search_result.append(p)
 
           return render_template('search.html', game_names = game_names, id_search = search_result)
+        
+        elif request.form.get("nickname_search"):
+
+          l = []
+          db = cdb()
+          game_names = db.cursor(buffered=True)
+          game_names.execute("SELECT game_name from Game_names")
+
+          nickname = request.form.get("nickname_search")
+          
+          nick = db.cursor()
+          nick.execute("SELECT P.id, P.nickname, P.icon, P.comment from Profiles as P where P.nickname = %s", (nickname,))
+          n = nick.fetchall()
+          if len(n) == 0:
+            msg = "該当するユーザーはいませんでした"
+            return render_template("search.html", game_names = game_names, n = msg)
+          n = list(n[0])
+
+          for i in range(1,4):
+
+            game_search = db.cursor(buffered=True)
+            game_search.execute("SELECT G.game_order, G.game_level, N.Game_name from Games as G INNER JOIN Game_names as N ON G.game_id = N.id where G.user_id = %s and G.game_order = %s", (n[0], i,))
+            g_list = game_search.fetchall()
+            g_list = list(g_list[0])
+
+            for g in g_list:
+                n.append(g)
+
+          l.append(n)
+          
+          return render_template('search.html', game_names = game_names, id_search = l)
+        
+        else:
+          db = cdb()
+          game_names = db.cursor(buffered=True)
+          game_names.execute("SELECT game_name from Game_names")
+          msg = "検索できませんでした。"
+          return render_template("search.html", game_names = game_names, n = msg)
 
 if __name__ == '__main__':
   app.run()
