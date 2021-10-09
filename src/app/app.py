@@ -51,21 +51,7 @@ socketio = SocketIO(app, manage_sesison=False)
 socketio.init_app(app, cors_allowed_origins="*")
 
 #メール設定
-def send_mail(email, message):
-  smtp_host = 'smtp.gmail.com'
-  smtp_port = 465
-  username = 'd958956a6b650@gmail.com'
-  password = 'mnmoqbimsnacnacb'
-  smtp = smtplib.SMTP_SSL(smtp_host, smtp_port)
-  smtp.login(username, password)
 
-  msg = MIMEText(message, 'html')
-  msg["Subject"] = "タイトル"
-  msg["To"] = email
-  msg["From"] = "SNS"
-  smtp.send_message(msg)
-
-  smtp.quit()
 
 #データベース
 def cdb():
@@ -108,7 +94,7 @@ def login():
       session['user'] = user
       session['loggedin'] = True
       session['user_id'] = account[0]
-      return redirect("/main")
+      return redirect("/top")
 
     # elif 'user' in session:
     #     return render_template('main.html', session=session['user'])
@@ -175,6 +161,23 @@ def logout():
 #   return render_template('register.html')
 
 
+def register_interface(words, limit_words):
+  if len(words) < limit_words:
+    return False
+  is_match = [0,0,0] # 大文字、小文字、数字なら各要素に1をセット
+  for c in words:
+    if re.match(r'[A-Z]',c):
+      is_match[0] = 1
+    elif re.match(r'[a-z]',c):
+      is_match[1] = 1
+    elif re.match(r'[0-9]',c):
+      is_match[2] = 1
+# もし「上記のみで構成される」という制約をつけたいなら、以下のコメント部分を生かす
+    else:
+      return False # それ以外はだめ
+  return sum(is_match) == 3 # すべてを含む
+
+
 @app.route('/register2', methods=['GET', 'POST'])
 def register2():
   msg = ''
@@ -183,6 +186,17 @@ def register2():
     nickname = request.form['nickname']
     password = request.form['password']
     email = request.form['email']
+
+    if (nickname is None) or (password is None) or (email is None):
+      pass
+    else:
+      if register_interface(password, 8) == False:
+        msg = 'パスワード入力に誤りがあります'
+        return render_template('register2.html', msg=msg)
+      if register_interface(nickname, 4) == False:
+        msg = 'ニックネーム入力に誤りがあります'
+        return render_template('register2.html', msg=msg)
+
     db = cdb()
     cursor = db.cursor()
     cursor.execute('SELECT * FROM Profiles WHERE nickname=%s AND password=%s',
@@ -371,7 +385,71 @@ def profile():
 
         db = cdb()
         if request.method == "POST":
-          if request.form.get("follow") == "フォロー":
+
+          if request.form.get("friend_id"):
+            each_id = request.form.get("friend_id")
+
+            cursor = db.cursor()
+            cursor.execute("SELECT * FROM Profiles WHERE id=%s", (each_id, ))
+            user_profile = cursor.fetchall()[0]
+
+            # isFollow = db.cursor()
+            # isFollow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s AND followed_id = %s", (session['user_id'], session['profile_id']))
+            # isFollow2 = isFollow.fetchall()[0][0]
+            
+            game_list = db.cursor()
+            game_list.execute("SELECT game_id, game_level, game_order FROM Games WHERE user_id = %s", (each_id,))
+            games = game_list.fetchall()
+
+            try:
+              star1 = games[0][1]
+            except:  
+              star1 = 0
+            try:
+              star2 = games[1][1]
+            except:
+              star2 = 0
+            try:              
+              star3 = games[2][1]
+            except:
+              star3 = 0
+
+            try:
+                game1 = db.cursor()
+                game1.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[0][0], ))
+                game_name1 = game1.fetchall()[0][0]
+            except:
+                game_name1 = "ゲームが選択されていません"
+
+            try:
+                game2 = db.cursor()
+                game2.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[1][0], ))
+                game_name2 = game2.fetchall()[0][0]
+            except:
+                game_name2 = "ゲームが選択されていません"
+
+            try:
+                game3 = db.cursor()
+                game3.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[2][0], ))
+                game_name3 = game3.fetchall()[0][0]
+            except:
+                game_name3 = "ゲームが選択されていません"
+
+
+            # follow = db.cursor()
+            # follow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s", (session['profile_id'], ))
+            # follow_count = follow.fetchall()[0][0]
+
+            # followed = db.cursor()
+            # followed.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s", (session['profile_id'],))
+            # followed_count = followed.fetchall()[0][0]
+
+            return render_template("profile.html", user_profile=user_profile,
+                               star1=star1, star2=star2, star3=star3, game_name1=game_name1, game_name2=game_name2,
+                               game_name3=game_name3)
+
+
+          elif request.form.get("follow") == "フォロー":
             user_follow = db.cursor()
             user_follow.execute("INSERT INTO Follows (follow_id, followed_id) VALUES (%s, %s)", (session['user_id'], session['profile_id']))
             db.commit()
@@ -547,10 +625,10 @@ def edit():
             pass
 
         # その他変更
-        set_prof = db.cursor()
-        set_prof.execute("UPDATE Profiles SET nickname = %s, password = %s, email = %s, comment = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("password"), request.form.get("email"), request.form.get("comment"), session['user_id']))
-        db.commit()
-        return redirect("/edit")
+          set_prof = db.cursor()
+          set_prof.execute("UPDATE Profiles SET nickname = %s, password = %s, email = %s, comment = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("password"), request.form.get("email"), request.form.get("comment"), session['user_id']))
+          db.commit()
+          return redirect("/edit")
       else:
         cursor = db.cursor()
         cursor.execute("SELECT * FROM Profiles WHERE id = %s", (session['user_id'],))
@@ -576,19 +654,6 @@ def edit():
     else:
       return redirect(url_for('login'))
 
-@app.route("/talk", methods=['GET', 'POST'])
-def talk():
-  if request.method == "POST":
-    return render_template("talk.html", session=session)
-  else:
-    session['room'] = 'test'
-    session['user_id'] = '1'
-    #db = cdb()
-    #follow = db.cursor()
-    #follow.execute("SELECT nickname FROM Profiles WHERE id IN (SELECT followed_id FROM Follows WHERE follow_id = %s)", (session['user_id'], ))
-    #follow_id_list = follow.fetchall()[0]    
-    return render_template("talk.html", session=session)
-
 @socketio.on('join', namespace='/talk')
 def join(message):
     room = session['room']
@@ -609,6 +674,144 @@ def left(message):
     leave_room(room)
     session.clear()
     emit('status', {'msg:' + username + ' has left the room.'}, room=room)
+
+@app.route("/top", methods=["GET", "POST"])
+def top():
+
+   if 'loggedin' in session:
+       session['user_id'] = session['user_id']
+       
+       if request.method == "GET":
+
+          db = mysql.connector.connect(
+            user ='root',
+            password = 'password',
+            host ='db',
+            database ='app'
+            )
+        #相互フォローの友達のアイコントニックネームを表示
+
+        #ログインユーザーがフォローしている人
+          follow_id = db.cursor(buffered=True)
+          follow_id.execute("SELECT followed_id from Follows where follow_id = %s", (session['user_id'],))
+      #ログインユーザーをフォローしている人
+          followed_id = db.cursor(buffered=True)
+          followed_id.execute("SELECT follow_id from Follows where followed_id = %s", (session['user_id'],))
+
+          follow_f = follow_id.fetchall()
+          followed_f = followed_id.fetchall()
+
+          follow_li = [i[0] for i in follow_f]
+          
+          followed_li = [i[0] for i in followed_f]
+        #共通する部分をリスト化
+          Mutuals = tuple(set(follow_li) & set(followed_li))
+          
+          Mutual_friends = []
+
+          for Mutual in Mutuals:
+            list_friends = db.cursor(buffered=True)
+            list_friends.execute("SELECT icon, nickname, id from Profiles where id = %s", (Mutual,))
+            m = list_friends.fetchall()
+            Mutual_friends.append(m)
+
+          
+          return render_template('top.html', user_id=session['user_id'], Mutuals=Mutuals, Mutual_friends=Mutual_friends)
+
+@app.route("/talk", methods=["GET", "POST"])
+def each():
+  if 'loggedin' in session:
+       session['user_id'] = session['user_id']
+       
+       if request.method == "POST":
+
+          db = mysql.connector.connect(
+                  user ='root',
+                  password = 'password',
+                  host ='db',
+                  database ='app'
+                  )
+
+          each_id = request.form.get("talk_id")
+
+          return render_template("talk.html", each_id=each_id, login_user=session['user_id'])
+
+       else:
+          return redirect("/")
+
+
+@app.route('/search', methods=["GET", "POST"])
+def search():
+  if 'loggedin' in session:
+      session['user_id'] = session['user_id']
+
+      if request.method == "GET":
+        db = mysql.connector.connect(
+                user ='root',
+                password = 'password',
+                host ='db',
+                database ='app'
+                )
+
+        game_names = db.cursor(buffered=True)
+        game_names.execute("SELECT game_name from Game_names")
+
+        return render_template('search.html', game_names=game_names)
+
+      else:
+        if request.form.get("game_name") and request.form.get("game_level"):
+          game_name = request.form.get("game_name")
+          game_level = request.form.get("game_level")
+
+          db = mysql.connector.connect(
+                user ='root',
+                password = 'password',
+                host ='db',
+                database ='app'
+                )
+          
+          game_names = db.cursor(buffered=True)
+          game_names.execute("SELECT game_name from Game_names")
+
+          #ゲーム名とレベルで検索し、該当するIDを取得
+          game_search = db.cursor(buffered=True)
+          game_search.execute("SELECT user_id FROM Games INNER JOIN Game_names on Games.game_id = Game_names.id WHERE game_name = %s AND game_level = %s", (game_name, game_level, ))
+          id_search = game_search.fetchall()
+
+          #取得したIDの中でログインユーザーとログインユーザーがフォローしている人のIDを抜き取る
+          follow_id = db.cursor(buffered=True)
+          follow_id.execute("SELECT followed_id from Follows where follow_id = %s", (session['user_id'],))
+          follow_f = follow_id.fetchall()
+
+          id_list = [i[0] for i in id_search]
+          follow_list = [i[0] for i in follow_f]
+          follow_list.append(session['user_id'])
+
+          results = tuple(set(id_list) - set(follow_list))
+
+          search_result = []
+
+          for result in results:
+            game_list = []
+            profile_search = db.cursor(buffered=True)
+            profile_search.execute("SELECT P.id, P.nickname, P.icon, P.comment from Profiles as P where P.id = %s", (result,))
+            p = profile_search.fetchall()
+            p = list(p[0])
+            
+            for i in range(1, 4):
+
+              game_search = db.cursor(buffered=True)
+              game_search.execute("SELECT G.game_order, G.game_level, N.Game_name from Games as G INNER JOIN Game_names as N ON G.game_id = N.id where G.user_id = %s and G.game_order = %s", (result, i,))
+              g_list = game_search.fetchall()
+              g_list = list(g_list[0])
+
+              #search_result.append(g_list)
+              for g in g_list:
+                p.append(g)
+            
+            search_result.append(p)
+
+          return render_template('search.html', game_names = game_names, id_search = search_result)
 
 if __name__ == '__main__':
   socketio.run(app, debug=True)

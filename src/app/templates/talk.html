@@ -41,6 +41,11 @@
 </head>
 
 <body>
+    <p>ログインユーザーと閲覧されたユーザのIDをトークルームに値を渡す</p>
+    <p>ログインユーザー</p>
+    {{ login_user }}
+    <p>閲覧されたユーザー</p>
+    {{ each_id }}
     <p><a href="/">戻る</a></p>
     <div class="flex">
         <p>グループ</p>
@@ -59,5 +64,5 @@
 
         </div>
     </div>
-</body>
+
 </html>
