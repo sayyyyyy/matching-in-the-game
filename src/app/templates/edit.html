@@ -12,10 +12,11 @@ Home
 <form action ="/edit" method ="POST" enctype="multipart/form-data">
     <div class ="flex">
         <img src ="{{ user_profile[5] }}" class ="is-circle">
+        <input type ="file" id="up_file" name ="up_file" accept="image/*" onchange="setImage(this)">
         <div>
             <input readonly id ="nickname" type ="text" name ="nickname" value="{{ user_profile[1] }}">
             <button type ="button" onclick="edit('nickname')">編集する</button>
-            <input readonly id ="email" type ="text" name ="email" value="{{ user_profile[3] }}">
+            <input readonly id ="email" type ="email" name ="email" value="{{ user_profile[3] }}">
             <button type ="button" onclick="edit('email')">編集する</button>
             <input readonly id ="password" type ="text" name ="password" value="{{ user_profile[2] }}">
             <button type ="button" onclick="edit('password')">編集する</button>
@@ -74,11 +75,14 @@ Home
     <p>コメント</p>
     <textarea readonly id ="comment" name ="comment" rows ="5">{{ user_profile[4] }}</textarea>
     <button type ="button" onclick="edit('comment')">編集する</button>
-
-    <input type =file name =up_file>
-    <input type ="submit">
 </form>
 
 <p>フォロー</p>
+{% for i in follow_id_list %}
+    <p>{{ i[0] }}</p>
+{% endfor %}
 <p>フォロワー</p>
+{% for j in followed_id_list %}
+    <p>{{ j[0] }}</p>
+{% endfor %}
 {% endblock %}

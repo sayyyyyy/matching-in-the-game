@@ -10,6 +10,7 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: app
       MYSQL_ROOT_HOST: '%'
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
   appserver:
     build:
       context: ./src/
