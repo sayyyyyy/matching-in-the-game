@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel ="stylesheet" href ="../static/style.css">
+    <title>Talk</title>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+        var socket;
+        $(document).ready(function(){
+            socket = io.connect('http://' + document.domain + ':' + location.port + '/talk');
+            console.log(socket);
+            socket.on('connect', function() {
+                socket.emit('join', {});
+            });
+            socket.on('status', function(data) {
+                $('#chat').val($('#chat').val() + '<' + data.msg + '>\n');
+                $('#chat').scrollTop($('#chat')[0].scrollHeight);
+            });
+            socket.on('message', function(data) {
+                $('#chat').val($('#chat').val() + data.msg + '\n');
+                $('#chat').scrollTop($('#chat')[0].scrollHeight);
+            });
+            $('#send').click(function(e) {
+                    text = $('#text').val();
+                    $('#text').val('');
+                    socket.emit('text', {msg: text});
+            });
+        });
+        function leave_room() {
+            socket.emit('left', {}, function() {
+                socket.disconnect();
+                // go back to the login page
+                window.location.href = "{{ url_for('main') }}";
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <p><a href="/">戻る</a></p>
+    <div class="flex">
+        <p>グループ</p>
+        <div>
+            <h2>{{session['room']}}</h2>
+            <h2>{{session['user_id']}}</h2>
+            <textarea readonly id="chat" cols="60" rows="10" placeholder="メッセージはありません"></textarea>
+            <input type="text" id="text" size="60" placeholder="メッセージを入力してください" />
+            <button type="button" id="send" class="" onclick="leave_room()">SEND</button>
+        </div>
+        <div>
+            <p>友達</p>
+            {% for i in follow_id_list %}   
+                <p>{{i}}</p>
+            {% endfor %}
+
+        </div>
+    </div>
+</body>
+</html>
