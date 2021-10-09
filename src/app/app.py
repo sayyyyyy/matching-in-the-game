@@ -149,6 +149,23 @@ def logout():
 #   return render_template('register.html')
 
 
+def register_interface(words, limit_words):
+  if len(words) < limit_words:
+    return False
+  is_match = [0,0,0] # 大文字、小文字、数字なら各要素に1をセット
+  for c in words:
+    if re.match(r'[A-Z]',c):
+      is_match[0] = 1
+    elif re.match(r'[a-z]',c):
+      is_match[1] = 1
+    elif re.match(r'[0-9]',c):
+      is_match[2] = 1
+# もし「上記のみで構成される」という制約をつけたいなら、以下のコメント部分を生かす
+    else:
+      return False # それ以外はだめ
+  return sum(is_match) == 3 # すべてを含む
+
+
 @app.route('/register2', methods=['GET', 'POST'])
 def register2():
   msg = ''
@@ -157,6 +174,17 @@ def register2():
     nickname = request.form['nickname']
     password = request.form['password']
     email = request.form['email']
+
+    if (nickname is None) or (password is None) or (email is None):
+      pass
+    else:
+      if register_interface(password, 8) == False:
+        msg = 'パスワード入力に誤りがあります'
+        return render_template('register2.html', msg=msg)
+      if register_interface(nickname, 4) == False:
+        msg = 'ニックネーム入力に誤りがあります'
+        return render_template('register2.html', msg=msg)
+
     db = cdb()
     cursor = db.cursor()
     cursor.execute('SELECT * FROM Profiles WHERE nickname=%s AND password=%s',
