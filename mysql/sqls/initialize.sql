@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS Profiles(
   id int PRIMARY KEY AUTO_INCREMENT, 
   nickname varchar(20) NOT NULL, 
   password varchar(20) NOT NULL, 
-  email varchar(30) NOT NULL, 
+  email varchar(50) NOT NULL, 
   comment varchar(500) DEFAULT "Hello World!", 
   icon varchar(100) DEFAULT "static/default_user_icon.png"
 );

@@ -9,16 +9,20 @@ import urllib.parse
 import urllib.parse as parse
 import json
 import base64
+import socketio
 from werkzeug.utils import secure_filename
 import os
-from requests_oauthlib import OAuth1Session
+#from requests_oauthlib import OAuth1Session
+from flask_socketio import SocketIO, join_room, leave_room, emit
+from flask_session import Session
+import ssl
+import smtplib
+from email.mime.text import MIMEText
 
 app = Flask(__name__)
 
 # セッション設定
-app.secret_key = 'user_id'
-app.secret_key = 'profile_id'
-app.config['SECRET_KEY'] = b'aaalllaa' # これが暗号化／復号のための鍵になる
+#app.config['SECRET_KEY'] = b'aaalllaa' # これが暗号化／復号のための鍵になる
 
 # Googleの設定
 client_id = ''
@@ -39,6 +43,16 @@ token_endpoint = twitter_base_url + ''
 # ファイルアップロード設定
 UPLOAD_FOLDER ='./static/images/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+#SocketIO設定
+app.config['SECRET_KEY'] = 'secret!'
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
+socketio = SocketIO(app, manage_sesison=False)
+socketio.init_app(app, cors_allowed_origins="*")
+
+#メール設定
+
 
 #データベース
 def cdb():
@@ -368,7 +382,7 @@ def callback():
 def profile():
     if 'loggedin' in session:
         #session['user_id'] = session['user_id']
-        session['profile_id'] = 1
+        session['profile_id'] = 2
 
         db = cdb()
         if request.method == "POST":
@@ -441,11 +455,22 @@ def profile():
             user_follow = db.cursor()
             user_follow.execute("INSERT INTO Follows (follow_id, followed_id) VALUES (%s, %s)", (session['user_id'], session['profile_id']))
             db.commit()
+            follow = db.cursor()
+            follow.execute("SELECT nickname FROM Profiles WHERE id = %s", (session['user_id'],))
+            follow_name = follow.fetchall()[0][0]
+            followed = db.cursor()
+            followed.execute("SELECT nickname, email FROM Profiles WHERE id = %s", (session['profile_id'],))
+            followed_pro = followed.fetchall()[0]
+            followed_name = followed_pro[0]
+            followed_mail = followed_pro[1]
+
+            send_mail(followed_mail, f"{followed_name}さん。あなたは{follow_name}さんにフォローされました")
           elif request.form.get("unfollow") == "フォローをやめる":
             user_unfollow = db.cursor()
             user_unfollow.execute("DELETE FROM Follows WHERE follow_id = %s AND followed_id = %s", (session['user_id'], session['profile_id']))
+            db.commit()
           elif request.form.get("talk") == "トーク":
-            return "トーク"          
+            return redirect("/talk")       
           
           return redirect("/profile")
 
@@ -608,7 +633,7 @@ def edit():
           return redirect("/edit")
       else:
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM Profiles")
+        cursor.execute("SELECT * FROM Profiles WHERE id = %s", (session['user_id'],))
         user_profile = cursor.fetchall()[0]
 
         game_list = db.cursor()
@@ -616,7 +641,7 @@ def edit():
         games = game_list.fetchall()
 
         game_all = db.cursor()
-        game_all.execute("SELECT * FROM Games")
+        game_all.execute("SELECT * FROM Games WHERE user_id = %s", (session['user_id'],))
         gameaaa = game_all.fetchall()
 
         follow = db.cursor()
@@ -631,6 +656,26 @@ def edit():
     else:
       return redirect(url_for('login'))
 
+@socketio.on('join', namespace='/talk')
+def join(message):
+    room = session['room']
+    join_room(room)
+    emit('status', {'msg :' + str(session['user_id']) + 'が入室しました'}, room=room)
+
+
+@socketio.on('text', namespace='/talk')
+def text(message):
+    room = session['room']
+    emit('message', {'msg :' + session['user_id'] + ' : ' + message['msg']}, room=room)
+
+
+@socketio.on('left', namespace='/talk')
+def left(message):
+    room = session['room']
+    username = session['user_id']
+    leave_room(room)
+    session.clear()
+    emit('status', {'msg:' + username + ' has left the room.'}, room=room)
 
 @app.route("/top", methods=["GET", "POST"])
 def top():
@@ -809,4 +854,4 @@ def search():
           return render_template("search.html", game_names = game_names, n = msg)
 
 if __name__ == '__main__':
-  app.run()
+  socketio.run(app, debug=True)
