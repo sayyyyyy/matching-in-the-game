@@ -30,11 +30,16 @@
         </div>
         <input class="search_btn" type="submit" value="search">
     </form>
+    {% if id_search %}
     {% for profile in id_search %}
     <div class="result">
         <div class="right_info">
             <p class="nickname">{{ profile[1] }}</p>
             <img class="search_icon" src="{{ profile[2] }}">
+            <form action="/profile" method="POST">
+                <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ profile[0] }}">
+                <button type="submit" name="profile">プロフを表示する</button>          
+            </form>
         </div>
         <div class="left_info">
             <ul>
@@ -58,9 +63,17 @@
                     </ul>
                 </li>
             </ul>
-            <p>{{ profile[3] }}</p>
+            <p class="short_comment" maxlength="5">{{ profile[3][0:11] }}...</p>
         </div>
     </div>
     {% endfor %}
+    {% else %}
+        {% if n %}
+        <p></p>
+        {% else %}
+        <p>該当するユーザーはいませんでした</p>
+        {% endif %}
+    {% endif %}
+    {{ n }}
 </body>
 </html>

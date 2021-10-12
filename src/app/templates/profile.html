@@ -10,8 +10,13 @@ Profile
 
 {% if session.profile_id == session.user_id %}
 <div class ="nav">
+
     <p><a href ="top">戻る</a></p>
+    {% if Not_edit_flag == 1 %}
+    <p></p>
+    {% else %}
     <p><a href ="edit">編集する</a></p>
+    {% endif %}
 </div>
 <form action ="/profile" method ="POST">
     <div class ="flex">
