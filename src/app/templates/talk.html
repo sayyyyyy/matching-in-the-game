@@ -12,12 +12,15 @@
         var socket;
         $(document).ready(function(){
             socket = io.connect('http://' + document.domain + ':' + location.port + '/talk');
-            console.log(socket);
             socket.on('connect', function() {
                 socket.emit('join', {});
             });
+            //socket.on('status', function(data) {
+            //    $('#chat').val($('#chat').val() + data.msg + '\n');
+            //    $('#chat').scrollTop($('#chat')[0].scrollHeight);
+            //});
             socket.on('status', function(data) {
-                $('#chat').val($('#chat').val() + '<' + data.msg + '>\n');
+                $('#chat').val(data.msg);
                 $('#chat').scrollTop($('#chat')[0].scrollHeight);
             });
             socket.on('message', function(data) {
@@ -46,15 +49,18 @@
     {{ login_user }}
     <p>閲覧されたユーザー</p>
     {{ each_id }}
-    <p><a href="/">戻る</a></p>
+    <p><a href="top">戻る</a></p>
     <div class="flex">
         <p>グループ</p>
+        {% for i in group_list %}   
+            <p>{{i}}</p>
+        {% endfor %}
         <div>
-            <h2>{{session['room']}}</h2>
-            <h2>{{session['user_id']}}</h2>
+            <h2>ルーム : {{session['room_id']}}</h2>
+            <h2>ログインユーザー : {{session['user_id']}}</h2>
             <textarea readonly id="chat" cols="60" rows="10" placeholder="メッセージはありません"></textarea>
             <input type="text" id="text" size="60" placeholder="メッセージを入力してください" />
-            <button type="button" id="send" class="" onclick="leave_room()">SEND</button>
+            <button type="button" id="send" class="">SEND</button>
         </div>
         <div>
             <p>友達</p>

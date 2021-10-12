@@ -52,11 +52,11 @@ CREATE TABLE IF NOT EXISTS Members (
 
 CREATE TABLE IF NOT EXISTS Messages (
   id int PRIMARY KEY AUTO_INCREMENT,
-  member_id int NOT NULL,
+  sender_id int NOT NULL,
   group_id int NOT NULL,
   message varchar(500),
   time timestamp,
-  FOREIGN KEY(member_id) REFERENCES Profiles(id),
+  FOREIGN KEY(sender_id) REFERENCES Profiles(id),
   FOREIGN KEY(group_id) REFERENCES Groups(id)
 );
 

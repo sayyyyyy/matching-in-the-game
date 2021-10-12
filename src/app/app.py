@@ -13,8 +13,6 @@ from werkzeug.utils import secure_filename
 import os
 #from requests_oauthlib import OAuth1Session
 from flask_socketio import SocketIO, join_room, leave_room, emit
-from flask_session import Session
-import ssl
 import smtplib
 from email.mime.text import MIMEText
 
@@ -45,15 +43,27 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #SocketIO設定
 app.config['SECRET_KEY'] = 'secret!'
-app.config['SESSION_TYPE'] = 'filesystem'
-Session(app)
-socketio = SocketIO(app, manage_sesison=False)
-socketio.init_app(app, cors_allowed_origins="*")
+socketio = SocketIO(app)
+#socketio.init_app(app, cors_allowed_origins="*")
 
 #メール設定
+def send_mail(email, message):
+  smtp_host = 'smtp.gmail.com'
+  smtp_port = 465
+  username = ''
+  password = ''
+  smtp = smtplib.SMTP_SSL(smtp_host, smtp_port)
+  smtp.login(username, password)
 
+  msg = MIMEText(message, 'html')
+  msg["Subject"] = "タイトル"
+  msg["To"] = email
+  msg["From"] = "SNS"
+  smtp.send_message(msg)
 
-#データベース
+  smtp.quit()
+
+#データベースを操作する関数
 def cdb():
   db = mysql.connector.connect(
       user='root',
@@ -62,6 +72,14 @@ def cdb():
       database='app'
   )
   return db
+
+#user_idからユーザ名を取得する関数
+def find_user(user_id):
+  db = cdb()
+  cursor = db.cursor()
+  cursor.execute("SELECT nickname FROM Profiles WHERE id = %s", (user_id,))
+  name = cursor.fetchall()[0][0]
+  return name
 
 @app.route("/")
 def main():
@@ -468,6 +486,10 @@ def profile():
             user_unfollow.execute("DELETE FROM Follows WHERE follow_id = %s AND followed_id = %s", (session['user_id'], session['profile_id']))
             db.commit()
           elif request.form.get("talk") == "トーク":
+            db = cdb()
+            #get_group = db.cursor()
+            #get_group.execute("SELECT id FROM Groups WHERE group_name = %s", )
+            session['room_id'] = 1 #グループidにしたい
             return redirect("/talk")       
           
           return redirect("/profile")
@@ -654,35 +676,67 @@ def edit():
     else:
       return redirect(url_for('login'))
 
+@app.route("/talk", methods=['GET', 'POST'])
+def talk():
+  if 'loggedin' in session:
+    if request.method == "POST":
+      return render_template("talk.html", session=session)
+    else:
+      session['room_id'] = 1
+      db = cdb()
+      follow = db.cursor()
+      follow.execute("SELECT nickname FROM Profiles WHERE id IN (SELECT followed_id FROM Follows WHERE follow_id = %s)", (session['user_id'], ))
+      follow_id_list = follow.fetchall()[0]
+      group = db.cursor()
+      group.execute("SELECT group_name FROM Groups WHERE id IN (SELECT group_id FROM Members WHERE member_id = %s", (session['user_id'],))
+      group_list = group.fetchall()[0]
+
+      return render_template("talk.html", session=session, follow_id_list=follow_id_list, group_list=group_list)
+
+  else:
+    return redirect(url_for('login'))
+
 @socketio.on('join', namespace='/talk')
 def join(message):
-    room = session['room']
+    room = session['room_id']
+    user = find_user(session['user_id'])
+    db = cdb()
+    get_msg = db.cursor()
+    get_msg.execute("SELECT message FROM Messages WHERE group_id = %s", (session['room_id'],))
+    view_msg = get_msg.fetchall()
+    
     join_room(room)
-    emit('status', {'msg :' + str(session['user_id']) + 'が入室しました'}, room=room)
+    #（未）DBから過去メッセージを取得して表示させる
+    emit('status', {'msg': view_msg}, room=room)
 
 
 @socketio.on('text', namespace='/talk')
 def text(message):
-    room = session['room']
-    emit('message', {'msg :' + session['user_id'] + ' : ' + message['msg']}, room=room)
+    room = session['room_id']
+    user = find_user(session['user_id'])
+    print(message['msg'])
+
+    db = cdb()
+    in_message = db.cursor()
+    in_message.execute("INSERT INTO Messages (sender_id, group_id, message) VALUES (%s, %s, %s)", (session['user_id'], session['room_id'], message['msg']))
+    db.commit()
+    #（未）グループidを取得してメッセージをDBに格納する
+    emit('message', {'msg': user + ' : ' + message['msg']}, room=room)
 
 
 @socketio.on('left', namespace='/talk')
 def left(message):
-    room = session['room']
-    username = session['user_id']
+    room = session['room_id']
+    user = find_user(session['user_id'])
     leave_room(room)
     session.clear()
-    emit('status', {'msg:' + username + ' has left the room.'}, room=room)
+    emit('status', {'msg': user + ' has left the room.'}, room=room)
 
 @app.route("/top", methods=["GET", "POST"])
 def top():
-
-   if 'loggedin' in session:
-       session['user_id'] = session['user_id']
-       
-       if request.method == "GET":
-
+  if 'loggedin' in session:
+      session['user_id'] = session['user_id']    
+      if request.method == "GET":
           db = mysql.connector.connect(
             user ='root',
             password = 'password',
@@ -713,31 +767,35 @@ def top():
             list_friends = db.cursor(buffered=True)
             list_friends.execute("SELECT icon, nickname, id from Profiles where id = %s", (Mutual,))
             m = list_friends.fetchall()
-            Mutual_friends.append(m)
-
-          
+            Mutual_friends.append(m)          
           return render_template('top.html', user_id=session['user_id'], Mutuals=Mutuals, Mutual_friends=Mutual_friends)
-
-@app.route("/talk", methods=["GET", "POST"])
-def each():
-  if 'loggedin' in session:
-       session['user_id'] = session['user_id']
-       
-       if request.method == "POST":
-
-          db = mysql.connector.connect(
-                  user ='root',
-                  password = 'password',
-                  host ='db',
-                  database ='app'
-                  )
-
-          each_id = request.form.get("talk_id")
-
-          return render_template("talk.html", each_id=each_id, login_user=session['user_id'])
-
-       else:
-          return redirect("/")
+      else:
+          db = cdb()
+          if request.form.get("profile") == "プロフを表示する":
+            session["profile_id"] = 1
+            return redirect("/profile")
+          elif request.form.get("talk") == "トークルームに行く":
+            #get_group = db.cursor()
+            #get_group.execute("SELECT id FROM Groups WHERE group_name = %s", )
+            session['room_id'] = 1 #グループidにしたい
+            return redirect("/talk")       
+          
+          return redirect("/top")
+#@app.route("/talk", methods=["GET", "POST"])
+#def each():
+#  if 'loggedin' in session:
+#       session['user_id'] = session['user_id']
+#       if request.method == "POST":
+#          db = mysql.connector.connect(
+#                  user ='root',
+#                  password = 'password',
+#                  host ='db',
+#                  database ='app'
+#                  )
+#          each_id = request.form.get("talk_id")
+#          return render_template("talk.html", each_id=each_id, login_user=session['user_id'])
+#       else:
+#          return redirect("/")
 
 
 @app.route('/search', methods=["GET", "POST"])

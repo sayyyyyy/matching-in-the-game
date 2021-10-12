@@ -21,13 +21,13 @@
             <p>{{ friend[0][1] }}</p>
             <p>{{ friend[0][2]}}</p>
 
-            <form action="/profile" method="POST">
+            <form action="/top" method="POST">
                 <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ friend[0][2] }}">
-                <button type="submit" name="profile">プロフを表示する</button>          
+                <input type="submit" name="profile" value="プロフを表示する">       
             </form>
-            <form action="/talk" method="POST">
+            <form action="/top" method="POST">
                 <input readonly id ="talk_id" type ="hidden" name ="talk_id" value="{{ friend[0][2] }}">
-                <button type="submit" name="talk">トークルームに行く</button>          
+                <input type="submit" name="talk" value="トークルームに行く">          
             </form>
         </div>
     {% endfor %}
