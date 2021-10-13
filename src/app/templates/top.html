@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel ="stylesheet" href ="../static/top.css">
     <title>Docker Test{% block title %} {% endblock %}</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src ="../static/main.js"></script>
 </head>
 <body>
@@ -31,6 +32,110 @@
             </form>
         </div>
     {% endfor %}
+    
+    <form id="form">
+        <div class="search-method">
+            <div class="search-game">
 
+                <select id ="game_name">
+                    <option id = "default_name" disabled selected>ゲームを選択してください</option>
+                    {% for i in game_names %}
+                    <option>{{ i[0] }}</option>
+                    {% endfor %}
+                </select>
+                <select id ="game_level">
+                    <option id = "default_level" disabled selected>レベルを選択してください</option>
+                    {% for i in range(1,4) %}
+                    <option>{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <p>or</p>
+            </div>
+                <input id ="nickname_search" type ="text" name ="nickname_search" placeholder="search nickname">
+        </div>
+        <button id="submit" type="submit" class="button is-link">search</button>
+        <!-- <input id="async-search" type="submit" value="search"> -->
+    </form>
+
+    <div id="search_result"></div>
+    <!-- {% if id_search %}
+    {% for profile in id_search %}
+    <div class="result">
+        <div class="right_info">
+            <p class="nickname">{{ profile[1] }}</p>
+            <img class="search_icon" src="{{ profile[2] }}">
+            <form action="/profile" method="POST">
+                <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ profile[0] }}">
+                <button type="submit" name="profile">プロフを表示する</button>          
+            </form>
+        </div>
+        <div class="left_info">
+            <ul>
+                <li>
+                    <ul>
+                        <li class="game_list">
+                            <p>{{ profile[4] }}</p>
+                            <p>{{ profile[6] }}</p>
+                            <p>Lv {{ profile[5] }}</p>
+                        </li>
+                        <li class="game_list">
+                            <p>{{ profile[7] }}</p>
+                            <p>{{ profile[9] }}</p>
+                            <p>Lv {{ profile[8] }}</p>
+                        </li>
+                        <li class="game_list"> 
+                            <p>{{ profile[10] }}</p>
+                            <p>{{ profile[12] }}</p>
+                            <p>Lv {{ profile[11] }}</p>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <p class="short_comment" maxlength="5">{{ profile[3][0:11] }}...</p>
+        </div>
+    </div>
+    {% endfor %}-->
+    <!-- {% else %}
+        {% if n %}
+        <p></p>
+        {% else %}
+        <p>該当するユーザーはいませんでした</p>
+        {% endif %}
+    {% endif %}
+    {{ n }} -->
+
+    <script>
+    function setNonSelect(idname){
+    // 未選択状態にする
+    var obj = document.getElementById(idname);
+    obj.selectedIndex = 0;
+    }
+
+    $(document).ready(function() {
+    //   ①formのsubmitボタンをクリック
+      $('#form').on('submit',function(event){
+        
+　　　　　//②Ajax通信
+        $.ajax({
+          data : {
+　　　　　　　//③form内inputの値、リクエスト(POST or GET),リクエスト先のURLを記述
+            game_name : $('#game_name').val(),
+            game_level : $('#game_level').val(),
+            nickname : $('#nickname_search').val()
+          },
+          type : 'POST',
+          url : '/asyncdata'
+        })
+
+　　　　　//④formの下に結果を表示
+        .done(function(data){
+          $('#search_result').html(data);
+          setNonSelect('game_name');
+          setNonSelect('game_level');
+        });
+        event.preventDefault();
+      });
+    });
+    </script>
 </body>
 </html>

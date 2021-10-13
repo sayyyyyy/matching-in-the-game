@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,9 +7,9 @@
     <link rel ="stylesheet" href ="../static/top.css">
     <title>Docker Test{% block title %} {% endblock %}</title>
     <script src ="../static/main.js"></script>
-</head>
-<body>
-    <form action='/search' method='POST'>
+</head> -->
+<!-- <body> -->
+    <!-- <form action='/search' method='POST'>
         <div class="search-method">
             <div class="search-game">
                 <select name ="game_name">
@@ -29,51 +29,50 @@
                 <input id ="nickname_search" type ="text" name ="nickname_search" placeholder="search nickname">
         </div>
         <input class="search_btn" type="submit" value="search">
-    </form>
-    {% if id_search %}
-    {% for profile in id_search %}
-    <div class="result">
-        <div class="right_info">
-            <p class="nickname">{{ profile[1] }}</p>
-            <img class="search_icon" src="{{ profile[2] }}">
-            <form action="/profile" method="POST">
-                <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ profile[0] }}">
-                <button type="submit" name="profile">プロフを表示する</button>          
-            </form>
-        </div>
-        <div class="left_info">
-            <ul>
-                <li>
-                    <ul>
-                        <li class="game_list">
-                            <p>{{ profile[4] }}</p>
-                            <p>{{ profile[6] }}</p>
-                            <p>Lv {{ profile[5] }}</p>
-                        </li>
-                        <li class="game_list">
-                            <p>{{ profile[7] }}</p>
-                            <p>{{ profile[9] }}</p>
-                            <p>Lv {{ profile[8] }}</p>
-                        </li>
-                        <li class="game_list"> 
-                            <p>{{ profile[10] }}</p>
-                            <p>{{ profile[12] }}</p>
-                            <p>Lv {{ profile[11] }}</p>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-            <p class="short_comment" maxlength="5">{{ profile[3][0:11] }}...</p>
-        </div>
+    </form> -->
+{% if id_search %}
+{% for profile in id_search %}
+<div class="result">
+    <div class="right_info">
+        <p class="nickname">{{ profile[1] }}</p>
+        <img class="search_icon" src="{{ profile[2] }}">
+        <form action="/profile" method="POST">
+            <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ profile[0] }}">
+            <button type="submit" name="profile">プロフを表示する</button>          
+        </form>
     </div>
-    {% endfor %}
+    <div class="left_info">
+        <ul>
+            <li>
+                <ul>
+                    <li class="game_list">
+                        <p>{{ profile[4] }}</p>
+                        <p>{{ profile[6] }}</p>
+                        <p>Lv {{ profile[5] }}</p>
+                    </li>
+                    <li class="game_list">
+                        <p>{{ profile[7] }}</p>
+                        <p>{{ profile[9] }}</p>
+                        <p>Lv {{ profile[8] }}</p>
+                    </li>
+                    <li class="game_list"> 
+                        <p>{{ profile[10] }}</p>
+                        <p>{{ profile[12] }}</p>
+                        <p>Lv {{ profile[11] }}</p>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <p class="short_comment" maxlength="5">{{ profile[3][0:11] }}...</p>
+    </div>
+</div>
+<div>
+{% endfor %}
+{% else %}
+    {% if n %}
+    <p>{{ n }}</p>
     {% else %}
-        {% if n %}
-        <p></p>
-        {% else %}
-        <p>該当するユーザーはいませんでした</p>
-        {% endif %}
+    <p>該当するユーザーはいませんでした</p>
     {% endif %}
-    {{ n }}
-</body>
-</html>
+{% endif %}
+</div>

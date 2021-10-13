@@ -124,7 +124,8 @@ def login():
 
     return render_template("login.html", msg=msg)
 
-  return render_template('login.html')
+  else:
+    return render_template('login.html')
 
 
 @app.route('/main')
@@ -734,74 +735,75 @@ def left(message):
     session.clear()
     emit('status', {'msg': user + ' has left the room.'}, room=room)
 
-@app.route("/top", methods=["GET", "POST"])
+# @app.route("/top", methods=["GET", "POST"])
+# def top():
+
+#    if 'loggedin' in session:
+#        session['user_id'] = session['user_id']
+       
+#        if request.method == "GET":
+
+#           db = mysql.connector.connect(
+#             user ='root',
+#             password = 'password',
+#             host ='db',
+#             database ='app'
+#             )
+#         #相互フォローの友達のアイコントニックネームを表示
+
+#         #ログインユーザーがフォローしている人
+#           follow_id = db.cursor(buffered=True)
+#           follow_id.execute("SELECT followed_id from Follows where follow_id = %s", (session['user_id'],))
+#         #ログインユーザーをフォローしている人
+#           followed_id = db.cursor(buffered=True)
+#           followed_id.execute("SELECT follow_id from Follows where followed_id = %s", (session['user_id'],))
+
+#           follow_f = follow_id.fetchall()
+#           followed_f = followed_id.fetchall()
+
+#           follow_li = [i[0] for i in follow_f]
+          
+#           followed_li = [i[0] for i in followed_f]
+#         #共通する部分をリスト化
+#           Mutuals = tuple(set(follow_li) & set(followed_li))
+          
+#           Mutual_friends = []
+
+#           for Mutual in Mutuals:
+#             list_friends = db.cursor(buffered=True)
+#             list_friends.execute("SELECT icon, nickname, id from Profiles where id = %s", (Mutual,))
+#             m = list_friends.fetchall()
+#             Mutual_friends.append(m)
+
+#           game_names = db.cursor(buffered=True)
+#           game_names.execute("SELECT game_name from Game_names")
+#           return render_template("top.html")
+          # return render_template('top.html', user_id=session['user_id'], Mutuals=Mutuals, Mutual_friends=Mutual_friends, game_names=game_names)
+
+# @app.route("/talk", methods=["GET", "POST"])
+# def each():
+#   if 'loggedin' in session:
+#        session['user_id'] = session['user_id']
+       
+#        if request.method == "POST":
+
+#           db = mysql.connector.connect(
+#                   user ='root',
+#                   password = 'password',
+#                   host ='db',
+#                   database ='app'
+#                   )
+
+#           each_id = request.form.get("talk_id")
+
+#           return render_template("talk.html", each_id=each_id, login_user=session['user_id'])
+
+#        else:
+#           return redirect("/")
+
+
+@app.route('/top', methods=["GET", "POST"])
 def top():
-  if 'loggedin' in session:
-      session['user_id'] = session['user_id']    
-      if request.method == "GET":
-          db = mysql.connector.connect(
-            user ='root',
-            password = 'password',
-            host ='db',
-            database ='app'
-            )
-        #相互フォローの友達のアイコントニックネームを表示
-
-        #ログインユーザーがフォローしている人
-          follow_id = db.cursor(buffered=True)
-          follow_id.execute("SELECT followed_id from Follows where follow_id = %s", (session['user_id'],))
-      #ログインユーザーをフォローしている人
-          followed_id = db.cursor(buffered=True)
-          followed_id.execute("SELECT follow_id from Follows where followed_id = %s", (session['user_id'],))
-
-          follow_f = follow_id.fetchall()
-          followed_f = followed_id.fetchall()
-
-          follow_li = [i[0] for i in follow_f]
-          
-          followed_li = [i[0] for i in followed_f]
-        #共通する部分をリスト化
-          Mutuals = tuple(set(follow_li) & set(followed_li))
-          
-          Mutual_friends = []
-
-          for Mutual in Mutuals:
-            list_friends = db.cursor(buffered=True)
-            list_friends.execute("SELECT icon, nickname, id from Profiles where id = %s", (Mutual,))
-            m = list_friends.fetchall()
-            Mutual_friends.append(m)          
-          return render_template('top.html', user_id=session['user_id'], Mutuals=Mutuals, Mutual_friends=Mutual_friends)
-      else:
-          db = cdb()
-          if request.form.get("profile") == "プロフを表示する":
-            session["profile_id"] = 1
-            return redirect("/profile")
-          elif request.form.get("talk") == "トークルームに行く":
-            #get_group = db.cursor()
-            #get_group.execute("SELECT id FROM Groups WHERE group_name = %s", )
-            session['room_id'] = 1 #グループidにしたい
-            return redirect("/talk")       
-          
-          return redirect("/top")
-#@app.route("/talk", methods=["GET", "POST"])
-#def each():
-#  if 'loggedin' in session:
-#       session['user_id'] = session['user_id']
-#       if request.method == "POST":
-#          db = mysql.connector.connect(
-#                  user ='root',
-#                  password = 'password',
-#                  host ='db',
-#                  database ='app'
-#                  )
-#          each_id = request.form.get("talk_id")
-#          return render_template("talk.html", each_id=each_id, login_user=session['user_id'])
-#       else:
-#          return redirect("/")
-
-
-@app.route('/search', methods=["GET", "POST"])
-def search():
   if 'loggedin' in session:
       session['user_id'] = session['user_id']
 
@@ -813,13 +815,53 @@ def search():
                 database ='app'
                 )
 
+        #selectボックスで使う選択肢
+
+        #------------------------------------------------------
+        #相互フォローの表示
+        #------------------------------------------------------
+        #ログインユーザーがフォローしている人
+        follow_id = db.cursor(buffered=True)
+        follow_id.execute("SELECT followed_id from Follows where follow_id = %s", (session['user_id'],))
+        #ログインユーザーをフォローしている人
+        followed_id = db.cursor(buffered=True)
+        followed_id.execute("SELECT follow_id from Follows where followed_id = %s", (session['user_id'],))
+
+        follow_f = follow_id.fetchall()
+        followed_f = followed_id.fetchall()
+
+        follow_li = [i[0] for i in follow_f]
+        
+        followed_li = [i[0] for i in followed_f]
+        #共通する部分をリスト化
+        Mutuals = tuple(set(follow_li) & set(followed_li))
+          
+        Mutual_friends = []
+
+        for Mutual in Mutuals:
+          list_friends = db.cursor(buffered=True)
+          list_friends.execute("SELECT icon, nickname, id from Profiles where id = %s", (Mutual,))
+          m = list_friends.fetchall()
+          Mutual_friends.append(m)
+
         game_names = db.cursor(buffered=True)
         game_names.execute("SELECT game_name from Game_names")
 
-        return render_template('search.html', game_names=game_names)
+        return render_template('top.html', user_id=session['user_id'], Mutuals=Mutuals, Mutual_friends=Mutual_friends, game_names=game_names)
 
-      else:
-        if request.form.get("game_name") and request.form.get("game_level"):
+@app.route("/asyncdata", methods=["GET", "POST"])
+def asyncdata():
+  if 'loggedin' in session:
+      session['user_id'] = session['user_id']
+
+      if request.method == "POST":
+
+        if request.form.get("game_name") and request.form.get("game_level") and request.form.get("nickname"):
+          msg = "同時には検索できません。"
+          return render_template("search.html", n = msg)
+          
+        elif request.form.get("game_name") and request.form.get("game_level"):
+
           game_name = request.form.get("game_name")
           game_level = request.form.get("game_level")
 
@@ -830,8 +872,9 @@ def search():
                 database ='app'
                 )
           
-          game_names = db.cursor(buffered=True)
-          game_names.execute("SELECT game_name from Game_names")
+          #選択肢のゲームネームの取得
+          # game_names = db.cursor(buffered=True)
+          # game_names.execute("SELECT game_name from Game_names")
 
           #ゲーム名とレベルで検索し、該当するIDを取得
           game_search = db.cursor(buffered=True)
@@ -871,23 +914,24 @@ def search():
             
             search_result.append(p)
 
-          return render_template('search.html', game_names = game_names, id_search = search_result)
+          return render_template("search.html", id_search = search_result)
         
-        elif request.form.get("nickname_search"):
+        elif request.form.get("nickname"):
 
           l = []
           db = cdb()
           game_names = db.cursor(buffered=True)
           game_names.execute("SELECT game_name from Game_names")
 
-          nickname = request.form.get("nickname_search")
+          nickname = request.form.get("nickname")
           
           nick = db.cursor()
           nick.execute("SELECT P.id, P.nickname, P.icon, P.comment from Profiles as P where P.nickname = %s", (nickname,))
           n = nick.fetchall()
           if len(n) == 0:
             msg = "該当するユーザーはいませんでした"
-            return render_template("search.html", game_names = game_names, n = msg)
+            return render_template("search.html", n = msg)
+
           n = list(n[0])
 
           for i in range(1,4):
@@ -902,14 +946,14 @@ def search():
 
           l.append(n)
           
-          return render_template('search.html', game_names = game_names, id_search = l)
+          return render_template("search.html", id_search = l)
         
         else:
           db = cdb()
           game_names = db.cursor(buffered=True)
           game_names.execute("SELECT game_name from Game_names")
           msg = "検索できませんでした。"
-          return render_template("search.html", game_names = game_names, n = msg)
+          return render_template("search.html", n = msg)
 
 if __name__ == '__main__':
   socketio.run(app, debug=True)
