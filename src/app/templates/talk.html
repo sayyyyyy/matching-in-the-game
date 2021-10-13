@@ -44,16 +44,11 @@
 </head>
 
 <body>
-    <p>ログインユーザーと閲覧されたユーザのIDをトークルームに値を渡す</p>
-    <p>ログインユーザー</p>
-    {{ login_user }}
-    <p>閲覧されたユーザー</p>
-    {{ each_id }}
     <p><a href="top">戻る</a></p>
     <div class="flex">
         <p>グループ</p>
         {% for i in group_list %}   
-            <p>{{i}}</p>
+            <p>{{i[0]}}</p>
         {% endfor %}
         <div>
             <h2>ルーム : {{session['room_id']}}</h2>
@@ -65,7 +60,7 @@
         <div>
             <p>友達</p>
             {% for i in follow_id_list %}   
-                <p>{{i}}</p>
+                <p>{{i[0]}}</p>
             {% endfor %}
 
         </div>

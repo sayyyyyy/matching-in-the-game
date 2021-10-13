@@ -399,9 +399,6 @@ def callback():
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     if 'loggedin' in session:
-        #session['user_id'] = session['user_id']
-        session['profile_id'] = 2
-
         db = cdb()
         if request.method == "POST":
           
@@ -489,9 +486,29 @@ def profile():
             db.commit()
           elif request.form.get("talk") == "トーク":
             db = cdb()
-            #get_group = db.cursor()
-            #get_group.execute("SELECT id FROM Groups WHERE group_name = %s", )
-            session['room_id'] = 1 #グループidにしたい
+            try:
+              get_group = db.cursor()
+              get_group.execute("SELECT group_id FROM Members WHERE member_id IN (%s, %s)", (session['user_id'], request.form.get('talk_id')))
+              get_group.fetchall()[0][0]
+            except:
+              session['room_id'] = request.form.get("talk_id") 
+              set_name = find_user(session['user_id']) + find_user(session['room_id']) + "のトーク"
+              
+              set_group = db.cursor()
+              set_group.execute("INSERT INTO Groups (group_name) VALUES (%s)", (set_name, ))
+              db.commit()
+
+              group_id = db.cursor()
+              group_id.execute("SELECT id FROM Groups WHERE group_name = %s", (set_name, ))
+              group = group_id.fetchall()[0][0]
+
+              into_group_user = db.cursor()
+              into_group_user.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (session['user_id'], group))
+              db.commit()
+
+              into_group_follower = db.cursor()
+              into_group_follower.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (request.form.get('talk_id'), group))
+              db.commit()
             return redirect("/talk")       
           
           return redirect("/profile")
@@ -554,7 +571,7 @@ def profile():
 
         return render_template("profile.html", user_profile=user_profile,
                                star1=star1, star2=star2, star3=star3, game_name1=game_name1, game_name2=game_name2,
-                               game_name3=game_name3, follow_count=follow_count, followed_count=followed_count, isFollow2=isFollow2)
+                               game_name3=game_name3, follow_count=follow_count, followed_count=followed_count, isFollow2=isFollow2, session=session)
 
     return redirect(url_for('login'))
 
@@ -684,14 +701,13 @@ def talk():
     if request.method == "POST":
       return render_template("talk.html", session=session)
     else:
-      session['room_id'] = 1
       db = cdb()
       follow = db.cursor()
       follow.execute("SELECT nickname FROM Profiles WHERE id IN (SELECT followed_id FROM Follows WHERE follow_id = %s)", (session['user_id'], ))
-      follow_id_list = follow.fetchall()[0]
+      follow_id_list = follow.fetchall()
       group = db.cursor()
-      group.execute("SELECT group_name FROM Groups WHERE id IN (SELECT group_id FROM Members WHERE member_id = %s", (session['user_id'],))
-      group_list = group.fetchall()[0]
+      group.execute("SELECT group_name FROM Groups WHERE id IN (SELECT group_id FROM Members WHERE member_id = %s)", (session['user_id'], ))
+      group_list = group.fetchall()
 
       return render_template("talk.html", session=session, follow_id_list=follow_id_list, group_list=group_list)
 
@@ -716,7 +732,6 @@ def join(message):
 def text(message):
     room = session['room_id']
     user = find_user(session['user_id'])
-    print(message['msg'])
 
     db = cdb()
     in_message = db.cursor()
@@ -729,10 +744,7 @@ def text(message):
 @socketio.on('left', namespace='/talk')
 def left(message):
     room = session['room_id']
-    user = find_user(session['user_id'])
     leave_room(room)
-    session.clear()
-    emit('status', {'msg': user + ' has left the room.'}, room=room)
 
 @app.route("/top", methods=["GET", "POST"])
 def top():
@@ -774,12 +786,33 @@ def top():
       else:
           db = cdb()
           if request.form.get("profile") == "プロフを表示する":
-            session["profile_id"] = 1
+            session["profile_id"] = request.form.get("friend_id")
             return redirect("/profile")
           elif request.form.get("talk") == "トークルームに行く":
-            #get_group = db.cursor()
-            #get_group.execute("SELECT id FROM Groups WHERE group_name = %s", )
-            session['room_id'] = 1 #グループidにしたい
+            try:
+              get_group = db.cursor()
+              get_group.execute("SELECT group_id FROM Members WHERE member_id IN (%s, %s)", (session['user_id'], request.form.get('talk_id')))
+              get_group.fetchall()[0][0]
+            except:
+              session['room_id'] = request.form.get("talk_id") #グループidにしたい
+              set_name = find_user(session['user_id']) + find_user(session['room_id']) + "のトーク"
+              
+              set_group = db.cursor()
+              set_group.execute("INSERT INTO Groups (group_name) VALUES (%s)", (set_name, ))
+              db.commit()
+
+              group_id = db.cursor()
+              group_id.execute("SELECT id FROM Groups WHERE group_name = %s", (set_name, ))
+              group = group_id.fetchall()[0][0]
+
+              into_group_user = db.cursor()
+              into_group_user.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (session['user_id'], group))
+              db.commit()
+
+              into_group_follower = db.cursor()
+              into_group_follower.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (request.form.get('talk_id'), group))
+              db.commit()
+
             return redirect("/talk")       
           
           return redirect("/top")

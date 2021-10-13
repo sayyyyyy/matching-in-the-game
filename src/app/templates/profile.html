@@ -158,6 +158,7 @@ Profile
                 {% else %}
                     <input type="submit" name="unfollow" value="フォローをやめる">
                 {% endif %}
+                <input readonly id ="talk_id" type ="hidden" name ="talk_id" value="{{ session['profile_id'] }}">
                 <input type="submit" name="talk" value="トーク">
             </div>
         </div>
