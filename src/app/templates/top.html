@@ -22,11 +22,11 @@
             <p>{{ friend[0][1] }}</p>
             <p>{{ friend[0][2]}}</p>
 
-            <form action="/top" method="POST">
+            <form action="/profile" method="POST">
                 <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ friend[0][2] }}">
                 <input type="submit" name="profile" value="プロフを表示する">       
             </form>
-            <form action="/top" method="POST">
+            <form action="/profile" method="POST">
                 <input readonly id ="talk_id" type ="hidden" name ="talk_id" value="{{ friend[0][2] }}">
                 <input type="submit" name="talk" value="トークルームに行く">          
             </form>
