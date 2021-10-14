@@ -81,6 +81,15 @@ INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(2, 3, 3, 3);
 INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(3, 1, 1, 1);
 INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(3, 2, 2, 2);
 INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(3, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(4, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(4, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(4, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(5, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(5, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(5, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(6, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(6, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(6, 3, 3, 3);
 
 INSERT INTO Follows (follow_id, followed_id) VALUES(1, 2);
 INSERT INTO Follows (follow_id, followed_id) VALUES(2, 1);

@@ -7,6 +7,9 @@ Home
 {% block main %}
 {{users}}
 {{games}}
-<a href="/login" role="button">login</a>
+<form action="/login" method="GET">
+    <input class="login" type="submit" value="login">
+</form>
+<!-- <a href="/login" role="button">login</a> -->
 <a href="/register2" role="button">register</a>
 {% endblock %}

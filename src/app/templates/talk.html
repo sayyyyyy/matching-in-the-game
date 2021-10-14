@@ -16,6 +16,7 @@
                 socket.emit('join', {});
             });
             //socket.on('status', function(data) {
+            //    data.msg.map(i => i + 'iii');
             //    $('#chat').val($('#chat').val() + data.msg + '\n');
             //    $('#chat').scrollTop($('#chat')[0].scrollHeight);
             //});
@@ -48,7 +49,8 @@
     <div class="flex">
         <p>グループ</p>
         {% for i in group_list %}   
-            <p>{{i[0]}}</p>
+            <input readonly id ="room_id" type ="hidden" name ="room_id" value={{ i[0] }}>
+            <input type="submit" name="talk" value={ i[1] }>
         {% endfor %}
         <div>
             <h2>ルーム : {{session['room_id']}}</h2>
@@ -60,7 +62,8 @@
         <div>
             <p>友達</p>
             {% for i in follow_id_list %}   
-                <p>{{i[0]}}</p>
+                <input readonly id ="room_id" type ="hidden" name ="room_id" value={{ i[0] }}>
+                <input type="submit" name="talk" value={ i[1] }>
             {% endfor %}
 
         </div>

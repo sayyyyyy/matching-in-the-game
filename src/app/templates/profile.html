@@ -7,6 +7,9 @@ Profile
 
 
 {% block main %}
+<p>user:{{session['user_id']}}</p>
+<p>profile:{{session['profile_id']}}</p>
+<p>talk:{{session['talk_id']}}</p>
 
 {% if session.profile_id == session.user_id %}
 <div class ="nav">
