@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html labg="en">
+
+<head>
+    <meta chrset="utf-8" />
+    <title>Create a Group</title>
+    <link rel="stylesheet" href="../static/trial.css" />
+</head>
+
+<body>
+<div class="modal__">
+    <button id="modalOpen" class="button">グループ作成</button>
+
+　　<div id="easyModal" class="modal">
+
+　　　　<div class="modal-content">
+
+<!--    ----------------------------------->
+　　　　　　<div class="modal-header">
+　　　　　　　　<h1>グループ作成</h1>
+　　　　　　　　<span class="modalClose">×</span>
+　　　　　　</div>
+<!--    ----------------------------------->
+
+　　　　　　<div class="modal-body">
+　　　　　　　　<form action='/a' method='POST'>
+                <input type="text" name="group_name" placeholder="グループネームを入力">
+                    <p></p>
+                  {% for i in Mutual_friends %}
+                    <label for="check_box">
+                    <input type="checkbox" id="check_box"
+                           name='member' value="{{i[0][2]}}">
+                    <img src ="{{ i[0][0] }}" class ="is-circle">
+                    {{ i[0][1] }}
+                    </label>
+                    <p></p>
+                  {% endfor %}
+                <input type="submit" name="create_group" value="グループ作成">
+              </form>
+    　　　　</div>
+　　　　　　</div>
+
+　　　　</div>
+　　</div>
+　　<script src="../static/trial.js"></script>
+</div>
+
+<p>aaa is {{ group }}</p>
+<p>members are {{ member }}</p>
+
+</body>
+</html>
