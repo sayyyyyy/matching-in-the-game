@@ -66,6 +66,9 @@ INSERT INTO Profiles (nickname, password, email) VALUES("test_user3", "password"
 INSERT INTO Profiles (nickname, password, email) VALUES("test_user4", "password", "test4@email.com");
 INSERT INTO Profiles (nickname, password, email) VALUES("test_user5", "password", "test5@email.com");
 INSERT INTO Profiles (nickname, password, email) VALUES("test_user6", "password", "test6@email.com");
+INSERT INTO Profiles (nickname, password, email) VALUES("test_user7", "password", "test7@email.com");
+INSERT INTO Profiles (nickname, password, email) VALUES("test_user8", "password", "test8@email.com");
+
 
 INSERT INTO Game_names (game_name) VALUES("APEX LEGENDS");
 INSERT INTO Game_names (game_name) VALUES("Minecraft");
@@ -93,9 +96,12 @@ INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(6, 3, 3, 3);
 
 INSERT INTO Follows (follow_id, followed_id) VALUES(1, 2);
 INSERT INTO Follows (follow_id, followed_id) VALUES(2, 1);
-INSERT INTO Follows (follow_id, followed_id) VALUES(1, 2);
-INSERT INTO Follows (follow_id, followed_id) VALUES(2, 1);
 INSERT INTO Follows (follow_id, followed_id) VALUES(1, 3);
 INSERT INTO Follows (follow_id, followed_id) VALUES(3, 1);
 INSERT INTO Follows (follow_id, followed_id) VALUES(1, 4);
 INSERT INTO Follows (follow_id, followed_id) VALUES(4, 1);
+INSERT INTO Follows (follow_id, followed_id) VALUES(1, 5);
+INSERT INTO Follows (follow_id, followed_id) VALUES(6, 1);
+INSERT INTO Follows (follow_id, followed_id) VALUES(7, 1);
+INSERT INTO Follows (follow_id, followed_id) VALUES(8, 1);
+INSERT INTO Follows (follow_id, followed_id) VALUES(3, 2);

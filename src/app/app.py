@@ -1000,9 +1000,97 @@ def a():
                            Mutual_friends=Mutual_friends, Mutuals=Mutuals,
                            member=member)
 
-@app.route('/b')
+
+@app.route('/b', methods=['POST', 'GET'])
 def b():
-    return render_template('b.html')
+  db = cdb()
+  if request.method == "POST" and "follow" in request.form:
+    # このやり方だと毎回ポップアップが消える (リダイレクトするから)
+    id = request.form.get("follow")
+    return_follow = db.cursor()
+    return_follow.execute("INSERT INTO Follows (follow_id, followed_id) "
+                          "VALUES(%s, %s)", (session['user_id'], id,))
+    db.commit()
+
+    return redirect('/b')
+
+  elif request.method == "POST" and "join_group" in request.form:
+    id = request.form.get("join_group")
+    join = db.cursor()
+    join.execute("UPDATE Members SET flag_join = %s WHERE group_id = %s",
+                 (1, id,))
+    db.commit()
+
+    return redirect('/b')
+
+  else:
+    # これはフォローの部分--------------------------------------------------------
+    # ログインユーザーをフォローしている人---------------------------
+    followed_id = db.cursor(buffered=True)
+    followed_id.execute("SELECT follow_id from Follows where followed_id = %s",
+                        (session['user_id'],))
+    followed_f = followed_id.fetchall()
+
+    # ログインユーザーがフォローしている人---------------------------
+    follow_id = db.cursor(buffered=True)
+    follow_id.execute("SELECT followed_id from Follows where follow_id = %s",
+                      (session['user_id'],))
+    follow_f = follow_id.fetchall()
+
+    # --------------------------------------------------------
+    follow_li = [i[0] for i in follow_f]
+    followed_li = [i[0] for i in followed_f]
+
+    # 相互フォローのタプルを取得--------------------------------------------------
+    Mutuals = tuple(set(follow_li) & set(followed_li))
+
+    # フォローされているリストから相互のリストで被らない部分を取得-----------------------
+    list_all = list(set(Mutuals)) + list(set(followed_li))
+    followed_list_only = [x for x in set(list_all) if
+                          list_all.count(x) == 1]
+
+    # followed_list_onlyからユーザーの情報を取得-------------------------------
+    followed_info = []
+    for user in followed_list_only:
+      list_friends = db.cursor(buffered=True)
+      list_friends.execute(
+        "SELECT icon, nickname, id from Profiles where id = %s", (user,))
+      m = list_friends.fetchall()
+      followed_info.append(m)
+
+    # フォローの部分はここまで------------------------------------------------------
+
+    # グループの部分--------------------------------------------------------------
+    # Memberに自分がいるが参加していないMemberテーブルのgroup_idを取得
+    group = db.cursor()
+    group.execute("SELECT group_id FROM Members WHERE member_id= %s AND "
+                  "flag_join= %s", (session['user_id'], 0, ))
+    group = group.fetchall()
+
+    # gropはリストの中が()になっているからリストにする---------------------------------
+    list_i = []
+    for i in group:
+      i = i[0]
+      list_i.append(i)
+
+    # groupで取ったidでGroupsテーブルからGroup_nameとGroup_iconを取得----------------
+    group_list = []
+    for i in list_i:
+      id = db.cursor(buffered=True)
+      id.execute(
+        "SELECT group_name, group_icon, id from Groups where id = %s", (i,))
+      m = id.fetchall()
+      group_list.append(m)
+
+    return render_template('b.html', followed_info=followed_info, group=group,
+                           list_i=list_i, group_list=group_list)
+
+@app.route('/c', methods=['GET', 'POST'])
+def c():
+  if request.method == "GET":
+
+    return render_template('c.html')
+
 
 
 if __name__ == '__main__':
