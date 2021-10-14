@@ -636,6 +636,9 @@ def edit():
           db.commit()
           return redirect("/edit")
       else:
+        mutual_follow = db.cursor()
+        mutual_follow.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s AND follow_id IN (SELECT followe_id FROM Follows WHERE follow_id = %s)", (session['user_id'], session['user_id']))
+
         cursor = db.cursor()
         cursor.execute("SELECT * FROM Profiles WHERE id = %s", (session['user_id'],))
         user_profile = cursor.fetchall()[0]
@@ -664,7 +667,11 @@ def edit():
 def talk():
   if 'loggedin' in session:
     if request.method == "POST":
-      return render_template("talk.html", session=session)
+      if request.form.get("group_talk") != None:
+        session['room_id'] = request.form.get("group_id")
+      elif request.form.get("friend_talk") != None:
+        session['room_id'] = request.form.get("friend_id")
+      return redirect("/talk")
     else:
       db = cdb()
       follow = db.cursor()

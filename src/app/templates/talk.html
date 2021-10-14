@@ -48,9 +48,11 @@
     <p><a href="top">戻る</a></p>
     <div class="flex">
         <p>グループ</p>
-        {% for i in group_list %}   
-            <input readonly id ="room_id" type ="hidden" name ="room_id" value={{ i[0] }}>
-            <input type="submit" name="talk" value={ i[1] }>
+        {% for i in group_list %}
+            <form action="/talk" method="POST">  
+                <input readonly id ="grou@_id" type ="hidden" name ="group_id" value="{{ i[0] }}">
+                <input type="submit" name="group_talk" value="{{ i[1] }}">
+            </form>
         {% endfor %}
         <div>
             <h2>ルーム : {{session['room_id']}}</h2>
@@ -61,9 +63,11 @@
         </div>
         <div>
             <p>友達</p>
-            {% for i in follow_id_list %}   
-                <input readonly id ="room_id" type ="hidden" name ="room_id" value={{ i[0] }}>
-                <input type="submit" name="talk" value={ i[1] }>
+            {% for i in follow_id_list %} 
+                <form action="/talk" method="POST">  
+                    <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ i[0] }}">
+                    <input type="submit" name="friend_talk" value="{{ i[1] }}">
+                </form>
             {% endfor %}
 
         </div>
