@@ -142,44 +142,6 @@ def logout():
   session.clear()
   return redirect(url_for('login'))
 
-# @app.route("/register", methods=["GET", "POST"])
-# def register():
-#   """登録フォーム"""
-#   if (request.method == "POST"):
-#     nickname = request.form.get('nickname')
-#     print(nickname)
-#     password = request.form.get('password')
-#     confirm = request.form.get('confirm')
-#     email = request.form.get('email')
-#
-#     if not nickname:
-#         return 'user_nickname is required!'
-#     elif not password:
-#         return 'user_password is not required!'
-#     elif not confirm:
-#         return 'user_confirm is not required!'
-#     elif not email:
-#         return 'user_mail is not required!'
-#
-#     if password != confirm:
-#         return 'Passwords do not match!'
-#
-#
-#     cnx = mysql.connector.connect(user='root', password='password', host='db', port='3306', database='app')
-#     cursor = cnx.cursor()
-#
-# #    account = cursor.fetchone()
-# #    if account:
-# #            session['loggedin'] = True
-# #            session['id'] = account['id']
-# #            session['username'] = account['username']
-# #      return "Register in successfully"
-#
-#
-#     cursor.execute("INSERT INTO Profiles (nickname, password, email) values (%s, %s, %s)", (nickname, password, email,))
-#     cnx.commit()
-#   return render_template('register.html')
-
 
 def register_interface(words, limit_words):
   if len(words) < limit_words:
@@ -954,6 +916,94 @@ def asyncdata():
           game_names.execute("SELECT game_name from Game_names")
           msg = "検索できませんでした。"
           return render_template("search.html", n = msg)
+
+
+@app.route('/a', methods=['POST', 'GET'])
+def a():
+  db = cdb()
+  if request.method == 'POST' and 'group_name' in request.form and "member" in \
+          request.form and request.form.get('create_group') == "グループ作成":
+    image_path = "static/images/iam.jpg"
+    group_name = request.form.get('group_name')
+    members = request.form.getlist("member")
+
+    # Groupの作成 (group_nameとgroup_icon→これはデフォルト設定にしてる)
+    create_group = db.cursor()
+    create_group.execute("INSERT INTO Groups (group_name, group_icon) "
+                         "VALUES (%s, %s)", (group_name, image_path,))
+    db.commit()
+
+    # GroupネームからそのグループIDを取ってくる。Group_nameが被った場合どうする？
+    group_id = db.cursor()
+    group_id.execute('SELECT id From Groups WHERE group_name = %s', (group_name,))
+    group_id = group_id.fetchall()
+    group_id = group_id[0][0]
+
+    # 初期メンバー(自分の登録)、これは、一意のgroup_idだから大丈夫
+    init_member = db.cursor()
+    init_member.execute('INSERT INTO Members (member_id, flag_join, group_id) '
+                        'VALUES (%s, %s, %s)',
+                        (session['user_id'], 1, group_id,))
+    db.commit()
+
+    # 招待した人をmemberのmember_idに追加してflagを0にする
+    for member in members:
+      member = int(member)
+      members = db.cursor()
+      members.execute('INSERT INTO Members (member_id, flag_join, group_id) '
+                      'VALUES (%s, %s, %s)', (member, 0, group_id,))
+      db.commit()
+
+    return redirect('/a')
+
+
+  else:
+    # ------------------テストで表示させたいやつ-----------------
+    group = db.cursor()
+    group.execute('SELECT * FROM Groups')
+    group = group.fetchall()
+
+    member = db.cursor()
+    member.execute('SELECT * FROM Members')
+    member = member.fetchall()
+
+    # -------------------------------------------------------
+
+    # ログインユーザーがフォローしている人
+    follow_id = db.cursor(buffered=True)
+    follow_id.execute("SELECT followed_id from Follows where follow_id = %s",
+                      (session['user_id'],))
+    # ログインユーザーをフォローしている人
+    followed_id = db.cursor(buffered=True)
+    followed_id.execute("SELECT follow_id from Follows where followed_id = %s",
+                        (session['user_id'],))
+
+    follow_f = follow_id.fetchall()
+    followed_f = followed_id.fetchall()
+
+    follow_li = [i[0] for i in follow_f]
+
+    followed_li = [i[0] for i in followed_f]
+    # 共通する部分をリスト化
+    Mutuals = tuple(set(follow_li) & set(followed_li))
+
+    Mutual_friends = []
+
+    for Mutual in Mutuals:
+      list_friends = db.cursor(buffered=True)
+      list_friends.execute(
+        "SELECT icon, nickname, id from Profiles where id = %s", (Mutual,))
+      m = list_friends.fetchall()
+      Mutual_friends.append(m)
+
+    return render_template('a.html', group=group,
+                           Mutual_friends=Mutual_friends, Mutuals=Mutuals,
+                           member=member)
+
+@app.route('/b')
+def b():
+    return render_template('b.html')
+
 
 if __name__ == '__main__':
   socketio.run(app, debug=True)

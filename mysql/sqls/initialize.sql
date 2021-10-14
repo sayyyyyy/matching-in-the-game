@@ -93,3 +93,9 @@ INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(6, 3, 3, 3);
 
 INSERT INTO Follows (follow_id, followed_id) VALUES(1, 2);
 INSERT INTO Follows (follow_id, followed_id) VALUES(2, 1);
+INSERT INTO Follows (follow_id, followed_id) VALUES(1, 2);
+INSERT INTO Follows (follow_id, followed_id) VALUES(2, 1);
+INSERT INTO Follows (follow_id, followed_id) VALUES(1, 3);
+INSERT INTO Follows (follow_id, followed_id) VALUES(3, 1);
+INSERT INTO Follows (follow_id, followed_id) VALUES(1, 4);
+INSERT INTO Follows (follow_id, followed_id) VALUES(4, 1);
