@@ -365,71 +365,71 @@ def profile():
         db = cdb()
         if request.method == "POST":
           
-          #ほかの人のプロフィールを見るとき
-          if request.form.get("friend_id"):
-            each_id = request.form.get("friend_id")
+        #   #ほかの人のプロフィールを見るとき
+        #   if request.form.get("friend_id"):
+        #     each_id = request.form.get("friend_id")
 
-            cursor = db.cursor()
-            cursor.execute("SELECT * FROM Profiles WHERE id=%s", (each_id, ))
-            user_profile = cursor.fetchall()[0]
+        #     cursor = db.cursor()
+        #     cursor.execute("SELECT * FROM Profiles WHERE id=%s", (each_id, ))
+        #     user_profile = cursor.fetchall()[0]
 
-            isFollow = db.cursor()
-            isFollow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s AND followed_id = %s", (session['user_id'], session['profile_id']))
-            isFollow2 = isFollow.fetchall()[0][0]
+        #     isFollow = db.cursor()
+        #     isFollow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s AND followed_id = %s", (session['user_id'], session['profile_id']))
+        #     isFollow2 = isFollow.fetchall()[0][0]
             
-            game_list = db.cursor()
-            game_list.execute("SELECT game_id, game_level, game_order FROM Games WHERE user_id = %s", (each_id,))
-            games = game_list.fetchall()
+        #     game_list = db.cursor()
+        #     game_list.execute("SELECT game_id, game_level, game_order FROM Games WHERE user_id = %s", (each_id,))
+        #     games = game_list.fetchall()
 
-            try:
-              star1 = games[0][1]
-            except:  
-              star1 = 0
-            try:
-              star2 = games[1][1]
-            except:
-              star2 = 0
-            try:              
-              star3 = games[2][1]
-            except:
-              star3 = 0
+        #     try:
+        #       star1 = games[0][1]
+        #     except:  
+        #       star1 = 0
+        #     try:
+        #       star2 = games[1][1]
+        #     except:
+        #       star2 = 0
+        #     try:              
+        #       star3 = games[2][1]
+        #     except:
+        #       star3 = 0
 
-            try:
-                game1 = db.cursor()
-                game1.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[0][0], ))
-                game_name1 = game1.fetchall()[0][0]
-            except:
-                game_name1 = "ゲームが選択されていません"
+        #     try:
+        #         game1 = db.cursor()
+        #         game1.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[0][0], ))
+        #         game_name1 = game1.fetchall()[0][0]
+        #     except:
+        #         game_name1 = "ゲームが選択されていません"
 
-            try:
-                game2 = db.cursor()
-                game2.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[1][0], ))
-                game_name2 = game2.fetchall()[0][0]
-            except:
-                game_name2 = "ゲームが選択されていません"
+        #     try:
+        #         game2 = db.cursor()
+        #         game2.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[1][0], ))
+        #         game_name2 = game2.fetchall()[0][0]
+        #     except:
+        #         game_name2 = "ゲームが選択されていません"
 
-            try:
-                game3 = db.cursor()
-                game3.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[2][0], ))
-                game_name3 = game3.fetchall()[0][0]
-            except:
-                game_name3 = "ゲームが選択されていません"
+        #     try:
+        #         game3 = db.cursor()
+        #         game3.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[2][0], ))
+        #         game_name3 = game3.fetchall()[0][0]
+        #     except:
+        #         game_name3 = "ゲームが選択されていません"
 
-            Not_edit_flag = 1
-            # follow = db.cursor()
-            # follow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s", (session['profile_id'], ))
-            # follow_count = follow.fetchall()[0][0]
+        #     Not_edit_flag = 1
+        #     # follow = db.cursor()
+        #     # follow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s", (session['profile_id'], ))
+        #     # follow_count = follow.fetchall()[0][0]
 
-            # followed = db.cursor()
-            # followed.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s", (session['profile_id'],))
-            # followed_count = followed.fetchall()[0][0]
+        #     # followed = db.cursor()
+        #     # followed.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s", (session['profile_id'],))
+        #     # followed_count = followed.fetchall()[0][0]
 
-            return render_template("profile.html", user_profile=user_profile,
-                               star1=star1, star2=star2, star3=star3, game_name1=game_name1, game_name2=game_name2,
-                               game_name3=game_name3, Not_edit_flag=Not_edit_flag, session=session)
+        #     return render_template("profile.html", user_profile=user_profile,
+        #                        star1=star1, star2=star2, star3=star3, game_name1=game_name1, game_name2=game_name2,
+        #                        game_name3=game_name3, session=session)
 
 
-          elif request.form.get("follow") == "フォロー":
+          if request.form.get("follow") == "フォロー":
             user_follow = db.cursor()
             user_follow.execute("INSERT INTO Follows (follow_id, followed_id) VALUES (%s, %s)", (session['user_id'], session['profile_id']))
             db.commit()
@@ -479,7 +479,7 @@ def profile():
           return redirect("/profile")
 
         else:
-            cursor = db.cursor()
+            cursor = db.cursor(buffered=True)
             cursor.execute("SELECT * FROM Profiles WHERE id=%s", (session['profile_id'], ))
             user_profile = cursor.fetchall()[0]
 
@@ -534,9 +534,36 @@ def profile():
             followed.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s", (session['profile_id'],))
             followed_count = followed.fetchall()[0][0]
 
+            modal_follow = db.cursor(buffered=True)
+            modal_follow.execute("SELECT followed_id FROM Follows WHERE follow_id = %s", (session['profile_id'],))
+            modal_follow_list = modal_follow.fetchall()
+            modal_follow_list = [i[0] for i in modal_follow_list]
+
+            follow_list = []
+            for i in modal_follow_list:
+              m = db.cursor(buffered = True)
+              m.execute("SELECT id, nickname, icon FROM Profiles WHERE id = %s", (i,))
+              n = m.fetchall()
+              n = list(n)
+              follow_list.append(n)
+            
+            modal_followed = db.cursor(buffered=True)
+            modal_followed.execute("SELECT follow_id FROM Follows WHERE followed_id = %s", (session['profile_id'],))
+            modal_followed_list = modal_followed.fetchall()
+            modal_followed_list = [i[0] for i in modal_followed_list]
+
+            followed_list = []
+            for i in modal_followed_list:
+              m = db.cursor(buffered = True)
+              m.execute("SELECT id, nickname, icon FROM Profiles WHERE id = %s", (i,))
+              n = m.fetchall()
+              n = list(n)
+              followed_list.append(n)
+
         return render_template("profile.html", user_profile=user_profile,
                                star1=star1, star2=star2, star3=star3, game_name1=game_name1, game_name2=game_name2,
-                               game_name3=game_name3, follow_count=follow_count, followed_count=followed_count, isFollow2=isFollow2, session=session)
+                               game_name3=game_name3, follow_count=follow_count, followed_count=followed_count,
+                                isFollow2=isFollow2, session=session, modal_follow_list=follow_list, modal_followed_list=followed_list)
 
     return redirect(url_for('login'))
 
@@ -766,6 +793,10 @@ def top():
           session["profile_id"] = request.form.get("friend_id")
           return redirect("/profile")
 
+        elif request.form.get("myprofile") == "マイプロフを表示する":
+          session["profile_id"] = request.form.get("my_id")
+          return redirect("/profile")
+
         elif request.form.get("talk") == "トークルームに行く":
           try:
             get_group = db.cursor()
@@ -867,14 +898,14 @@ def asyncdata():
           return render_template("search.html", id_search = search_result)
         
         elif request.form.get("nickname"):
-
+          
           l = []
           db = cdb()
           game_names = db.cursor(buffered=True)
           game_names.execute("SELECT game_name from Game_names")
 
           nickname = request.form.get("nickname")
-          
+
           nick = db.cursor()
           nick.execute("SELECT P.id, P.nickname, P.icon, P.comment from Profiles as P where P.nickname = %s", (nickname,))
           n = nick.fetchall()
