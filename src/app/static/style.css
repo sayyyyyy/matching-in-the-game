@@ -289,3 +289,12 @@ body.loggedin {
     border: solid 3px black;
 	opacity: 0.5;
 }
+
+/* しゅう作成 トーク部分 */
+#chat {
+	border-radius: 10px;
+	background-color: #FFF0F5;
+}
+#text {
+	border-radius: 5px;
+}
