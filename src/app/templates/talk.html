@@ -55,9 +55,11 @@
         <div>
             <h2>ルーム : {{session['room_id']}}</h2>
             <h2>ログインユーザー : {{session['user_id']}}</h2>
-            <textarea readonly id="chat" cols="60" rows="10" placeholder="メッセージはありません"></textarea>
-            <input type="text" id="text" size="60" placeholder="メッセージを入力してください" />
-            <button type="button" id="send" class="">SEND</button>
+            <textarea readonly id="chat" cols="67" rows="10" placeholder="メッセージはありません"></textarea>
+            <div class="addmsg">
+                <input type="text" id="text" size="60" placeholder="メッセージを入力してください" />
+                <button type="button" id="send" class="">SEND</button>
+            </div>
         </div>
         <div>
             <p>友達</p>
