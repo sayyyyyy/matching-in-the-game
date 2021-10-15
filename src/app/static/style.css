@@ -41,6 +41,9 @@
 	font-size: 36px;
 	color: #008080;
 }
+*.addmsg {
+	display: block;
+}
 body {
   	background-color: #435165;
   	margin: 0;
