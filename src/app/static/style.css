@@ -35,6 +35,12 @@
 	border-radius: 10px;
 	background-color: #FAEBD7;
 }
+*.top_title {
+	font-family: 'Comic Sans MS', 'SimSun';
+	text-align: center;
+	font-size: 36px;
+	color: #008080;
+}
 body {
   	background-color: #435165;
   	margin: 0;
