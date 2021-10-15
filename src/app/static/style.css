@@ -31,6 +31,10 @@
   	-webkit-font-smoothing: antialiased;
   	-moz-osx-font-smoothing: grayscale;
 }
+*.msg_text {
+	border-radius: 10px;
+	background-color: #FAEBD7;
+}
 body {
   	background-color: #435165;
   	margin: 0;
