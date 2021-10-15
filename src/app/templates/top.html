@@ -4,11 +4,105 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/trial.css" />
+    <!--    ↑　追加した-->
     <link rel ="stylesheet" href ="../static/top.css">
     <title>Docker Test{% block title %} {% endblock %}</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src ="../static/main.js"></script>
 </head>
+
+<!--------------------------------------------------------------------------------------->
+
+<div>
+    <div class="modal__">
+    <button id="modalOpen" class="aaa">グループ作成</button>
+
+　　 <div id="easyModal" class="modal">
+
+　　　　<div class="modal-content">
+
+　　　　　　<div class="modal-header">
+　　　　　　　　<h1>グループ作成</h1>
+　　　　　　　　<span class="modalClose">×</span>
+　　　　　　</div>
+
+　　　　　　<div class="modal-body">
+　　　　　　　　<form action='/top' method='POST'>
+                <input type="text" name="group_name" placeholder="グループネームを入力">
+                    <p></p>
+                  {% for i in Mutual_friends %}
+                    <label for="check_box">
+                    <input type="checkbox" id="check_box"
+                           name='member' value="{{i[0][2]}}">
+                    <img src ="{{ i[0][0] }}" class ="is-circle">
+                    {{ i[0][1] }}
+                    </label>
+                    <p></p>
+                  {% endfor %}
+                <input type="submit" name="create_group" value="グループ作成">
+              </form>
+    　　　　</div>
+　　　　　　</div>
+
+　　　　</div>
+　　</div>
+<!--　　<script src="../static/trial.js"></script>-->
+
+<!--------------------------------------------------------------------------------------->
+
+<div class="modal__">
+    <button id="modalOpen_" >通知</button>
+
+　　<div id="easyModal_" class="modal_">
+
+　　　　<div class="modal-content_">
+
+　　　　　　<div class="modal-header_">
+　　　　　　　　<h1>通知</h1>
+　　　　　　　　<span class="modalClose_">×</span>
+　　　　　　</div>
+
+　　　　　　<div class="modal-body_">
+             <div class="follows">
+　　　　　　　　<form action='/top' method='POST'>
+                  {% for i in followed_info %}
+                    <label>
+                    <img src ="{{ i[0][0] }}" class ="is-circle">
+                    {{ i[0][1] }}
+                    <input type="hidden" name="follow" value="{{i[0][2]}}">
+                    <button type="submit">フォローする</button>
+                    </label>
+                    <p></p>
+                  {% endfor %}
+              </form>
+             </div>
+
+         <div class="groups">
+             <form action='/top' method='POST'>
+             {% for i in group_list %}
+             <label>
+                 <img src ="{{ i[0][1] }}" class ="is-circle">
+                 {{i[0][0]}}
+             </label>
+             <input type="hidden" name="join_group" value="{{i[0][2]}}">
+             <button type="submit">グループ参加</button>
+             <p></p>
+             {% endfor %}
+             </form>
+         </div>
+
+    　　　　</div>
+　　　　　　</div>
+　　　　</div>
+　　</div>
+<script src="../static/trial.js"></script>
+</div>
+
+
+<!--------------------------------------------------------------------------------------->
+
+
 <body>
     <h1>Your mutual follow friends</h1>
     <p>あなたのID</p>
