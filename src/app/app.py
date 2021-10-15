@@ -895,10 +895,12 @@ def top():
         db = cdb()
         if request.form.get("profile") == "プロフを表示する":
           session["profile_id"] = request.form.get("friend_id")
+          session["profile_id"] = int(session["profile_id"])
           return redirect("/profile")
 
         elif request.form.get("myprofile") == "マイプロフを表示する":
           session["profile_id"] = request.form.get("my_id")
+          session["profile_id"] = int(session["profile_id"])
           return redirect("/profile")
 
         elif request.form.get("talk") == "トークルームに行く":
