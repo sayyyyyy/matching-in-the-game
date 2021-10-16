@@ -115,10 +115,6 @@ def login():
       session['user_id'] = account[0]
       return redirect("/top")
 
-    # elif 'user' in session:
-    #     return render_template('main.html', session=session['user'])
-    #もしこれをコメントアウトしないとログインの記入画面でnicknameとpasswordが間違っていてもmain画面を開いてしまう
-
     else:
       msg = 'incorrect username or password'
 
@@ -135,7 +131,7 @@ def main1():
   cursor.execute("SELECT * FROM Profiles WHERE id = %s", (session['user_id'],))
   account = cursor.fetchone()
 
-  return render_template('main.html', session=session['user'], session_id=session['user_id'], account=account, log=session['loggedin'], user=session['user'])
+  return render_template('top.html', session=session['user'], session_id=session['user_id'], account=account, log=session['loggedin'], user=session['user'])
 
 @app.route('/logout')
 def logout():
@@ -204,7 +200,7 @@ def register2():
       session['loggedin'] = True
       session['user_id'] = account_new[0]
 
-      return render_template('main.html')
+      return render_template('top.html')
 
   else:
     return render_template('register2.html')
@@ -258,7 +254,7 @@ def check():
      session['loggedin'] = True
      session['user_id'] = account[0]
 
-     return render_template('main.html')
+     return render_template('top.html')
 
   else:
      cnx = cdb()
@@ -277,7 +273,7 @@ def check():
      session['loggedin'] = True
      session['user_id'] = account_new[0]
 
-     return render_template('main.html')
+     return render_template('top.html')
 
 
 
@@ -339,7 +335,7 @@ def callback():
      session['user'] = nick_name
      session['loggedin'] = True
      session['user_id'] = account[0]
-     return render_template('main.html')
+     return render_template('top.html')
 
   else:
      cnx = cdb()
@@ -356,7 +352,7 @@ def callback():
      session['user'] = nick_name
      session['loggedin'] = True
      session['user_id'] = account_new[0]
-     return render_template('main.html')
+     return render_template('top.html')
 
 
 @app.route("/profile", methods=["GET", "POST"])
@@ -1085,172 +1081,6 @@ def asyncdata():
           return render_template("search.html", n = msg)
 
 
-@app.route('/a', methods=['POST', 'GET'])
-def a():
-  db = cdb()
-  if request.method == 'POST' and 'group_name' in request.form and "member" in \
-          request.form and request.form.get('create_group') == "グループ作成":
-    image_path = "static/images/iam.jpg"
-    group_name = request.form.get('group_name')
-    members = request.form.getlist("member")
-
-    # Groupの作成 (group_nameとgroup_icon→これはデフォルト設定にしてる)
-    create_group = db.cursor()
-    create_group.execute("INSERT INTO Groups (group_name, group_icon) "
-                         "VALUES (%s, %s)", (group_name, image_path,))
-    db.commit()
-
-    # GroupネームからそのグループIDを取ってくる。Group_nameが被った場合どうする？
-    group_id = db.cursor()
-    group_id.execute('SELECT id From Groups WHERE group_name = %s', (group_name,))
-    group_id = group_id.fetchall()
-    group_id = group_id[0][0]
-
-    # 初期メンバー(自分の登録)、これは、一意のgroup_idだから大丈夫
-    init_member = db.cursor()
-    init_member.execute('INSERT INTO Members (member_id, flag_join, group_id) '
-                        'VALUES (%s, %s, %s)',
-                        (session['user_id'], 1, group_id,))
-    db.commit()
-
-    # 招待した人をmemberのmember_idに追加してflagを0にする
-    for member in members:
-      member = int(member)
-      members = db.cursor()
-      members.execute('INSERT INTO Members (member_id, flag_join, group_id) '
-                      'VALUES (%s, %s, %s)', (member, 0, group_id,))
-      db.commit()
-
-    return redirect('/a')
-
-
-  else:
-    # ------------------テストで表示させたいやつ-----------------
-    group = db.cursor()
-    group.execute('SELECT * FROM Groups')
-    group = group.fetchall()
-
-    member = db.cursor()
-    member.execute('SELECT * FROM Members')
-    member = member.fetchall()
-
-    # -------------------------------------------------------
-
-    # ログインユーザーがフォローしている人
-    follow_id = db.cursor(buffered=True)
-    follow_id.execute("SELECT followed_id from Follows where follow_id = %s",
-                      (session['user_id'],))
-    # ログインユーザーをフォローしている人
-    followed_id = db.cursor(buffered=True)
-    followed_id.execute("SELECT follow_id from Follows where followed_id = %s",
-                        (session['user_id'],))
-
-    follow_f = follow_id.fetchall()
-    followed_f = followed_id.fetchall()
-
-    follow_li = [i[0] for i in follow_f]
-
-    followed_li = [i[0] for i in followed_f]
-    # 共通する部分をリスト化
-    Mutuals = tuple(set(follow_li) & set(followed_li))
-
-    Mutual_friends = []
-
-    for Mutual in Mutuals:
-      list_friends = db.cursor(buffered=True)
-      list_friends.execute(
-        "SELECT icon, nickname, id from Profiles where id = %s", (Mutual,))
-      m = list_friends.fetchall()
-      Mutual_friends.append(m)
-
-    return render_template('a.html', group=group,
-                           Mutual_friends=Mutual_friends, Mutuals=Mutuals,
-                           member=member)
-
-
-@app.route('/b', methods=['POST', 'GET'])
-def b():
-  db = cdb()
-  if request.method == "POST" and "follow" in request.form:
-    # このやり方だと毎回ポップアップが消える (リダイレクトするから)
-    id = request.form.get("follow")
-    return_follow = db.cursor()
-    return_follow.execute("INSERT INTO Follows (follow_id, followed_id) "
-                          "VALUES(%s, %s)", (session['user_id'], id,))
-    db.commit()
-
-    return redirect('/b')
-
-  elif request.method == "POST" and "join_group" in request.form:
-    id = request.form.get("join_group")
-    join = db.cursor()
-    join.execute("UPDATE Members SET flag_join = %s WHERE group_id = %s",
-                 (1, id,))
-    db.commit()
-
-    return redirect('/b')
-
-  else:
-    # これはフォローの部分--------------------------------------------------------
-    # ログインユーザーをフォローしている人---------------------------
-    followed_id = db.cursor(buffered=True)
-    followed_id.execute("SELECT follow_id from Follows where followed_id = %s",
-                        (session['user_id'],))
-    followed_f = followed_id.fetchall()
-
-    # ログインユーザーがフォローしている人---------------------------
-    follow_id = db.cursor(buffered=True)
-    follow_id.execute("SELECT followed_id from Follows where follow_id = %s",
-                      (session['user_id'],))
-    follow_f = follow_id.fetchall()
-
-    # --------------------------------------------------------
-    follow_li = [i[0] for i in follow_f]
-    followed_li = [i[0] for i in followed_f]
-
-    # 相互フォローのタプルを取得--------------------------------------------------
-    Mutuals = tuple(set(follow_li) & set(followed_li))
-
-    # フォローされているリストから相互のリストで被らない部分を取得-----------------------
-    list_all = list(set(Mutuals)) + list(set(followed_li))
-    followed_list_only = [x for x in set(list_all) if
-                          list_all.count(x) == 1]
-
-    # followed_list_onlyからユーザーの情報を取得-------------------------------
-    followed_info = []
-    for user in followed_list_only:
-      list_friends = db.cursor(buffered=True)
-      list_friends.execute(
-        "SELECT icon, nickname, id from Profiles where id = %s", (user,))
-      m = list_friends.fetchall()
-      followed_info.append(m)
-
-    # フォローの部分はここまで------------------------------------------------------
-
-    # グループの部分--------------------------------------------------------------
-    # Memberに自分がいるが参加していないMemberテーブルのgroup_idを取得
-    group = db.cursor()
-    group.execute("SELECT group_id FROM Members WHERE member_id= %s AND "
-                  "flag_join= %s", (session['user_id'], 0, ))
-    group = group.fetchall()
-
-    # gropはリストの中が()になっているからリストにする---------------------------------
-    list_i = []
-    for i in group:
-      i = i[0]
-      list_i.append(i)
-
-    # groupで取ったidでGroupsテーブルからGroup_nameとGroup_iconを取得----------------
-    group_list = []
-    for i in list_i:
-      id = db.cursor(buffered=True)
-      id.execute(
-        "SELECT group_name, group_icon, id from Groups where id = %s", (i,))
-      m = id.fetchall()
-      group_list.append(m)
-
-    return render_template('b.html', followed_info=followed_info, group=group,
-                           list_i=list_i, group_list=group_list)
 
 @app.route('/c', methods=['GET', 'POST'])
 def c():
