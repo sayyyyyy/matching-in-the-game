@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../static/trial.css" />
+</head>
+
+
+<body>
+
+
+
+{% for i in group_list %}
+    <div class="groups">
+        <form action='/group_pre' method='POST'>
+            <button>
+                <label>
+                 <img src ="{{ i[0][1] }}" class ="is-circle">
+                 {{i[0][0]}}
+                </label>
+                <input type="hidden" name="edit" value="{{i[0][2]}}">
+            </button>
+        </form>
+    </div>
+{% endfor %}
+
+
+
+</body>
+</html>

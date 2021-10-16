@@ -1,4 +1,9 @@
-/*@charset UTF-8;*/
+@charset UTF-8;
+
+:root {
+    --main-color: #cccccc;
+    --sub-color: #9999ff;
+}
 
 .is-circle {
     width:  50px;       /* ※縦横を同値に */
@@ -52,4 +57,157 @@
 .right_info {
     display: flex;
     flex-direction: column;
+}
+
+.is-circle {
+    width:  30px;       /* ※縦横を同値に */
+    height: 30px;       /* ※縦横を同値に */
+    border-radius: 50%;  /* 角丸半径を50%にする(=円形にする) */
+    background-position: left top;  /* 横長画像の左上を基準に表示 */
+    display: inline-block;
+    border: solid 3px black;
+}
+
+body {
+  font-family: serif;
+  font-size: 16px;
+  line-height: 1.6;
+  /color: #fff;/
+}
+
+.button {
+  background: lightblue;
+  color: #fff;
+  padding: 0 2em;
+  border: 0;
+  width: 200px;
+  height: 50px;
+  font-size: 8px;
+  border-radius: 5px;
+  font-weight: 900;
+  position: relative;
+  left: 10px;
+  top: 10px;
+  font-family: serif;
+}
+
+.button:hover {
+  background: lightcoral;
+  cursor: pointer;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: #f4f4f4;
+  margin: 5% auto;
+  width: 50%;
+  box-shadow: 0 5px 8px 0 rgba(0,0,0,0.2),0 7px 20px 0 rgba(0,0,0,0.17);
+  animation-name: modalopen;
+  animation-duration: 1s;
+}
+
+@keyframes modalopen {
+  from {opacity: 0}
+  to {opacity: 1}
+}
+
+.modal-header h1 {
+  margin: 1rem 0;
+}
+
+.modal-header {
+  background: lightblue;
+  padding: 3px 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modalClose {
+  font-size: 2rem;
+}
+
+.modalClose:hover {
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 10px 20px;
+  color: black;
+  /text-align: center;
+}
+
+/*--------------------------------------------------------------------*/
+
+.modal_ {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content_ {
+  background-color: #f4f4f4;
+  margin: 5% auto;
+  width: 50%;
+  box-shadow: 0 5px 8px 0 rgba(0,0,0,0.2),0 7px 20px 0 rgba(0,0,0,0.17);
+  animation-name: modalopen_;
+  animation-duration: 1s;
+}
+
+@keyframes modalopen_ {
+  from {opacity: 0}
+  to {opacity: 1}
+}
+
+.modal-header_ h1 {
+  margin: 1rem 0;
+}
+
+.modal-header_ {
+  background: lightblue;
+  padding: 3px 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modalClose_ {
+  font-size: 2rem;
+}
+
+.modalClose_:hover {
+  cursor: pointer;
+}
+
+.modal-body_ {
+  padding: 10px 20px;
+  color: black;
+  /text-align: center;
+}
+
+/*------------------------------*/
+.header-title {
+    margin: 0 auto;
+    text-align: center;
+    background-color: var(--main-color);
+    padding: 20px;
+}
+
+h1 {
+    color: var(--sub-color);
 }

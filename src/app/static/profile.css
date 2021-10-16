@@ -1,0 +1,10 @@
+:root {
+    --main-color: #FFFFFF;
+    --sub-color: #000000;
+}
+#profile_contents {
+    margin: 100px;
+}
+#profile_right {
+    padding-left: 100px;
+}

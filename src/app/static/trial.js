@@ -48,26 +48,3 @@ function outsideClose_(e) {
 　　};
 };
 
-//----------------------------------------------------------------------------------------------
-
-
-//以下みーや追加
-//ボタンがクリックされた時
-buttonOpen_follow.addEventListener('click', modalOpen_follow);
-function modalOpen_follow() {
-　　modal_follow.style.display = 'block';
-};
-
-//バツ印がクリックされた時
-buttonClose_follow.addEventListener('click', modalClose_follow);
-function modalClose_follow() {
-　　modal_follow.style.display = 'none';
-};
-
-//モーダルコンテンツ以外がクリックされた時
-addEventListener('click', outsideClose_follow);
-function outsideClose_follow(e) {
-　　if (e.target == modal_follow) {
-　　modal_follow.style.display = 'none';
-　　};
-};
