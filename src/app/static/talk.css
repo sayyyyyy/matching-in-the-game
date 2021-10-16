@@ -1,0 +1,85 @@
+:root {
+    --main-color: lightcoral;
+    --sub-color: lightblue;
+    --background-color: #333333;
+    --text-color: white;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.space {
+    width: 10vw;
+}
+
+.group {
+    padding-top: 10vh;
+}
+
+.friend {
+    padding-top: 10vh;
+}
+
+#chat {
+    height: 50vh;
+    width: 40vw;
+    overflow: scroll;
+}
+
+#chat > li {
+    color: black;
+    padding-bottom: 10px;
+    list-style: none;
+}
+
+#chat > li::before {
+    content: '';
+    height: 20px;
+    width: 20px;
+    background-image: url();
+}
+
+#chat > img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: solid 3px var(--main-color);
+}
+
+#text {
+    width: 30vw;
+    margin-left: 2vw;
+}
+.group_btn {
+    border-color: var(--main-color);
+    font-size: 1vw;
+    width: 20vw;
+    height: 10vh;
+    overflow-wrap: normal;
+}
+
+.friend_btn {
+    border-color: var(--sub-color);
+    font-size: 1vw;
+    width: 20vw;
+    height: 10vh;
+}
+
+.friend_icon {
+    width: 10vh;
+    height: 10vh;
+}
+
+.back {
+    text-decoration: none;
+    color:blac;
+    background-color: whitesmoke;
+    font-size: 3vh;
+}
+
+i {
+    margin-top: 20px;
+    margin-right: 10px;
+}

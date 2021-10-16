@@ -115,10 +115,6 @@ def login():
       session['user_id'] = account[0]
       return redirect("/top")
 
-    # elif 'user' in session:
-    #     return render_template('main.html', session=session['user'])
-    #もしこれをコメントアウトしないとログインの記入画面でnicknameとpasswordが間違っていてもmain画面を開いてしまう
-
     else:
       msg = 'incorrect username or password'
 
@@ -135,7 +131,7 @@ def main1():
   cursor.execute("SELECT * FROM Profiles WHERE id = %s", (session['user_id'],))
   account = cursor.fetchone()
 
-  return render_template('main.html', session=session['user'], session_id=session['user_id'], account=account, log=session['loggedin'], user=session['user'])
+  return render_template('top.html', session=session['user'], session_id=session['user_id'], account=account, log=session['loggedin'], user=session['user'])
 
 @app.route('/logout')
 def logout():
@@ -204,7 +200,7 @@ def register2():
       session['loggedin'] = True
       session['user_id'] = account_new[0]
 
-      return render_template('main.html')
+      return render_template('top.html')
 
   else:
     return render_template('register2.html')
@@ -258,7 +254,7 @@ def check():
      session['loggedin'] = True
      session['user_id'] = account[0]
 
-     return render_template('main.html')
+     return render_template('top.html')
 
   else:
      cnx = cdb()
@@ -277,7 +273,7 @@ def check():
      session['loggedin'] = True
      session['user_id'] = account_new[0]
 
-     return render_template('main.html')
+     return render_template('top.html')
 
 
 
@@ -339,7 +335,7 @@ def callback():
      session['user'] = nick_name
      session['loggedin'] = True
      session['user_id'] = account[0]
-     return render_template('main.html')
+     return render_template('top.html')
 
   else:
      cnx = cdb()
@@ -356,7 +352,7 @@ def callback():
      session['user'] = nick_name
      session['loggedin'] = True
      session['user_id'] = account_new[0]
-     return render_template('main.html')
+     return render_template('top.html')
 
 
 @app.route("/profile", methods=["GET", "POST"])
@@ -364,70 +360,6 @@ def profile():
     if 'loggedin' in session:
         db = cdb()
         if request.method == "POST":
-          
-        #   #ほかの人のプロフィールを見るとき
-        #   if request.form.get("friend_id"):
-        #     each_id = request.form.get("friend_id")
-
-        #     cursor = db.cursor()
-        #     cursor.execute("SELECT * FROM Profiles WHERE id=%s", (each_id, ))
-        #     user_profile = cursor.fetchall()[0]
-
-        #     isFollow = db.cursor()
-        #     isFollow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s AND followed_id = %s", (session['user_id'], session['profile_id']))
-        #     isFollow2 = isFollow.fetchall()[0][0]
-            
-        #     game_list = db.cursor()
-        #     game_list.execute("SELECT game_id, game_level, game_order FROM Games WHERE user_id = %s", (each_id,))
-        #     games = game_list.fetchall()
-
-        #     try:
-        #       star1 = games[0][1]
-        #     except:  
-        #       star1 = 0
-        #     try:
-        #       star2 = games[1][1]
-        #     except:
-        #       star2 = 0
-        #     try:              
-        #       star3 = games[2][1]
-        #     except:
-        #       star3 = 0
-
-        #     try:
-        #         game1 = db.cursor()
-        #         game1.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[0][0], ))
-        #         game_name1 = game1.fetchall()[0][0]
-        #     except:
-        #         game_name1 = "ゲームが選択されていません"
-
-        #     try:
-        #         game2 = db.cursor()
-        #         game2.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[1][0], ))
-        #         game_name2 = game2.fetchall()[0][0]
-        #     except:
-        #         game_name2 = "ゲームが選択されていません"
-
-        #     try:
-        #         game3 = db.cursor()
-        #         game3.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[2][0], ))
-        #         game_name3 = game3.fetchall()[0][0]
-        #     except:
-        #         game_name3 = "ゲームが選択されていません"
-
-        #     Not_edit_flag = 1
-        #     # follow = db.cursor()
-        #     # follow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s", (session['profile_id'], ))
-        #     # follow_count = follow.fetchall()[0][0]
-
-        #     # followed = db.cursor()
-        #     # followed.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s", (session['profile_id'],))
-        #     # followed_count = followed.fetchall()[0][0]
-
-        #     return render_template("profile.html", user_profile=user_profile,
-        #                        star1=star1, star2=star2, star3=star3, game_name1=game_name1, game_name2=game_name2,
-        #                        game_name3=game_name3, session=session)
-
 
           if request.form.get("follow") == "フォロー":
             user_follow = db.cursor()
@@ -474,6 +406,10 @@ def profile():
               into_group_follower.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (request.form.get('talk_id'), group))
               db.commit()
               session['room_id'] = group
+
+            get_group_name = db.cursor()
+            get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
+            session['room_name'] = get_group_name.fetchall()[0][0]
             return redirect("/talk")       
           
           return redirect("/profile")
@@ -583,13 +519,13 @@ def edit():
           img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
           img_file.save(img_url)
 
-          cursor = db.cursor()
+          cursor = db.cursor(buffered=True)
           cursor.execute("UPDATE Profiles SET icon = %s WHERE id = %s", (UPLOAD_FOLDER + filename, session['user_id']))
           db.commit()
 
         # ゲーム変更
         if request.form.get("game1"):
-          edit_game1 = db.cursor()
+          edit_game1 = db.cursor(buffered=True)
           edit_game1.execute("SELECT id FROM Game_names WHERE game_name = %s", (request.form.get("game1"),))
           game_name_1 = edit_game1.fetchall()[0][0]
           
@@ -605,14 +541,14 @@ def edit():
 
         if request.form.get("skill1"):
           try:
-            star1 = db.cursor()
+            star1 = db.cursor(buffered=True)
             star1.execute("UPDATE Games SET game_level = %s WHERE user_id = %s AND game_order = %s", (request.form.get("skill1"), session['user_id'], 1))
             db.commit()
           except:
             pass
 
         if request.form.get("game2"):
-          edit_game2 = db.cursor()
+          edit_game2 = db.cursor(buffered=True)
           edit_game2.execute("SELECT id FROM Game_names WHERE game_name = %s", (request.form.get("game2"),))
           game_name_2 = edit_game2.fetchall()[0][0]
           
@@ -628,7 +564,7 @@ def edit():
 
         if request.form.get("skill2"):
           try:
-            star2 = db.cursor()
+            star2 = db.cursor(buffered=True)
             star2.execute("UPDATE Games SET game_level = %s WHERE user_id = %s AND game_order = %s", (request.form.get("skill2"), session['user_id'], 2))
             db.commit()
           except:
@@ -651,38 +587,38 @@ def edit():
 
         if request.form.get("skill3"):
           try:
-            star3 = db.cursor()
+            star3 = db.cursor(buffered=True)
             star3.execute("UPDATE Games SET game_level = %s WHERE user_id = %s AND game_order = %s", (request.form.get("skill3"), session['user_id'], 3))
             db.commit()
           except:
             pass
 
         # その他変更
-          set_prof = db.cursor()
+          set_prof = db.cursor(buffered=True)
           set_prof.execute("UPDATE Profiles SET nickname = %s, password = %s, email = %s, comment = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("password"), request.form.get("email"), request.form.get("comment"), session['user_id']))
           db.commit()
-          return redirect("/edit")
+        return redirect("/edit")
       else:
-        mutual_follow = db.cursor()
-        mutual_follow.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s AND follow_id IN (SELECT followe_id FROM Follows WHERE follow_id = %s)", (session['user_id'], session['user_id']))
+        mutual_follow = db.cursor(buffered=True)
+        mutual_follow.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s AND follow_id IN (SELECT followed_id FROM Follows WHERE follow_id = %s)", (session['user_id'], session['user_id']))
 
-        cursor = db.cursor()
+        cursor = db.cursor(buffered=True)
         cursor.execute("SELECT * FROM Profiles WHERE id = %s", (session['user_id'],))
         user_profile = cursor.fetchall()[0]
 
-        game_list = db.cursor()
+        game_list = db.cursor(buffered=True)
         game_list.execute("SELECT game_name FROM Game_names")
         games = game_list.fetchall()
 
-        game_all = db.cursor()
+        game_all = db.cursor(buffered=True)
         game_all.execute("SELECT * FROM Games WHERE user_id = %s", (session['user_id'],))
         gameaaa = game_all.fetchall()
 
-        follow = db.cursor()
+        follow = db.cursor(buffered=True)
         follow.execute("SELECT nickname FROM Profiles WHERE id IN (SELECT followed_id FROM Follows WHERE follow_id = %s)", (session['user_id'], ))
         follow_id_list = follow.fetchall()        
 
-        followed = db.cursor()
+        followed = db.cursor(buffered=True)
         followed.execute("SELECT nickname FROM Profiles WHERE id IN (SELECT follow_id FROM Follows WHERE followed_id = %s)", (session['user_id'], ))
         followed_id_list = followed.fetchall()        
 
@@ -696,6 +632,10 @@ def talk():
     if request.method == "POST":
       if request.form.get("group_talk") != None:
         session['room_id'] = request.form.get("group_id")
+        db = cdb()
+        get_group_name = db.cursor()
+        get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
+        session['room_name'] = get_group_name.fetchall()[0][0]
       elif request.form.get("friend_talk") != None:
         db = cdb()
         try:
@@ -723,11 +663,15 @@ def talk():
           into_group_follower.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (request.form.get('friend_id'), group))
           db.commit()
           session['room_id'] = group
+
+        get_group_name = db.cursor()
+        get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
+        session['room_name'] = get_group_name.fetchall()[0][0]
       return redirect("/talk")
     else:
       db = cdb()
       follow = db.cursor()
-      follow.execute("SELECT id, nickname FROM Profiles WHERE id IN (SELECT followed_id FROM Follows WHERE follow_id = %s)", (session['user_id'], ))
+      follow.execute("SELECT id, nickname, icon FROM Profiles WHERE id IN (SELECT followed_id FROM Follows WHERE follow_id = %s)", (session['user_id'], ))
       follow_id_list = follow.fetchall()
       group = db.cursor()
       group.execute("SELECT id, group_name FROM Groups WHERE id IN (SELECT group_id FROM Members WHERE member_id = %s)", (session['user_id'], ))
@@ -752,8 +696,6 @@ def join(message):
     user = user_info.fetchall()
     
     join_room(room)
-    #（未）DBから過去メッセージを取得して表示させる
-    #emit('status', {'msg': map(lambda i: i + 'iii', view_msg)}, room=room)
     emit('status', {'msg': view_msg, 'user': user}, room=room)
 
 
@@ -768,9 +710,8 @@ def text(message):
     user = user_info.fetchall()
 
     in_message = db.cursor()
-    in_message.execute("INSERT INTO Messages (sender_id, group_id, message) VALUES (%s, %s, %s)", (session['user_id'], session['room_id'], user[0][0] + message['msg']))
+    in_message.execute("INSERT INTO Messages (sender_id, group_id, message) VALUES (%s, %s, %s)", (session['user_id'], session['room_id'], message['msg']))
     db.commit()
-    #（未）グループidを取得してメッセージをDBに格納する
     emit('message', {'msg': message['msg'], 'user': user}, room=room)
 
 
@@ -951,6 +892,9 @@ def top():
             #isOneonOne = db.cursor()
             #isOneonOne.execute("SELECT * FROM Groups WHERE %s = (SELECT COUNT(*) FROM Members WHERE group_id =)")
             session['room_id'] = get_group.fetchall()[0][0]
+            get_group_name = db.cursor()
+            get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
+            session['room_name'] = get_group_name.fetchall()[0][0]
             
           except:
             session['room_id'] = request.form.get("talk_id") #グループidにしたい
@@ -973,6 +917,10 @@ def top():
             db.commit()
 
             session['room_id'] = group
+
+            get_group_name = db.cursor()
+            get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
+            session['room_name'] = get_group_name.fetchall()[0][0]
           return redirect("/talk")   
         
         return "error"
@@ -1085,172 +1033,6 @@ def asyncdata():
           return render_template("search.html", n = msg)
 
 
-@app.route('/a', methods=['POST', 'GET'])
-def a():
-  db = cdb()
-  if request.method == 'POST' and 'group_name' in request.form and "member" in \
-          request.form and request.form.get('create_group') == "グループ作成":
-    image_path = "static/images/iam.jpg"
-    group_name = request.form.get('group_name')
-    members = request.form.getlist("member")
-
-    # Groupの作成 (group_nameとgroup_icon→これはデフォルト設定にしてる)
-    create_group = db.cursor()
-    create_group.execute("INSERT INTO Groups (group_name, group_icon) "
-                         "VALUES (%s, %s)", (group_name, image_path,))
-    db.commit()
-
-    # GroupネームからそのグループIDを取ってくる。Group_nameが被った場合どうする？
-    group_id = db.cursor()
-    group_id.execute('SELECT id From Groups WHERE group_name = %s', (group_name,))
-    group_id = group_id.fetchall()
-    group_id = group_id[0][0]
-
-    # 初期メンバー(自分の登録)、これは、一意のgroup_idだから大丈夫
-    init_member = db.cursor()
-    init_member.execute('INSERT INTO Members (member_id, flag_join, group_id) '
-                        'VALUES (%s, %s, %s)',
-                        (session['user_id'], 1, group_id,))
-    db.commit()
-
-    # 招待した人をmemberのmember_idに追加してflagを0にする
-    for member in members:
-      member = int(member)
-      members = db.cursor()
-      members.execute('INSERT INTO Members (member_id, flag_join, group_id) '
-                      'VALUES (%s, %s, %s)', (member, 0, group_id,))
-      db.commit()
-
-    return redirect('/a')
-
-
-  else:
-    # ------------------テストで表示させたいやつ-----------------
-    group = db.cursor()
-    group.execute('SELECT * FROM Groups')
-    group = group.fetchall()
-
-    member = db.cursor()
-    member.execute('SELECT * FROM Members')
-    member = member.fetchall()
-
-    # -------------------------------------------------------
-
-    # ログインユーザーがフォローしている人
-    follow_id = db.cursor(buffered=True)
-    follow_id.execute("SELECT followed_id from Follows where follow_id = %s",
-                      (session['user_id'],))
-    # ログインユーザーをフォローしている人
-    followed_id = db.cursor(buffered=True)
-    followed_id.execute("SELECT follow_id from Follows where followed_id = %s",
-                        (session['user_id'],))
-
-    follow_f = follow_id.fetchall()
-    followed_f = followed_id.fetchall()
-
-    follow_li = [i[0] for i in follow_f]
-
-    followed_li = [i[0] for i in followed_f]
-    # 共通する部分をリスト化
-    Mutuals = tuple(set(follow_li) & set(followed_li))
-
-    Mutual_friends = []
-
-    for Mutual in Mutuals:
-      list_friends = db.cursor(buffered=True)
-      list_friends.execute(
-        "SELECT icon, nickname, id from Profiles where id = %s", (Mutual,))
-      m = list_friends.fetchall()
-      Mutual_friends.append(m)
-
-    return render_template('a.html', group=group,
-                           Mutual_friends=Mutual_friends, Mutuals=Mutuals,
-                           member=member)
-
-
-@app.route('/b', methods=['POST', 'GET'])
-def b():
-  db = cdb()
-  if request.method == "POST" and "follow" in request.form:
-    # このやり方だと毎回ポップアップが消える (リダイレクトするから)
-    id = request.form.get("follow")
-    return_follow = db.cursor()
-    return_follow.execute("INSERT INTO Follows (follow_id, followed_id) "
-                          "VALUES(%s, %s)", (session['user_id'], id,))
-    db.commit()
-
-    return redirect('/b')
-
-  elif request.method == "POST" and "join_group" in request.form:
-    id = request.form.get("join_group")
-    join = db.cursor()
-    join.execute("UPDATE Members SET flag_join = %s WHERE group_id = %s",
-                 (1, id,))
-    db.commit()
-
-    return redirect('/b')
-
-  else:
-    # これはフォローの部分--------------------------------------------------------
-    # ログインユーザーをフォローしている人---------------------------
-    followed_id = db.cursor(buffered=True)
-    followed_id.execute("SELECT follow_id from Follows where followed_id = %s",
-                        (session['user_id'],))
-    followed_f = followed_id.fetchall()
-
-    # ログインユーザーがフォローしている人---------------------------
-    follow_id = db.cursor(buffered=True)
-    follow_id.execute("SELECT followed_id from Follows where follow_id = %s",
-                      (session['user_id'],))
-    follow_f = follow_id.fetchall()
-
-    # --------------------------------------------------------
-    follow_li = [i[0] for i in follow_f]
-    followed_li = [i[0] for i in followed_f]
-
-    # 相互フォローのタプルを取得--------------------------------------------------
-    Mutuals = tuple(set(follow_li) & set(followed_li))
-
-    # フォローされているリストから相互のリストで被らない部分を取得-----------------------
-    list_all = list(set(Mutuals)) + list(set(followed_li))
-    followed_list_only = [x for x in set(list_all) if
-                          list_all.count(x) == 1]
-
-    # followed_list_onlyからユーザーの情報を取得-------------------------------
-    followed_info = []
-    for user in followed_list_only:
-      list_friends = db.cursor(buffered=True)
-      list_friends.execute(
-        "SELECT icon, nickname, id from Profiles where id = %s", (user,))
-      m = list_friends.fetchall()
-      followed_info.append(m)
-
-    # フォローの部分はここまで------------------------------------------------------
-
-    # グループの部分--------------------------------------------------------------
-    # Memberに自分がいるが参加していないMemberテーブルのgroup_idを取得
-    group = db.cursor()
-    group.execute("SELECT group_id FROM Members WHERE member_id= %s AND "
-                  "flag_join= %s", (session['user_id'], 0, ))
-    group = group.fetchall()
-
-    # gropはリストの中が()になっているからリストにする---------------------------------
-    list_i = []
-    for i in group:
-      i = i[0]
-      list_i.append(i)
-
-    # groupで取ったidでGroupsテーブルからGroup_nameとGroup_iconを取得----------------
-    group_list = []
-    for i in list_i:
-      id = db.cursor(buffered=True)
-      id.execute(
-        "SELECT group_name, group_icon, id from Groups where id = %s", (i,))
-      m = id.fetchall()
-      group_list.append(m)
-
-    return render_template('b.html', followed_info=followed_info, group=group,
-                           list_i=list_i, group_list=group_list)
 
 @app.route('/c', methods=['GET', 'POST'])
 def c():

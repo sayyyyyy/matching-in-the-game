@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel ="stylesheet" href ="../static/style.css">
+    <link rel ="stylesheet" href ="../static/talk.css">
+    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
     <title>Talk</title>
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
@@ -24,14 +26,17 @@
 
                 var item = document.createElement('li');
 
-                for (let i = 0; i <= data['msg'].length; i++) {
+                for (let i = 0; i < data['msg'].length; i++) {
                     var item = document.createElement('li');
-                    var img = document.createElement('img');
+                    //var img = document.createElement('img');
 
-                    img.src = data['user'][0][1];
-                    chat.appendChild(img);
-                    item.textContent = data['msg'][i];
+                    //img.src = data['user'][0][1];
+                    //chat.appendChild(img);
+                    item.textContent = data['user'][0][0] + ':' + data['msg'][i];
+                    //item.style.listStyleImage = "url('" + data['user'][0][1] + "')";
+                    item.style.listStyle = "circle";
                     chat.appendChild(item);
+
                 }
                 $('#chat').scrollTop($('#chat')[0].scrollHeight);
             });
@@ -57,10 +62,10 @@
             });
             socket.on('message', function(data) {
                 var item = document.createElement('li');
-                var img = document.createElement('img');
+                //var img = document.createElement('img');
 
-                img.src = data['user'][0][1];
-                chat.appendChild(img);
+                //img.src = data['user'][0][1];
+                //chat.appendChild(img);
 
                 item.textContent = data['user'][0][0] + ':' + data['msg'];
                 chat.appendChild(item);
@@ -78,36 +83,50 @@
 </head>
 
 <body>
-    <p><a href="top">戻る</a></p>
+    <p><a class="back" href="top">戻る</a></p>
     <div class="flex">
-        <p>グループ</p>
-        {% for i in group_list %}
-            <form action="/talk" method="POST">  
-                <input readonly id ="group_id" type ="hidden" name ="group_id" value="{{ i[0] }}">
-                <input type="submit" name="group_talk" value="{{ i[1] }}">
-            </form>
-        {% endfor %}
+        <div class="group">
+            <div class="flex">
+                <i class="fas fa-users"></i>
+                <p>グループ</p>
+            </div>
+            <div class="scroll">
+                {% for i in group_list %}
+                    <form action="/talk" method="POST">  
+                        <input readonly id ="group_id" type ="hidden" name ="group_id" value="{{ i[0] }}">
+                        <input type="submit" name="group_talk" class="group_btn" value="{{ i[1] }}">
+                    </form>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="space"></div>
         <div>
-            <h2>ルーム : {{session['room_id']}}</h2>
-            <h2>ログインユーザー : {{session['user_id']}}</h2>
+            <h2>{{session['room_name']}}</h2>
             <ul id="chat">
-                <li>あああ</li>
             </ul>
             <form id="form" action="">
-                <input type="text" id="text" size="60" placeholder="メッセージを入力してください" />
-                <button>send</button>
+                <input type="text" id="text" placeholder="メッセージを入力してください" />
+                <button>送信</button>
             </form>
 
         </div>
-        <div>
-            <p>友達</p>
-            {% for i in follow_id_list %} 
-                <form action="/talk" method="POST">  
-                    <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ i[0] }}">
-                    <input type="submit" name="friend_talk" value="{{ i[1] }}">
-                </form>
-            {% endfor %}
-
+        <div class="space"></div>
+        <div class="friend">
+            <div  class="flex">
+                <i class="fas fa-user-friends"></i>
+                <p>友達</p>
+            </div>
+            <div class="scroll">
+                {% for i in follow_id_list %}                 
+                    <form action="/talk" method="POST">
+                        <div class="flex friend_container" >
+                            <img class="friend_icon" src ="{{ i[2] }}">  
+                            <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ i[0] }}">
+                            <input type="submit" name="friend_talk" class="friend_btn" value="{{ i[1] }}">
+                        </div>
+                    </form>
+                {% endfor %}
+            </div>
         </div>
     </div>
 
