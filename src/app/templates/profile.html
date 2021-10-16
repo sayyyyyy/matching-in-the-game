@@ -7,8 +7,6 @@ Profile
 
 
 {% block main %}
-<p>user:{{session['user_id']}}</p>
-<p>profile:{{session['profile_id']}}</p>
 
 {% if session.profile_id == session.user_id %}
 
@@ -68,33 +66,81 @@ Profile
                     </tr>
                 </tbody>
             </table>
-            <div class ="Follow_list">
-                <!-- <p>フォロー</p>
-                <p>{{follow_count}}</p> 
-                <p>フォロワー</p>
-                <p>{{followed_count}}</p> -->
+            <div class ="flex">
 
                 <!-- ここからみーやが書いたところ -->
                 <div class="modal__follow">
-<!--                    <button id="modalOpen_follow" class="button_follow">フォロー</button>-->
+                    <button id="modalOpen_follow" class="button_follow" type="button">フォロー({{follow_count}})</button>
                 
-                　　<div id="easyModal_follow" class="modal_follow">
+                    <div id="easyModal_follow" class="modal_follow">
+                
+                        <div class="modal-content_follow">
+                
+　　　　　　                 <div class="modal-header_follow">
+            　　　　　　　　    <h1>フォロー</h1>
+            　　　　　　　　    <button type="button" id="modalClose_follow" class="modalClose_follow">×</button>
+            　　　　　　     </div>
+    
+                            <div class="modal-body_follow">
+
+                                {% for i in modal_follow_list %}      
+                                
+                                
+                                <form action="/top" method="POST">
+                            
+                                    <div class="follow_info">
+                                    <img class="follow_info_img" src="{{ i[0][2] }}">
+
+                                    <p>{{ i[0][1] }}</p>
+                                    </div>
+                            
+                                    <input type ="hidden" name ="friend_id" value="{{ i[0][0] }}">
+                                    <input type="submit" name="profile" value="プロフを表示する">
+                            
+                                </form>
+
+                                {% endfor %}
+
+                    　　　   </div>
+                
+                    </div>
+                </div>
+                <!-- ----------------------------------------- -->
+                <!-- フォロワーの表示　-->
+                <div class="modal__followed">
+                    <button id="modalOpen_followed" class="button_follow" type="button">フォロワー({{followed_count}})</button>
+                
+                　　<div id="easyModal_followed" class="modal_followed">
                 
             　　        <div class="modal-content_follow">
                 
-                <!--    ----------------------------------->
             　　　　　　    <div class="modal-header_follow">
-                　　　　　　　　<h1>フォロー</h1>
-                　　　　　　　　<span class="modalClose_follow">×</span>
+                　　　　　　　　<h1>フォロワー</h1>
+                　　　　　　　　<button type="button" id="modalClose_followed" class="modalClose_followed">×</button>
                 　　　　　　</div>
-                <!--    ----------------------------------->
-                　　　　　　<div class="modal-body_follow">
-                        
-                            {% for i in range(10) %}
-                            <li>{{ i }}</li>
-                            {% endfor %}
 
-                    　　　　</div>
+                　　　　　　<div class="modal-body_follow">
+
+                                {% for i in modal_followed_list %}
+                            
+                           
+                                <form action="/top" method="POST">
+                        
+                                    <div class="follow_info">
+                                    <img class="follow_info_img" src="{{ i[0][2] }}">
+
+                                    <p>{{ i[0][1] }}</p>
+                                    </div>
+                            
+                                    <input type ="hidden" name ="friend_id" value="{{  i[0][0] }}">
+                                    <input type="submit" name="profile" value="プロフを表示する">
+                            
+                                </form>
+                
+                
+                                {% endfor %}   
+
+                    　　　   </div>
                 
                 　　　　</div>
                 　　</div>
@@ -167,13 +213,7 @@ Profile
                 </tbody>
             </table>
             <div class ="flex">
-                <!-- <p>フォロー</p>
-                <p>{{follow_count}}</p> 
-                <p>フォロワー</p>
-                <p>{{followed_count}}</p> -->
 
-                <!-- ここからみーやが書いたところ -->
-                <!-- フォローの表示　-->
                 <div class="modal__follow">
                     <button id="modalOpen_follow" class="button_follow" type="button">フォロー({{follow_count}})</button>
                 
@@ -273,4 +313,6 @@ Profile
 
 </form>
 {% endif %}
+<p>user:{{session['user_id']}}</p>
+<p>profile:{{session['profile_id']}}</p>
 {% endblock %}
