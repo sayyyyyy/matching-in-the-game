@@ -868,7 +868,8 @@ def top():
         db = cdb()
         id = request.form.get("join_group")
         join = db.cursor()
-        join.execute("UPDATE Members SET flag_join = %s WHERE group_id = %s", (1, id,))
+        join.execute("UPDATE Members SET flag_join = %s WHERE group_id = %s AND member_id = %s",
+                     (1, id, session['user_id'],))
         db.commit()
 
         return redirect('/top')
@@ -1074,27 +1075,118 @@ def group_pre():
 @app.route('/group_edit', methods=['GET', 'POST'])
 def group_edit():
     db = cdb()
+    if request.method == "POST" and "kick" in request.form:
+      id = request.form.get('kick')
+      kick = db.cursor()
+      kick.execute("DELETE FROM Members WHERE member_id = %s AND flag_join = %s",
+                   (id, 1, ))
+      db.commit()
+      return redirect('/group_edit')
+
+    elif request.method == "POST" and "invite" in request.form:
+      id = request.form.get('invite')
+      invite = db.cursor()
+      invite.execute("INSERT INTO Members (member_id, flag_join, group_id) "
+                     "VALUES(%s, %s, %s)", (id, 0,session['group_id'], ))
+      db.commit()
+      return redirect('/group_edit')
+
+
     if request.method == "POST":
-        # 画像変更
-        # if 'up_file' in request.files:
-        if request.form.get("up_file"):
-            img_file = request.files['up_file']
-            filename = secure_filename(img_file.filename)
-            img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            img_file.save(img_url)
+      img_file = request.files['up_file']
+      filename = secure_filename(img_file.filename)
+      img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+      img_file.save(img_url)
 
-            cursor = db.cursor()
-            cursor.execute("UPDATE Groups SET group_icon = %s WHERE id = %s",
-                           (UPLOAD_FOLDER + filename, session['group_id']))
-            db.commit()
+      cursor = db.cursor()
+      cursor.execute("UPDATE Groups SET group_icon = %s WHERE id = %s",
+                       (UPLOAD_FOLDER + filename, session['group_id']))
+      db.commit()
 
-    if request.method == 'GET':
-        group = db.cursor()
-        group.execute("SELECT group_name, group_icon FROM Groups WHERE id = %s",
+      set_name = db.cursor()
+      set_name.execute("UPDATE Groups SET group_name = %s WHERE id = %s",
+                       (request.form.get("group_name"), session['group_id'],))
+      db.commit()
+
+      return redirect('/group_edit')
+
+
+    else:
+      group = db.cursor()
+      group.execute("SELECT group_name, group_icon FROM Groups WHERE id = %s",
                       (session['group_id'],))
-        group = group.fetchall()
-    return render_template('group_edit.html', group=group)
+      group = group.fetchall()
+      # Mutual ---------------------------------------------------------------------------------------------
+      follow_id = db.cursor(buffered=True)
+      follow_id.execute("SELECT followed_id from Follows where follow_id = %s", (session['user_id'],))
+      followed_id = db.cursor(buffered=True)
+      followed_id.execute("SELECT follow_id from Follows where followed_id = %s", (session['user_id'],))
+      follow_f = follow_id.fetchall()
+      followed_f = followed_id.fetchall()
+      follow_li = [i[0] for i in follow_f]
+      followed_li = [i[0] for i in followed_f]
+      Mutuals = tuple(set(follow_li) & set(followed_li))
+      # Mutual -----------------------------------------------------------------------------------------
+      # current user
+      user_id = session['user_id']
 
+      # グループ参加者
+      group_member = db.cursor()
+      group_member.execute("SELECT member_id FROM Members WHERE group_id = %s AND flag_join = %s",
+                           (session['group_id'], 1,))
+      list_group_member = []
+      for i in group_member:
+          i = i[0]
+          list_group_member.append(i)
+
+      list_group_except_me = []
+      for i in list_group_member:
+          if i == session['user_id']:
+              pass
+          else:
+              list_group_except_me.append(i)
+
+      invited = db.cursor()
+      invited.execute("SELECT member_id FROM Members WHERE group_id = %s AND flag_join = %s",
+                      (session['group_id'], 0, ))
+      list_invited = []
+      for i in invited:
+        i = i[0]
+        list_invited.append(i)
+
+      group_related = list_invited + list_group_except_me
+      temp_1 = list(set(Mutuals)) + list(set(group_related))
+      not_invited = [x for x in set(temp_1) if temp_1.count(x) == 1]
+
+      current = db.cursor()
+      current.execute("SELECT icon, nickname, id from Profiles where id = %s",
+                      (session['user_id'],))
+      current = current.fetchall()
+
+      group_joined = []
+      for i in list_group_except_me:
+          list_friends = db.cursor(buffered=True)
+          list_friends.execute("SELECT icon, nickname, id from Profiles where id = %s", (i,))
+          m = list_friends.fetchall()
+          group_joined.append(m)
+
+      already_invited = []
+      for i in list_invited:
+          list_friends = db.cursor(buffered=True)
+          list_friends.execute("SELECT icon, nickname, id from Profiles where id = %s", (i,))
+          m = list_friends.fetchall()
+          already_invited.append(m)
+
+      not_invited_ = []
+      for i in not_invited:
+          list_friends = db.cursor(buffered=True)
+          list_friends.execute("SELECT icon, nickname, id from Profiles where id = %s", (i,))
+          m = list_friends.fetchall()
+          not_invited_.append(m)
+
+      return render_template('group_edit.html', group=group, current=current,
+                             not_invited_=not_invited_, group_joined=group_joined,
+                             already_invited=already_invited)
 
 
 if __name__ == '__main__':
