@@ -1,0 +1,35 @@
+:root {
+    --main-color: lightcoral;
+    --sub-color: lightblue;
+    --background-color: white;
+    --text-color: white;
+}
+
+body {
+    background-color: var(--background-color);
+}
+
+.top_title {
+    font-size: 8vh;
+}
+.center {
+    background-color: black;
+    position: relative;
+    top: 20vh;
+}
+
+.login {
+    width: 20vw;
+    position: relative;
+    left: 20vw;
+}
+
+.register {
+    width: 20vw;
+    position: relative;
+    left: 40vw;
+}
+
+.button_follow {
+    font-size: 2vw;
+}

@@ -1,16 +1,24 @@
 {% extends "layout.html" %}
 
+{% block css %}
+<link rel ="stylesheet" href ="../static/index.css">
+{% endblock %}
+
 {% block title %}
 Home
 {% endblock %}
 
 {% block main %}
-{{users}}
-{{games}}
-<h1 class="top_title"> ~ Welcome to "Matching in the game" ~ </h1>
-<form action="/login" method="GET">
-    <input class="login" type="submit" value="login">
-</form>
-<!-- <a href="/login" role="button">login</a> -->
-<a href="/register2" role="button">register</a>
+<div class="center">
+    <h1 class="top_title"> ~ Welcome to "Matching in the game" ~ </h1>
+    <div class="flex">
+        <form action="/login" method="GET">
+            <input class="login button_follow" type="submit" value="login">
+        </form>
+        <form action="/register2" method="GET">
+            <input class="register button_follow" type="submit" value="register">
+        </form>
+    </div>
+</div>
+
 {% endblock %}
