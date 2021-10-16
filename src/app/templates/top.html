@@ -49,9 +49,9 @@
 
                 <div class="modal-body_">
                     <div class="follows">
+                        
+                        {% for i in followed_info %}
                         <form action='/top' method='POST'>
-                            {% for i in followed_info %}
-
                             <div class="information">
                                 <label class="label_information">
                                     <img src ="{{ i[0][0] }}" class ="is-circle">
@@ -61,9 +61,9 @@
                                 </label>
                                 <p></p>
                             </div>
-                            
-                            {% endfor %}
                         </form>
+                        {% endfor %}
+                        
                     </div>
 
                     <div class="groups">
