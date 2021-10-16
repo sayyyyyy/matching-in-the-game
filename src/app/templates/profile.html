@@ -7,8 +7,6 @@ Profile
 
 
 {% block main %}
-<p>user:{{session['user_id']}}</p>
-<p>profile:{{session['profile_id']}}</p>
 
 {% if session.profile_id == session.user_id %}
 
@@ -315,4 +313,6 @@ Profile
 
 </form>
 {% endif %}
+<p>user:{{session['user_id']}}</p>
+<p>profile:{{session['profile_id']}}</p>
 {% endblock %}
