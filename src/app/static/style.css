@@ -301,3 +301,6 @@ body.loggedin {
 #text {
 	border-radius: 5px;
 }
+#send {
+	background-color: yellow;
+}
