@@ -6,31 +6,29 @@
         <img class="search_icon" src="{{ profile[2] }}">
         <form action="/top" method="POST">
             <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ profile[0] }}">
-            <input type="submit" name="profile" value="プロフを表示する">           
+            <input class="submit_prof" type="submit" name="profile" value="プロフを表示する">           
         </form>
     </div>
     <div class="left_info">
-        <ul>
-            <li>
-                <ul>
-                    <li class="game_list">
-                        <p>{{ profile[4] }}</p>
-                        <p>{{ profile[6] }}</p>
-                        <p>Lv {{ profile[5] }}</p>
-                    </li>
-                    <li class="game_list">
-                        <p>{{ profile[7] }}</p>
-                        <p>{{ profile[9] }}</p>
-                        <p>Lv {{ profile[8] }}</p>
-                    </li>
-                    <li class="game_list"> 
-                        <p>{{ profile[10] }}</p>
-                        <p>{{ profile[12] }}</p>
-                        <p>Lv {{ profile[11] }}</p>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+
+            <ul>
+                <li class="game_list">
+                    <p>{{ profile[4] }}</p>
+                    <p>{{ profile[6] }}</p>
+                    <p>Lv {{ profile[5] }}</p>
+                </li>
+                <li class="game_list">
+                    <p>{{ profile[7] }}</p>
+                    <p>{{ profile[9] }}</p>
+                    <p>Lv {{ profile[8] }}</p>
+                </li>
+                <li class="game_list"> 
+                    <p>{{ profile[10] }}</p>
+                    <p>{{ profile[12] }}</p>
+                    <p>Lv {{ profile[11] }}</p>
+                </li>
+            </ul>
+            
         <p class="short_comment" maxlength="5">{{ profile[3][0:11] }}...</p>
     </div>
 </div>

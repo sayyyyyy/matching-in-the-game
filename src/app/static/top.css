@@ -5,6 +5,18 @@
     --sub-color: #9999ff;
 }
 
+* {
+    box-sizing: border-box;
+ }
+ 
+ body {
+    margin: 0;
+    margin-top: 100px;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", メイリオ, Meiryo, "ＭＳ Ｐゴシック", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: #e6e6e6;
+ }
+
 .is-circle {
     width:  50px;       /* ※縦横を同値に */
     height: 50px;       /* ※縦横を同値に */
@@ -12,15 +24,6 @@
     background-position: left top;  /* 横長画像の左上を基準に表示 */
     display: inline-block;
     border: solid 3px black;       
-}
-
-.friends {
-    display: flex;
-    margin: 20px;
-}
-
-.friends img {
-    margin-right: 10px;
 }
 
 /* .search-method {
@@ -184,6 +187,7 @@ body {
   padding: 3px 15px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .modalClose_ {
@@ -201,13 +205,238 @@ body {
 }
 
 /*------------------------------*/
-.header-title {
-    margin: 0 auto;
-    text-align: center;
-    background-color: var(--main-color);
-    padding: 20px;
+
+header {
+    width: 100%;
+    padding: 30px 4% 10px;
+    background-color: #fff;
 }
 
-h1 {
+header {
+    width: 100%;
+    padding: 30px 4% 10px;
+    background-color: #fff;
+    position: fixed;
+    top: 0;
+ }
+
+ header {
+    padding: 30px 4% 10px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: var(--main-color);
+    display: flex;
+    align-items: center;
+ }
+
+ h1 {
+    margin: 0 auto;
+    margin: 0; padding: 0;
+    font-size: 30px;
     color: var(--sub-color);
+ }
+
+ a {	
+    text-decoration: none;
+    color: #4b4b4b;
+ }
+
+ ul {
+    list-style: none;
+    margin: 0;
+ }
+
+ ul {
+    list-style: none;
+    margin: 0;
+    display: flex;
+ }
+
+ li {
+    margin: 0 0 0 15px;
+    font-size: 14px;
+ }
+
+ nav {
+    margin: 0 0 0 auto;
+ }
+
+ .header-nav {
+     height: 30px;
+     width: auto;
+ }
+
+ .body-flex {
+     display: flex;
+     justify-content: space-around;
+ }
+ .friend_list {
+     width: 35%;
+ }
+ .search {
+     width: 65%;
+ }
+
+ .link {
+     display: flex;
+     flex-direction: column;
+ }
+
+ .friend_img {
+    width:  40px;       /* ※縦横を同値に */
+    height: 40px;       /* ※縦横を同値に */
+    border-radius: 50%;  /* 角丸半径を50%にする(=円形にする) */
+    background-position: left top;  /* 横長画像の左上を基準に表示 */
+    display: inline-block;
+    border: solid 3px black;
+ }
+
+ .friends {
+     display: flex;
+     justify-content: space-between;
+     margin: 10px 20px;
+     align-items: center;
+ }
+
+ .myprof {
+     border: solid 0;
+ }
+
+ .group_and_friend {
+    display: flex;
+    flex-direction: column;
 }
+
+#group-box {
+    width: 350px;
+    height: 200px;
+    overflow: scroll;
+    background: var(--main-color);
+    margin: 10px;
+}
+
+#friend-box {
+    width: 350px;
+    height: 200px;
+    overflow: scroll;
+    background: var(--main-color);
+    margin: 10px;
+}
+
+#modalOpen {
+    width: 100px;
+    height: auto;
+    margin: 0 auto;
+}
+
+#search_result {
+    width: 750px;
+    height: 400px;
+    overflow: scroll;
+    background: var(--main-color);
+    margin: 10px;
+}
+
+/*----------------------------
+pop up
+--------------------------*/
+.group_make {
+    display: flex;
+    flex-direction: column;
+}
+
+.group_make input {
+    width: 100px;
+}
+
+.invite label {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+}
+
+.scroll-invite {
+    width: 550px;
+    height: 200px;
+    overflow: scroll;
+    background: #fff;
+    margin: 10px;
+}
+
+.modal-body_ {
+    width: 550px;
+    height: 200px;
+    overflow: scroll;
+    background: #fff;
+    margin: 10px;
+}
+
+.scroll-invite p {
+    margin-left: 10px;
+}
+
+.information label {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+}
+
+ /*-----------------------------
+ 検索結果のCSS
+ -------------------------------*/
+.result {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: azure;
+    margin: 10px auto;
+    border-radius: 20px;
+}
+
+.right_info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.submit_prof {
+    margin: 10px;
+}
+.game_list {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.left_info {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.left_info ul{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.search-method {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#nickname_search {
+    height: 25px;
+}
+#game_name {
+    height: 25px;
+}
+#game_level {
+    height: 25px;
+}
+#async-search {
+    height: 25px;
+}
+
+
+

@@ -808,9 +808,28 @@ def top():
             group_list.append(m)
         # ここまで------------------------------------------------------------------------------------------------------
 
+        group_join = db.cursor(buffered=True)
+        group_join.execute("SELECT group_id FROM Members WHERE member_id= %s AND "
+                            "flag_join= %s", (session['user_id'], 1,))
+        group_id_join = group_join.fetchall()
+        # groupはリストの中が()になっているからリストにする---------------------------------
+        list_i_join = []
+        for i in group_id_join:
+          i = i[0]
+          list_i_join.append(i)
+
+        # groupで取ったidでGroupsテーブルからGroup_nameとGroup_iconを取得----------------
+        group_list_join = []
+        for i in list_i_join:
+          id = db.cursor(buffered=True)
+          id.execute(
+          "SELECT group_name, group_icon, id from Groups where id = %s", (i,))
+          m = id.fetchall()
+          group_list_join.append(m)
+
         return render_template('top.html', user_id=session['user_id'], Mutuals=Mutuals,
                                Mutual_friends=Mutual_friends, game_names=game_names,
-                               followed_info=followed_info, group_list=group_list)
+                               followed_info=followed_info, group_list=group_list, group_list_join=group_list_join)
 
 
       # ポップアップ1を追加---------------------------------------------------------------------------------------------------
