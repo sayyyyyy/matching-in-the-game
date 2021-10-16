@@ -595,12 +595,14 @@ def edit():
           db.commit()
           return redirect("/edit")
       else:
+        db = cdb()
         mutual_follow = db.cursor()
-        mutual_follow.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s AND follow_id IN (SELECT followe_id FROM Follows WHERE follow_id = %s)", (session['user_id'], session['user_id']))
+        mutual_follow.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s AND follow_id IN (SELECT followed_id FROM Follows WHERE follow_id = %s)", (session['user_id'], session['user_id']))
+        mutual_follow = mutual_follow.fetchall()
 
-        cursor = db.cursor()
-        cursor.execute("SELECT * FROM Profiles WHERE id = %s", (session['user_id'],))
-        user_profile = cursor.fetchall()[0]
+        user_profile = db.cursor()
+        user_profile.execute("SELECT * FROM Profiles WHERE id = %s", (session['user_id'],))
+        user_profile = user_profile.fetchall()[0]
 
         game_list = db.cursor()
         game_list.execute("SELECT game_name FROM Game_names")
@@ -1018,11 +1020,63 @@ def asyncdata():
 
 
 
-@app.route('/c', methods=['GET', 'POST'])
-def c():
-  if request.method == "GET":
 
-    return render_template('c.html')
+@app.route('/group_pre', methods=['GET', 'POST'])
+def group_pre():
+  db = cdb()
+  if request.method == 'POST' and 'edit' in request.form:
+      session["group_id"] = request.form.get("edit")
+      session["group_id"] = int(session["group_id"])
+
+      return redirect('/group_edit')
+
+
+  else:
+    group = db.cursor()
+    group.execute("SELECT group_id FROM Members WHERE member_id= %s AND "
+                "flag_join= %s", (session['user_id'], 1,))
+    group_id = group.fetchall()
+    # groupはリストの中が()になっているからリストにする---------------------------------
+    list_i = []
+    for i in group_id:
+      i = i[0]
+      list_i.append(i)
+
+    # groupで取ったidでGroupsテーブルからGroup_nameとGroup_iconを取得----------------
+    group_list = []
+    for i in list_i:
+      id = db.cursor(buffered=True)
+      id.execute(
+          "SELECT group_name, group_icon, id from Groups where id = %s", (i,))
+      m = id.fetchall()
+      group_list.append(m)
+
+    return render_template('group_pre.html', group=group_id, group_list=group_list)
+
+
+@app.route('/group_edit', methods=['GET', 'POST'])
+def group_edit():
+    db = cdb()
+    if request.method == "POST":
+        # 画像変更
+        # if 'up_file' in request.files:
+        if request.form.get("up_file"):
+            img_file = request.files['up_file']
+            filename = secure_filename(img_file.filename)
+            img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            img_file.save(img_url)
+
+            cursor = db.cursor()
+            cursor.execute("UPDATE Groups SET group_icon = %s WHERE id = %s",
+                           (UPLOAD_FOLDER + filename, session['group_id']))
+            db.commit()
+
+    if request.method == 'GET':
+        group = db.cursor()
+        group.execute("SELECT group_name, group_icon FROM Groups WHERE id = %s",
+                      (session['group_id'],))
+        group = group.fetchall()
+    return render_template('group_edit.html', group=group)
 
 
 
