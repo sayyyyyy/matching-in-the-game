@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!--    ↑　追加した-->
     <link rel ="stylesheet" href ="../static/top.css">
     <title>Docker Test{% block title %} {% endblock %}</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -20,6 +19,7 @@
         <nav class="header-nav">
 
             <ul>
+
                 <li>
                     <button class="header-nav">
                         <form action="/top" method="POST">
@@ -51,6 +51,7 @@
                     <div class="follows">
                         <form action='/top' method='POST'>
                             {% for i in followed_info %}
+
                             <div class="information">
                                 <label class="label_information">
                                     <img src ="{{ i[0][0] }}" class ="is-circle">
@@ -67,15 +68,17 @@
 
                     <div class="groups">
                         <form action='/top' method='POST'>
+
                             {% for i in group_list %}
                             <div class="information">
                                 <label class="label_information">
                                     <img src ="{{ i[0][1] }}" class ="is-circle">
                                     {{i[0][0]}}
+                                
+                                    <input type="hidden" name="join_group" value="{{i[0][2]}}">
+                                    <button type="submit">グループ参加</button>
+                                    <p></p>
                                 </label>
-                                <input type="hidden" name="join_group" value="{{i[0][2]}}">
-                                <button type="submit">グループ参加</button>
-                                <p></p>
                             </div>
                             {% endfor %}
 
@@ -102,6 +105,7 @@
                     <form action='/top' method='POST'>
 
                         <div class="group_make">
+
                             <input type="text" name="group_name" placeholder="グループネームを入力">
                             
                             <div class="scroll-invite">
@@ -118,11 +122,12 @@
                             
                                 </div>
                                 {% endfor %}
+
                             </div>
                             
                             <input type="submit" name="create_group" value="グループ作成">
+
                         </div>
-                        
                     </form>
                 </div>
 　　        </div>
@@ -249,6 +254,5 @@
       });
     });
     </script>
-    
 </body>
 </html>
