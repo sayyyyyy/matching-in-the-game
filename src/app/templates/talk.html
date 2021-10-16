@@ -12,26 +12,56 @@
         var socket;
         $(document).ready(function(){
             socket = io.connect('http://' + document.domain + ':' + location.port + '/talk');
+            
+            var chat = document.getElementById('chat');
+            var text = document.getElementById('text');
+            var form = document.getElementById('form');
+
             socket.on('connect', function() {
                 socket.emit('join', {});
             });
+            socket.on('status', function(data) {
+
+                var item = document.createElement('li');
+                console.log(JSON.stringify(data));
+
+                for (let i = 0; i <= data.length; i++) {
+                    var item = document.createElement('li');
+                    item.textContent = data[i]['msg'];
+                    chat.appendChild(item);
+                }
+                $('#chat').scrollTop($('#chat')[0].scrollHeight);
+            });
             //socket.on('status', function(data) {
-            //    data.msg.map(i => i + 'iii');
+            //    $('#chat').val(data.msg);
+            //    $('#chat').scrollTop($('#chat')[0].scrollHeight);
+            //});
+            //socket.on('message', function(data) {
             //    $('#chat').val($('#chat').val() + data.msg + '\n');
             //    $('#chat').scrollTop($('#chat')[0].scrollHeight);
             //});
-            socket.on('status', function(data) {
-                $('#chat').val(data.msg);
-                $('#chat').scrollTop($('#chat')[0].scrollHeight);
+            //$('#send').click(function(e) {
+            //        text = $('#text').val();
+            //        $('#text').val('');
+            //        socket.emit('text', {msg: text});
+            //});
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (text.value) {
+                socket.emit('text', {msg: text.value});
+                text.value = '';
+                }
             });
             socket.on('message', function(data) {
-                $('#chat').val($('#chat').val() + data.msg + '\n');
+                var item = document.createElement('li');
+                var img = document.createElement('img');
+
+                img.src = data['user'][0][1];
+                chat.appendChild(img);
+
+                item.textContent = data['user'][0][0] + ':' + data['msg'];
+                chat.appendChild(item);
                 $('#chat').scrollTop($('#chat')[0].scrollHeight);
-            });
-            $('#send').click(function(e) {
-                    text = $('#text').val();
-                    $('#text').val('');
-                    socket.emit('text', {msg: text});
             });
         });
         function leave_room() {
@@ -50,16 +80,20 @@
         <p>グループ</p>
         {% for i in group_list %}
             <form action="/talk" method="POST">  
-                <input readonly id ="grou@_id" type ="hidden" name ="group_id" value="{{ i[0] }}">
+                <input readonly id ="group_id" type ="hidden" name ="group_id" value="{{ i[0] }}">
                 <input type="submit" name="group_talk" value="{{ i[1] }}">
             </form>
         {% endfor %}
         <div>
             <h2>ルーム : {{session['room_id']}}</h2>
             <h2>ログインユーザー : {{session['user_id']}}</h2>
-            <textarea readonly id="chat" cols="60" rows="10" placeholder="メッセージはありません"></textarea>
-            <input type="text" id="text" size="60" placeholder="メッセージを入力してください" />
-            <button type="button" id="send" class="">SEND</button>
+            <ul id="chat">
+                <li>あああ</li>
+            </ul>
+            <form id="form" action="">
+                <input type="text" id="text" size="60" placeholder="メッセージを入力してください" />
+                <button>send</button>
+            </form>
         </div>
         <div>
             <p>友達</p>

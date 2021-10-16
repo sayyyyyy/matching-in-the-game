@@ -670,7 +670,32 @@ def talk():
       if request.form.get("group_talk") != None:
         session['room_id'] = request.form.get("group_id")
       elif request.form.get("friend_talk") != None:
-        session['room_id'] = request.form.get("friend_id")
+        db = cdb()
+        try:
+          get_group = db.cursor()
+          get_group.execute("SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1", (session['user_id'], request.form.get('friend_id')))
+          #get_group.execute("SELECT group_id FROM Members WHERE member_id IN (%s, %s)", (session['user_id'], request.form.get('talk_id')))
+          session['room_id'] = get_group.fetchall()[0][0]
+        except:
+          session['room_id'] = request.form.get("friend_id") 
+          set_name = find_user(session['user_id']) + find_user(session['room_id']) + "のトーク"
+          
+          set_group = db.cursor()
+          set_group.execute("INSERT INTO Groups (group_name) VALUES (%s)", (set_name, ))
+          db.commit()
+
+          group_id = db.cursor()
+          group_id.execute("SELECT id FROM Groups WHERE group_name = %s", (set_name, ))
+          group = group_id.fetchall()[0][0]
+
+          into_group_user = db.cursor()
+          into_group_user.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (session['user_id'], group))
+          db.commit()
+
+          into_group_follower = db.cursor()
+          into_group_follower.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (request.form.get('friend_id'), group))
+          db.commit()
+          session['room_id'] = group
       return redirect("/talk")
     else:
       db = cdb()
@@ -707,11 +732,15 @@ def text(message):
     user = find_user(session['user_id'])
 
     db = cdb()
+    user_info = db.cursor()
+    user_info.execute("SELECT nickname, icon FROM Profiles WHERE id = %s", (session['user_id'],))
+    user = user_info.fetchall()
+
     in_message = db.cursor()
-    in_message.execute("INSERT INTO Messages (sender_id, group_id, message) VALUES (%s, %s, %s)", (session['user_id'], session['room_id'], user + ':' + message['msg'] + '\n'))
+    in_message.execute("INSERT INTO Messages (sender_id, group_id, message) VALUES (%s, %s, %s)", (session['user_id'], session['room_id'], user[0][0] + message['msg']))
     db.commit()
     #（未）グループidを取得してメッセージをDBに格納する
-    emit('message', {'msg': user + ' : ' + message['msg']}, room=room)
+    emit('message', {'msg': message['msg'], 'user': user}, room=room)
 
 
 @socketio.on('left', namespace='/talk')
@@ -777,7 +806,9 @@ def top():
           try:
             get_group = db.cursor()
             get_group.execute("SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1", (session['user_id'], request.form.get('talk_id')))
-            #get_group.execute("SELECT group_id FROM Members WHERE member_id IN (%s, %s)", (session['user_id'], request.form.get('talk_id')))
+            
+            #isOneonOne = db.cursor()
+            #isOneonOne.execute("SELECT * FROM Groups WHERE %s = (SELECT COUNT(*) FROM Members WHERE group_id =)")
             session['room_id'] = get_group.fetchall()[0][0]
             
           except:

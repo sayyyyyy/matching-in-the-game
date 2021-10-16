@@ -9,9 +9,9 @@ Profile
 {% block main %}
 <p>user:{{session['user_id']}}</p>
 <p>profile:{{session['profile_id']}}</p>
-<p>talk:{{session['talk_id']}}</p>
 
 {% if session.profile_id == session.user_id %}
+
 <div class ="nav">
 
     <p><a href ="top">戻る</a></p>
@@ -87,8 +87,8 @@ Profile
         <p>コメント</p>
         <textarea readonly name ="comment" rows ="5">{{ user_profile[4] }}</textarea>
     </div>
-
 </form>
+
 {% else %}
 <div class ="nav">
     <p><a href ="top">戻る</a></p>
