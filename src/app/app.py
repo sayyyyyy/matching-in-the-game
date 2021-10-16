@@ -365,71 +365,71 @@ def profile():
         db = cdb()
         if request.method == "POST":
           
-          #ほかの人のプロフィールを見るとき
-          if request.form.get("friend_id"):
-            each_id = request.form.get("friend_id")
+        #   #ほかの人のプロフィールを見るとき
+        #   if request.form.get("friend_id"):
+        #     each_id = request.form.get("friend_id")
 
-            cursor = db.cursor()
-            cursor.execute("SELECT * FROM Profiles WHERE id=%s", (each_id, ))
-            user_profile = cursor.fetchall()[0]
+        #     cursor = db.cursor()
+        #     cursor.execute("SELECT * FROM Profiles WHERE id=%s", (each_id, ))
+        #     user_profile = cursor.fetchall()[0]
 
-            isFollow = db.cursor()
-            isFollow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s AND followed_id = %s", (session['user_id'], session['profile_id']))
-            isFollow2 = isFollow.fetchall()[0][0]
+        #     isFollow = db.cursor()
+        #     isFollow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s AND followed_id = %s", (session['user_id'], session['profile_id']))
+        #     isFollow2 = isFollow.fetchall()[0][0]
             
-            game_list = db.cursor()
-            game_list.execute("SELECT game_id, game_level, game_order FROM Games WHERE user_id = %s", (each_id,))
-            games = game_list.fetchall()
+        #     game_list = db.cursor()
+        #     game_list.execute("SELECT game_id, game_level, game_order FROM Games WHERE user_id = %s", (each_id,))
+        #     games = game_list.fetchall()
 
-            try:
-              star1 = games[0][1]
-            except:  
-              star1 = 0
-            try:
-              star2 = games[1][1]
-            except:
-              star2 = 0
-            try:              
-              star3 = games[2][1]
-            except:
-              star3 = 0
+        #     try:
+        #       star1 = games[0][1]
+        #     except:  
+        #       star1 = 0
+        #     try:
+        #       star2 = games[1][1]
+        #     except:
+        #       star2 = 0
+        #     try:              
+        #       star3 = games[2][1]
+        #     except:
+        #       star3 = 0
 
-            try:
-                game1 = db.cursor()
-                game1.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[0][0], ))
-                game_name1 = game1.fetchall()[0][0]
-            except:
-                game_name1 = "ゲームが選択されていません"
+        #     try:
+        #         game1 = db.cursor()
+        #         game1.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[0][0], ))
+        #         game_name1 = game1.fetchall()[0][0]
+        #     except:
+        #         game_name1 = "ゲームが選択されていません"
 
-            try:
-                game2 = db.cursor()
-                game2.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[1][0], ))
-                game_name2 = game2.fetchall()[0][0]
-            except:
-                game_name2 = "ゲームが選択されていません"
+        #     try:
+        #         game2 = db.cursor()
+        #         game2.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[1][0], ))
+        #         game_name2 = game2.fetchall()[0][0]
+        #     except:
+        #         game_name2 = "ゲームが選択されていません"
 
-            try:
-                game3 = db.cursor()
-                game3.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[2][0], ))
-                game_name3 = game3.fetchall()[0][0]
-            except:
-                game_name3 = "ゲームが選択されていません"
+        #     try:
+        #         game3 = db.cursor()
+        #         game3.execute("SELECT game_name FROM Game_names WHERE id = %s", (games[2][0], ))
+        #         game_name3 = game3.fetchall()[0][0]
+        #     except:
+        #         game_name3 = "ゲームが選択されていません"
 
-            Not_edit_flag = 1
-            # follow = db.cursor()
-            # follow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s", (session['profile_id'], ))
-            # follow_count = follow.fetchall()[0][0]
+        #     Not_edit_flag = 1
+        #     # follow = db.cursor()
+        #     # follow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s", (session['profile_id'], ))
+        #     # follow_count = follow.fetchall()[0][0]
 
-            # followed = db.cursor()
-            # followed.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s", (session['profile_id'],))
-            # followed_count = followed.fetchall()[0][0]
+        #     # followed = db.cursor()
+        #     # followed.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s", (session['profile_id'],))
+        #     # followed_count = followed.fetchall()[0][0]
 
-            return render_template("profile.html", user_profile=user_profile,
-                               star1=star1, star2=star2, star3=star3, game_name1=game_name1, game_name2=game_name2,
-                               game_name3=game_name3, Not_edit_flag=Not_edit_flag, session=session)
+        #     return render_template("profile.html", user_profile=user_profile,
+        #                        star1=star1, star2=star2, star3=star3, game_name1=game_name1, game_name2=game_name2,
+        #                        game_name3=game_name3, session=session)
 
 
-          elif request.form.get("follow") == "フォロー":
+          if request.form.get("follow") == "フォロー":
             user_follow = db.cursor()
             user_follow.execute("INSERT INTO Follows (follow_id, followed_id) VALUES (%s, %s)", (session['user_id'], session['profile_id']))
             db.commit()
@@ -479,7 +479,7 @@ def profile():
           return redirect("/profile")
 
         else:
-            cursor = db.cursor()
+            cursor = db.cursor(buffered=True)
             cursor.execute("SELECT * FROM Profiles WHERE id=%s", (session['profile_id'], ))
             user_profile = cursor.fetchall()[0]
 
@@ -534,9 +534,36 @@ def profile():
             followed.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s", (session['profile_id'],))
             followed_count = followed.fetchall()[0][0]
 
+            modal_follow = db.cursor(buffered=True)
+            modal_follow.execute("SELECT followed_id FROM Follows WHERE follow_id = %s", (session['profile_id'],))
+            modal_follow_list = modal_follow.fetchall()
+            modal_follow_list = [i[0] for i in modal_follow_list]
+
+            follow_list = []
+            for i in modal_follow_list:
+              m = db.cursor(buffered = True)
+              m.execute("SELECT id, nickname, icon FROM Profiles WHERE id = %s", (i,))
+              n = m.fetchall()
+              n = list(n)
+              follow_list.append(n)
+            
+            modal_followed = db.cursor(buffered=True)
+            modal_followed.execute("SELECT follow_id FROM Follows WHERE followed_id = %s", (session['profile_id'],))
+            modal_followed_list = modal_followed.fetchall()
+            modal_followed_list = [i[0] for i in modal_followed_list]
+
+            followed_list = []
+            for i in modal_followed_list:
+              m = db.cursor(buffered = True)
+              m.execute("SELECT id, nickname, icon FROM Profiles WHERE id = %s", (i,))
+              n = m.fetchall()
+              n = list(n)
+              followed_list.append(n)
+
         return render_template("profile.html", user_profile=user_profile,
                                star1=star1, star2=star2, star3=star3, game_name1=game_name1, game_name2=game_name2,
-                               game_name3=game_name3, follow_count=follow_count, followed_count=followed_count, isFollow2=isFollow2, session=session)
+                               game_name3=game_name3, follow_count=follow_count, followed_count=followed_count,
+                                isFollow2=isFollow2, session=session, modal_follow_list=follow_list, modal_followed_list=followed_list)
 
     return redirect(url_for('login'))
 
@@ -799,11 +826,121 @@ def top():
         game_names = db.cursor(buffered=True)
         game_names.execute("SELECT game_name from Game_names")
 
-        return render_template('top.html', user_id=session['user_id'], Mutuals=Mutuals, Mutual_friends=Mutual_friends, game_names=game_names)
+        # 齋藤追加-------------------------------------------------------------------------------------------------------
+        list_all = list(set(Mutuals)) + list(set(followed_li))
+        followed_list_only = [x for x in set(list_all) if
+                              list_all.count(x) == 1]
+
+        # followed_list_onlyからユーザーの情報を取得-------------------------------
+        followed_info = []
+        for user in followed_list_only:
+            list_friends = db.cursor(buffered=True)
+            list_friends.execute("SELECT icon, nickname, id from Profiles where id = %s", (user,))
+            m = list_friends.fetchall()
+            followed_info.append(m)
+
+        # フォローの部分はここまで------------------------------------------------------
+
+        # グループの部分--------------------------------------------------------------
+        # Memberに自分がいるが参加していないMemberテーブルのgroup_idを取得
+        group = db.cursor()
+        group.execute("SELECT group_id FROM Members WHERE member_id= %s AND "
+                      "flag_join= %s", (session['user_id'], 0,))
+        group = group.fetchall()
+
+        # gropはリストの中が()になっているからリストにする---------------------------------
+        list_i = []
+        for i in group:
+            i = i[0]
+            list_i.append(i)
+
+        # groupで取ったidでGroupsテーブルからGroup_nameとGroup_iconを取得----------------
+        group_list = []
+        for i in list_i:
+            id = db.cursor(buffered=True)
+            id.execute(
+                "SELECT group_name, group_icon, id from Groups where id = %s", (i,))
+            m = id.fetchall()
+            group_list.append(m)
+        # ここまで------------------------------------------------------------------------------------------------------
+
+        return render_template('top.html', user_id=session['user_id'], Mutuals=Mutuals,
+                               Mutual_friends=Mutual_friends, game_names=game_names,
+                               followed_info=followed_info, group_list=group_list)
+
+
+      # ポップアップ1を追加---------------------------------------------------------------------------------------------------
+      if request.method == 'POST' and 'group_name' in request.form and "member" in \
+        request.form and request.form.get('create_group') == "グループ作成":
+        db = cdb()
+        image_path = "static/images/iam.jpg"
+        group_name = request.form.get('group_name')
+        members = request.form.getlist("member")
+
+        # Groupの作成 (group_nameとgroup_icon→これはデフォルト設定にしてる)
+        create_group = db.cursor()
+        create_group.execute("INSERT INTO Groups (group_name, group_icon) "
+                             "VALUES (%s, %s)", (group_name, image_path,))
+        db.commit()
+
+        # GroupネームからそのグループIDを取ってくる。Group_nameが被った場合どうする？
+        group_id = db.cursor()
+        group_id.execute('SELECT id From Groups WHERE group_name = %s', (group_name,))
+        group_id = group_id.fetchall()
+        group_id = group_id[0][0]
+
+        # 初期メンバー(自分の登録)、これは、一意のgroup_idだから大丈夫
+        init_member = db.cursor()
+        init_member.execute('INSERT INTO Members (member_id, flag_join, group_id) '
+                            'VALUES (%s, %s, %s)',
+                            (session['user_id'], 1, group_id,))
+        db.commit()
+
+        # 招待した人をmemberのmember_idに追加してflagを0にする
+        for member in members:
+          member = int(member)
+          members = db.cursor()
+          members.execute('INSERT INTO Members (member_id, flag_join, group_id) '
+                            'VALUES (%s, %s, %s)', (member, 0, group_id,))
+          db.commit()
+
+        return redirect('/top')
+
+
+      # ポップアップ2を追加---------------------------------------------------------------------------------------------------
+
+      if request.method == "POST" and "follow" in request.form:
+        db = cdb()
+        # このやり方だと毎回ポップアップが消える (リダイレクトするから)
+        id = request.form.get("follow")
+        return_follow = db.cursor()
+        return_follow.execute("INSERT INTO Follows (follow_id, followed_id) "
+                                "VALUES(%s, %s)", (session['user_id'], id,))
+        db.commit()
+
+        return redirect('/top')
+
+      elif request.method == "POST" and "join_group" in request.form:
+        db = cdb()
+        id = request.form.get("join_group")
+        join = db.cursor()
+        join.execute("UPDATE Members SET flag_join = %s WHERE group_id = %s", (1, id,))
+        db.commit()
+
+        return redirect('/top')
+      # ----------------------------------------------------------------------------------------------------------------
+
+
       else:
         db = cdb()
         if request.form.get("profile") == "プロフを表示する":
           session["profile_id"] = request.form.get("friend_id")
+          session["profile_id"] = int(session["profile_id"])
+          return redirect("/profile")
+
+        elif request.form.get("myprofile") == "マイプロフを表示する":
+          session["profile_id"] = request.form.get("my_id")
+          session["profile_id"] = int(session["profile_id"])
           return redirect("/profile")
 
         elif request.form.get("talk") == "トークルームに行く":
@@ -909,14 +1046,14 @@ def asyncdata():
           return render_template("search.html", id_search = search_result)
         
         elif request.form.get("nickname"):
-
+          
           l = []
           db = cdb()
           game_names = db.cursor(buffered=True)
           game_names.execute("SELECT game_name from Game_names")
 
           nickname = request.form.get("nickname")
-          
+
           nick = db.cursor()
           nick.execute("SELECT P.id, P.nickname, P.icon, P.comment from Profiles as P where P.nickname = %s", (nickname,))
           n = nick.fetchall()

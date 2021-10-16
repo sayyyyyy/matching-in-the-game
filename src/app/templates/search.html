@@ -1,35 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel ="stylesheet" href ="../static/top.css">
-    <title>Docker Test{% block title %} {% endblock %}</title>
-    <script src ="../static/main.js"></script>
-</head> -->
-<!-- <body> -->
-    <!-- <form action='/search' method='POST'>
-        <div class="search-method">
-            <div class="search-game">
-                <select name ="game_name">
-                    <option disabled selected>ゲームを選択してください</option>
-                    {% for i in game_names %}
-                    <option>{{ i[0] }}</option>
-                    {% endfor %}
-                </select>
-                <select name ="game_level">
-                    <option disabled selected>ゲームレベルを選択してください</option>
-                    {% for i in range(1,4) %}
-                    <option>{{ i }}</option>
-                    {% endfor %}
-                </select>
-                <p>or</p>
-            </div>
-                <input id ="nickname_search" type ="text" name ="nickname_search" placeholder="search nickname">
-        </div>
-        <input class="search_btn" type="submit" value="search">
-    </form> -->
 {% if id_search %}
 {% for profile in id_search %}
 <div class="result">

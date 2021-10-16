@@ -31,6 +31,19 @@
   	-webkit-font-smoothing: antialiased;
   	-moz-osx-font-smoothing: grayscale;
 }
+*.msg_text {
+	border-radius: 10px;
+	background-color: #FAEBD7;
+}
+*.top_title {
+	font-family: 'Comic Sans MS', 'SimSun';
+	text-align: center;
+	font-size: 36px;
+	color: #008080;
+}
+*.addmsg {
+	display: block;
+}
 body {
   	background-color: #435165;
   	margin: 0;
@@ -170,4 +183,124 @@ body.loggedin {
 .content > div p {
 	padding: 5px;
 	margin: 0 0 10px 0;
+}
+
+/* みーや追加分 */
+
+/* body {
+  font-family: serif;
+  font-size: 16px;
+  line-height: 1.6;
+  /color: #fff;/
+} */
+
+.button_follow {
+  background: lightblue;
+  color: #fff;
+  padding: 0 2em;
+  border: 0;
+  width: 200px;
+  height: 50px;
+  font-size: 8px;
+  border-radius: 5px;
+  font-weight: 900;
+  position: relative;
+  left: 10px;
+  top: 10px;
+  font-family: serif;
+}
+
+.button_follow:hover {
+  background: lightcoral;
+  cursor: pointer;
+}
+
+.modal_follow {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal_followed {
+	display: none;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	overflow: auto;
+	background-color: rgba(0,0,0,0.5);
+  }
+
+.modal-content_follow {
+  background-color: #f4f4f4;
+  margin: 5% auto;
+  width: 50%;
+  box-shadow: 0 5px 8px 0 rgba(0,0,0,0.2),0 7px 20px 0 rgba(0,0,0,0.17);
+  animation-name: modalopen_follow;
+  animation-duration: 1s;
+}
+
+@keyframes modalopen_follow {
+  from {opacity: 0}
+  to {opacity: 1}
+}
+
+.modal-header_follow h1 {
+  margin: 1rem 0;
+}
+
+.modal-header_follow {
+  background: lightblue;
+  padding: 3px 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modalClose_follow {
+  font-size: 2rem;
+}
+
+.modalClose_follow:hover {
+  cursor: pointer;
+}
+
+.modal-body_follow {
+  padding: 10px 20px;
+  color: black;
+  text-align: center;
+}
+
+.follow_info {
+	display: flex;
+	
+}
+
+.follow_info_img {
+	width:  40px;       /* ※縦横を同値に */
+    height: 40px;       /* ※縦横を同値に */
+    border-radius: 50%;  /* 角丸半径を50%にする(=円形にする) */
+    background-position: left top;  /* 横長画像の左上を基準に表示 */
+    display: inline-block;     
+    border: solid 3px black;
+	opacity: 0.5;
+}
+
+/* しゅう作成 トーク部分 */
+#chat {
+	border-radius: 10px;
+	background-color: #FFF0F5;
+}
+#text {
+	border-radius: 5px;
+}
+#send {
+	background-color: yellow;
 }
