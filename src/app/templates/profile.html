@@ -5,7 +5,6 @@ Profile
 {% endblock %}
 
 
-
 {% block main %}
 
 {% if session.profile_id == session.user_id %}
@@ -17,9 +16,9 @@ Profile
     
 </div>
 <form action ="/profile" method ="POST">
-    <div class ="flex">
+    <div id="profile_contents" class ="flex">
         <img src ="{{ user_profile[5] }}" class ="is-circle">
-        <div>
+        <div id="profile_right">
             <table>
                 <thead>
                     <tr>
