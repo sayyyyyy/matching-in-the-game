@@ -719,11 +719,15 @@ def join(message):
     get_msg = db.cursor()
     get_msg.execute("SELECT message FROM Messages WHERE group_id = %s", (session['room_id'],))
     view_msg = get_msg.fetchall()
+
+    user_info = db.cursor()
+    user_info.execute("SELECT nickname, icon FROM Profiles WHERE id = %s", (session['user_id'],))
+    user = user_info.fetchall()
     
     join_room(room)
     #（未）DBから過去メッセージを取得して表示させる
     #emit('status', {'msg': map(lambda i: i + 'iii', view_msg)}, room=room)
-    emit('status', {'msg': view_msg}, room=room)
+    emit('status', {'msg': view_msg, 'user': user}, room=room)
 
 
 @socketio.on('text', namespace='/talk')
