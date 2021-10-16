@@ -5,7 +5,6 @@
     background-position: left top;  /* 横長画像の左上を基準に表示 */
     display: inline-block;     
     border: solid 3px black;
-	opacity: 0.5;
 }
 
 .nav {
