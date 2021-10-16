@@ -1,10 +1,91 @@
 :root {
-    --main-color: #FFFFFF;
-    --sub-color: #000000;
+    --main-color: lightcoral;
+    --sub-color: lightblue;
+    --background-color: white;
+    --text-color: white;
 }
-#profile_contents {
-    margin: 100px;
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
 }
+
+form {
+    background-color: black;
+    position: relative;
+    top: 10vh;
+    left: 10vw;
+    width: 80%;
+    height: 80vh;
+}
+
+td {
+    font-size: 3vh;
+    padding-bottom: 10px;
+    border-bottom: solid 2px white;
+}
+
+.nickname {
+    padding-left: 20px;
+    font-size: 2.2vh;
+}
+
+.user-icon {
+    margin: 20px;
+    border: solid 3px black;
+    width: 30vw;
+    height: 30vw;
+}
+
+.back {
+    text-decoration: none;
+    color:blac;
+    background-color: whitesmoke;
+    font-size: 3vh;
+}
+
+.msg-text {
+    background-color: var(--sub-color);
+    border-radius: 5%;
+    width: 30vw;
+    height: 20vh;
+}
+
+.button_follow {
+    font-size: 2vh;
+}
+
 #profile_right {
     padding-left: 100px;
+}
+
+.box1 {
+    position: relative;
+    top: 5vh;
+    left: 20vw;
+}
+
+.box2 {
+    position: relative;
+    top: 4vh;
+    left: 2vw;
+}
+
+.box3 {
+    position: relative;
+    top: 10vh;
+    left: 6vw;
+}
+
+.box4 {
+    position: relative;
+    top: 10vh;
+    left: 10vw;
+}
+
+.icon {
+    background-color: white;
+    position: relative;
+    top: 2vh;
+    left: 2vw;
 }
