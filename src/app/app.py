@@ -12,7 +12,7 @@ import base64
 import socketio
 from werkzeug.utils import secure_filename
 import os
-#from requests_oauthlib import OAuth1Session
+from requests_oauthlib import OAuth1Session
 from flask_socketio import SocketIO, join_room, leave_room, emit
 import smtplib
 from email.mime.text import MIMEText
@@ -81,6 +81,34 @@ def find_user(user_id):
   cursor.execute("SELECT nickname FROM Profiles WHERE id = %s", (user_id,))
   name = cursor.fetchall()[0][0]
   return name
+
+#Mutual friend関数
+def mutual_friend():
+  db = cdb()
+  follow_id = db.cursor(buffered=True)
+  follow_id.execute("SELECT followed_id from Follows where follow_id = %s", (session['user_id'],))
+  #ログインユーザーをフォローしている人
+  followed_id = db.cursor(buffered=True)
+  followed_id.execute("SELECT follow_id from Follows where followed_id = %s", (session['user_id'],))
+
+  follow_f = follow_id.fetchall()
+  followed_f = followed_id.fetchall()
+
+  follow_li = [i[0] for i in follow_f]
+  
+  followed_li = [i[0] for i in followed_f]
+  #共通する部分をリスト化
+  Mutuals = tuple(set(follow_li) & set(followed_li))
+    
+  Mutual_friends = []
+
+  for Mutual in Mutuals:
+    list_friends = db.cursor(buffered=True)
+    list_friends.execute("SELECT icon, nickname, id from Profiles where id = %s", (Mutual,))
+    m = list_friends.fetchall()
+    Mutual_friends.append(m)
+
+  return Mutuals, Mutual_friends, followed_li
 
 @app.route("/")
 def main():
@@ -643,8 +671,8 @@ def talk():
         db = cdb()
         try:
           get_group = db.cursor()
-          get_group.execute("SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1", (session['user_id'], request.form.get('friend_id')))
-          #get_group.execute("SELECT group_id FROM Members WHERE member_id IN (%s, %s)", (session['user_id'], request.form.get('talk_id')))
+          get_group.execute("SELECT id FROM Groups flag_talk = %s AND id = (SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1)", (0, session['user_id'], request.form.get('friend_id')))  
+          
           session['room_id'] = get_group.fetchall()[0][0]
         except:
           session['room_id'] = request.form.get("friend_id") 
@@ -659,11 +687,11 @@ def talk():
           group = group_id.fetchall()[0][0]
 
           into_group_user = db.cursor()
-          into_group_user.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (session['user_id'], group))
+          into_group_user.execute("INSERT INTO Members (member_id, group_id, flag_join) VALUES (%s, %s, %s)", (session['user_id'], group, 1))
           db.commit()
 
           into_group_follower = db.cursor()
-          into_group_follower.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (request.form.get('friend_id'), group))
+          into_group_follower.execute("INSERT INTO Members (member_id, group_id, flag_join) VALUES (%s, %s, %s)", (request.form.get('friend_id'), group, 1))
           db.commit()
           session['room_id'] = group
 
@@ -677,7 +705,7 @@ def talk():
       follow.execute("SELECT id, nickname, icon FROM Profiles WHERE id IN (SELECT followed_id FROM Follows WHERE follow_id = %s)", (session['user_id'], ))
       follow_id_list = follow.fetchall()
       group = db.cursor()
-      group.execute("SELECT id, group_name FROM Groups WHERE id IN (SELECT group_id FROM Members WHERE member_id = %s)", (session['user_id'], ))
+      group.execute("SELECT id, group_name FROM Groups WHERE id IN (SELECT group_id FROM Members WHERE member_id = %s) AND flag_group = %s", (session['user_id'], 1))
       group_list = group.fetchall()
 
       return render_template("talk.html", session=session, follow_id_list=follow_id_list, group_list=group_list)
@@ -731,12 +759,7 @@ def top():
       session['user_id'] = session['user_id']
 
       if request.method == "GET":
-        db = mysql.connector.connect(
-                user ='root',
-                password = 'password',
-                host ='db',
-                database ='app'
-                )
+        db = cdb()
 
         #selectボックスで使う選択肢
 
@@ -744,28 +767,8 @@ def top():
         #相互フォローの表示
         #------------------------------------------------------
         #ログインユーザーがフォローしている人
-        follow_id = db.cursor(buffered=True)
-        follow_id.execute("SELECT followed_id from Follows where follow_id = %s", (session['user_id'],))
-        #ログインユーザーをフォローしている人
-        followed_id = db.cursor(buffered=True)
-        followed_id.execute("SELECT follow_id from Follows where followed_id = %s", (session['user_id'],))
 
-        follow_f = follow_id.fetchall()
-        followed_f = followed_id.fetchall()
-
-        follow_li = [i[0] for i in follow_f]
-        
-        followed_li = [i[0] for i in followed_f]
-        #共通する部分をリスト化
-        Mutuals = tuple(set(follow_li) & set(followed_li))
-          
-        Mutual_friends = []
-
-        for Mutual in Mutuals:
-          list_friends = db.cursor(buffered=True)
-          list_friends.execute("SELECT icon, nickname, id from Profiles where id = %s", (Mutual,))
-          m = list_friends.fetchall()
-          Mutual_friends.append(m)
+        Mutuals, Mutual_friends, followed_li = mutual_friend()
 
         game_names = db.cursor(buffered=True)
         game_names.execute("SELECT game_name from Game_names")
@@ -786,15 +789,15 @@ def top():
         # フォローの部分はここまで------------------------------------------------------
 
         # グループの部分--------------------------------------------------------------
-        # Memberに自分がいるが参加していないMemberテーブルのgroup_idを取得
-        group = db.cursor()
-        group.execute("SELECT group_id FROM Members WHERE member_id= %s AND "
+        # 通知のグループを取得
+        group_not_join = db.cursor()
+        group_not_join.execute("SELECT group_id FROM Members WHERE member_id= %s AND "
                       "flag_join= %s", (session['user_id'], 0,))
-        group = group.fetchall()
+        group_not_join = group_not_join.fetchall()
 
         # gropはリストの中が()になっているからリストにする---------------------------------
         list_i = []
-        for i in group:
+        for i in group_not_join:
             i = i[0]
             list_i.append(i)
 
@@ -808,6 +811,8 @@ def top():
             group_list.append(m)
         # ここまで------------------------------------------------------------------------------------------------------
 
+        """
+        # 入っているグループを取得
         group_join = db.cursor(buffered=True)
         group_join.execute("SELECT group_id FROM Members WHERE member_id= %s AND "
                             "flag_join= %s", (session['user_id'], 1,))
@@ -823,9 +828,14 @@ def top():
         for i in list_i_join:
           id = db.cursor(buffered=True)
           id.execute(
-          "SELECT group_name, group_icon, id from Groups where id = %s", (i,))
+          "SELECT group_name, group_icon, id from Groups WHERE id = %s AND flag_group = %s", (i, 1))
           m = id.fetchall()
           group_list_join.append(m)
+        """
+        
+        cursor = db.cursor()
+        cursor.execute("SELECT group_name, group_icon, id from Groups WHERE id IN (SELECT group_id FROM Members WHERE member_id= %s AND flag_join= %s) AND flag_group = %s", (session['user_id'], 1, 1))
+        group_list_join = cursor.fetchall()
 
         return render_template('top.html', user_id=session['user_id'], Mutuals=Mutuals,
                                Mutual_friends=Mutual_friends, game_names=game_names,
@@ -842,8 +852,8 @@ def top():
 
         # Groupの作成 (group_nameとgroup_icon→これはデフォルト設定にしてる)
         create_group = db.cursor()
-        create_group.execute("INSERT INTO Groups (group_name, group_icon) "
-                             "VALUES (%s, %s)", (group_name, image_path,))
+        create_group.execute("INSERT INTO Groups (group_name, group_icon, flag_group) "
+                             "VALUES (%s, %s, %s)", (group_name, image_path, 1))
         db.commit()
 
         # GroupネームからそのグループIDを取ってくる。Group_nameが被った場合どうする？
@@ -1055,15 +1065,20 @@ def asyncdata():
           msg = "検索できませんでした。"
           return render_template("search.html", n = msg)
 
-
-
-
 @app.route('/group_pre', methods=['GET', 'POST'])
 def group_pre():
   db = cdb()
   if request.method == 'POST' and 'edit' in request.form:
       session["group_id"] = request.form.get("edit")
       session["group_id"] = int(session["group_id"])
+      if request.form.get("to_talk") == "トークルームに行く":
+        session['room_id'] = int(request.form.get("edit"))
+
+        get_group_name = db.cursor()
+        get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
+        session['room_name'] = get_group_name.fetchall()[0][0]
+
+        return redirect('/talk')
 
       return redirect('/group_edit')
 
@@ -1136,15 +1151,7 @@ def group_edit():
                       (session['group_id'],))
       group = group.fetchall()
       # Mutual ---------------------------------------------------------------------------------------------
-      follow_id = db.cursor(buffered=True)
-      follow_id.execute("SELECT followed_id from Follows where follow_id = %s", (session['user_id'],))
-      followed_id = db.cursor(buffered=True)
-      followed_id.execute("SELECT follow_id from Follows where followed_id = %s", (session['user_id'],))
-      follow_f = follow_id.fetchall()
-      followed_f = followed_id.fetchall()
-      follow_li = [i[0] for i in follow_f]
-      followed_li = [i[0] for i in followed_f]
-      Mutuals = tuple(set(follow_li) & set(followed_li))
+      Mutuals, Mutual_friends, followed_li = mutual_friend()
       # Mutual -----------------------------------------------------------------------------------------
       # current user
       user_id = session['user_id']

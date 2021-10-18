@@ -144,13 +144,14 @@
                 {% for i in group_list_join %}
                 <div class="friends">
 
-                    <img src="{{ i[0][1] }}" class="friend_img">
+                    <img src="{{ i[1] }}" class="friend_img">
 
-                    <p>{{ i[0][0] }}</p>
+                    <p>{{ i[0] }}</p>
 
                     <div class="link-group">
                         <form action="/group_pre" method="POST">
-                            <input readonly id ="group_id" type="hidden" name="edit" value="{{ i[0][2] }}">
+                            <input readonly id ="group_id" type="hidden" name="edit" value="{{ i[2] }}">
+                            <input readonly type="submit" name="to_talk" value="トークルームに行く">
                             <input readonly id ="group_id_submit" type="submit" name="edit-group" value="編集する">
                         </form>
                     </div>

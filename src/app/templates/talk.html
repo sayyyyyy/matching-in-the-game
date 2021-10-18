@@ -28,10 +28,6 @@
 
                 for (let i = 0; i < data['msg'].length; i++) {
                     var item = document.createElement('li');
-                    //var img = document.createElement('img');
-
-                    //img.src = data['user'][0][1];
-                    //chat.appendChild(img);
                     item.textContent = data['user'][0][0] + ':' + data['msg'][i];
                     //item.style.listStyleImage = "url('" + data['user'][0][1] + "')";
                     item.style.listStyle = "circle";
@@ -40,19 +36,6 @@
                 }
                 $('#chat').scrollTop($('#chat')[0].scrollHeight);
             });
-            //socket.on('status', function(data) {
-            //    $('#chat').val(data.msg);
-            //    $('#chat').scrollTop($('#chat')[0].scrollHeight);
-            //});
-            //socket.on('message', function(data) {
-            //    $('#chat').val($('#chat').val() + data.msg + '\n');
-            //    $('#chat').scrollTop($('#chat')[0].scrollHeight);
-            //});
-            //$('#send').click(function(e) {
-            //        text = $('#text').val();
-            //        $('#text').val('');
-            //        socket.emit('text', {msg: text});
-            //});
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 if (text.value) {
@@ -62,11 +45,6 @@
             });
             socket.on('message', function(data) {
                 var item = document.createElement('li');
-                //var img = document.createElement('img');
-
-                //img.src = data['user'][0][1];
-                //chat.appendChild(img);
-
                 item.textContent = data['user'][0][0] + ':' + data['msg'];
                 chat.appendChild(item);
                 $('#chat').scrollTop($('#chat')[0].scrollHeight);

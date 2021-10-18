@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS Follows (
 CREATE TABLE IF NOT EXISTS Groups (
   id int PRIMARY KEY AUTO_INCREMENT, 
   group_name varchar(100),
-  group_icon varchar(100)
+  group_icon varchar(100),
+  flag_group boolean DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS Members (
