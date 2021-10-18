@@ -49,9 +49,9 @@
 
                 <div class="modal-body_">
                     <div class="follows">
+                        
+                        {% for i in followed_info %}
                         <form action='/top' method='POST'>
-                            {% for i in followed_info %}
-
                             <div class="information">
                                 <label class="label_information">
                                     <img src ="{{ i[0][0] }}" class ="is-circle">
@@ -61,25 +61,27 @@
                                 </label>
                                 <p></p>
                             </div>
-                            
-                            {% endfor %}
                         </form>
+                        {% endfor %}
+                        
                     </div>
 
                     <div class="groups">
                         <form action='/top' method='POST'>
 
                             {% for i in group_list %}
-                            <div class="information">
-                                <label class="label_information">
-                                    <img src ="{{ i[0][1] }}" class ="is-circle">
-                                    {{i[0][0]}}
-                                
-                                    <input type="hidden" name="join_group" value="{{i[0][2]}}">
-                                    <button type="submit">グループ参加</button>
-                                    <p></p>
-                                </label>
-                            </div>
+                            <form action='/top' method='POST'>
+                                <div class="information">
+                                    <label class="label_information">
+                                        <img src ="{{ i[0][1] }}" class ="is-circle">
+                                        {{i[0][0]}}
+                                    
+                                        <input type="hidden" name="join_group" value="{{i[0][2]}}">
+                                        <button type="submit">グループ参加</button>
+                                        <p></p>
+                                    </label>
+                                </div>
+                            </form>
                             {% endfor %}
 
                         </form>

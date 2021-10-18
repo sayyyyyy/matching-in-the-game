@@ -1127,22 +1127,26 @@ def group_edit():
 
 
     if request.method == "POST":
-      img_file = request.files['up_file']
-      filename = secure_filename(img_file.filename)
-      img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-      img_file.save(img_url)
+        try:
+          img_file = request.files['up_file']
+          filename = secure_filename(img_file.filename)
+          img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+          img_file.save(img_url)
 
-      cursor = db.cursor()
-      cursor.execute("UPDATE Groups SET group_icon = %s WHERE id = %s",
-                       (UPLOAD_FOLDER + filename, session['group_id']))
-      db.commit()
+          cursor = db.cursor()
+          cursor.execute("UPDATE Groups SET group_icon = %s WHERE id = %s",
+                           (UPLOAD_FOLDER + filename, session['group_id']))
+          db.commit()
+        except:
+          pass
 
-      set_name = db.cursor()
-      set_name.execute("UPDATE Groups SET group_name = %s WHERE id = %s",
-                       (request.form.get("group_name"), session['group_id'],))
-      db.commit()
+        if "group_name" in request.form:
+          set_name = db.cursor()
+          set_name.execute("UPDATE Groups SET group_name = %s WHERE id = %s",
+                           (request.form.get("group_name"), session['group_id'],))
+          db.commit()
 
-      return redirect('/group_edit')
+        return redirect('/group_edit')
 
 
     else:
