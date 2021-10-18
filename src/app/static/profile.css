@@ -186,3 +186,27 @@ td {
     margin: 0 auto;
     margin-bottom: 13px;
 }
+
+.modal-body_follow {
+    width: 500px;
+    height: 300px;
+    margin: 0 auto;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.follow_info {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border: solid 1px #333333;
+    margin: 10px 0;
+    border-radius: 20px;
+}
+
+.modal-header_follow {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    
+}
