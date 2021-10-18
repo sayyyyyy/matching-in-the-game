@@ -2,23 +2,27 @@
     --main-color: lightcoral;
     --sub-color: lightblue;
     --background-color: white;
-    --text-color: white;
+    /* --text-color: white; */
 }
 
 body {
     background-color: var(--background-color);
     color: var(--text-color);
+    margin: 0 auto;
+    width: auto;
+    max-width: 960px;
 }
 
-form {
-    background-color: black;
-    position: relative;
-    top: 10vh;
+.edit_content {
+    display: flex;
+    margin: 0 auto;
+    /* position: relative;
+    top: 0vh;
     left: 10vw;
     width: 80%;
     height: 80vh;
+    margin: 0 auto; */
 }
-
 td {
     font-size: 3vh;
     padding-bottom: 10px;
@@ -27,14 +31,15 @@ td {
 
 .nickname {
     padding-left: 20px;
-    font-size: 2.2vh;
+    font-size: 2.5vh;
 }
 
 .user-icon {
     margin: 20px;
     border: solid 3px black;
-    width: 30vw;
-    height: 30vw;
+    width: 20vw;
+    height: 20vw;
+    border-radius: 50%;
 }
 
 .back {
@@ -49,17 +54,17 @@ td {
     border-radius: 5%;
     width: 30vw;
     height: 20vh;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    margin-bottom: 15px;
 }
 
 .button_follow {
     font-size: 2vh;
 }
 
-#profile_right {
-    padding-left: 100px;
-}
 
-.box1 {
+/* .box1 {
     position: relative;
     top: 5vh;
     left: 20vw;
@@ -81,11 +86,103 @@ td {
     position: relative;
     top: 10vh;
     left: 10vw;
-}
+} */
 
 .icon {
     background-color: white;
     position: relative;
     top: 2vh;
     left: 2vw;
+}
+
+.profile_right {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.profile_left {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.edit_left {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.edit_right {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.flex {
+    display: flex;
+    justify-content: space-around;
+    margin: 0 auto;
+    background-color: #cccccc;
+}
+
+.flex_btn {
+    display: flex;
+
+}
+
+.flex_btn button {
+    margin-right: 20px;
+}
+
+.edit_right {
+    display: flex;
+    flex-direction: column;
+}
+
+.edit_left {
+    display: flex;
+    flex-direction: column;
+}
+
+.nickname_edit {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.box3 {
+    margin: 15px 0;
+}
+.edit_icon {
+    margin: 10px;
+}
+
+.edit_left div {
+    margin: 7px;
+}
+
+.flex_file {
+    display: flex;
+    flex-direction: column;
+}
+
+.file_save {
+    width: 70px;
+}
+
+.comment_edit {
+    display: flex;
+    justify-content: space-around;
+    
+    align-items: center;
+}
+
+.comment_edit button {
+    height: 28px;
+}
+.file_save {
+    padding: 10px;
+    border-radius: 10px;
+    margin: 0 auto;
+    margin-bottom: 13px;
 }

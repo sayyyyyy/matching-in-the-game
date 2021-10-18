@@ -19,10 +19,18 @@ Profile
     <p><a href ="edit" class="back">編集する</a></p>
     
 </div>
+
 <form action ="/profile" method ="POST" id="profile_contents">
     <div class ="flex">
-        <img src ="{{ user_profile[5] }}" class ="is-circle user-icon">
+        <div class="profile_left">
+            <img src ="{{ user_profile[5] }}" class ="user-icon">
+        </div>
+        
         <div id="profile_right">
+            <div>
+                <p><u>ニックネーム</u></p>
+                <p class="nickname">{{ user_profile[1] }}</p>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -66,7 +74,7 @@ Profile
                     </tr>
                 </tbody>
             </table>
-            <div class="flex">
+            <div class="flex_btn">
                 <button id="modalOpen_follow" class="button_follow" type="button">フォロー({{follow_count}})</button>
                 <button id="modalOpen_followed" class="button_follow" type="button">フォロワー({{followed_count}})</button>
             </div>
@@ -148,13 +156,10 @@ Profile
                 　　</div>
             </div>
             <script src="../static/main.js"></script>    
-        <div>
-            <p><u>ニックネーム</u></p>
-            <p class="nickname">{{ user_profile[1] }}</p>
-        </div>
+        
         <p><u>コメント</u></p>
         <textarea class="msg-text" readonly name ="comment" rows ="5">{{ user_profile[4] }}</textarea>
-</div>
+    </div>
 </form>
 
 {% else %}
@@ -163,8 +168,24 @@ Profile
 </div>
 <form action ="/profile" method ="POST">
     <div class ="flex">
-        <img src ="{{ user_profile[5] }}" class ="user-icon">
+        <div class="profile_left">
+            <img src ="{{ user_profile[5] }}" class ="user-icon">
+            <div class ="follow_followed">
+                {% if isFollow2 == 0 %}
+                    <input type="submit" name="follow" value="フォロー">
+                {% else %}
+                    <input type="submit" name="unfollow" value="フォローをやめる">
+                {% endif %}
+                <input readonly id ="talk_id" type ="hidden" name ="talk_id" value="{{ session['profile_id'] }}">
+                <input type="submit" name="talk" value="トーク">
+            </div>
+        </div>
+        
         <div class="profile_right">
+            <div>
+                <p><u>ニックネーム</u></p>
+                <p class="nickname">{{ user_profile[1] }}</p>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -208,7 +229,7 @@ Profile
                     </tr>
                 </tbody>
             </table>
-            <div class="flex">
+            <div class="flex_btn">
                 <button id="modalOpen_follow" class="button_follow" type="button">フォロー({{follow_count}})</button>
                 <button id="modalOpen_followed" class="button_follow" type="button">フォロワー({{followed_count}})</button>
             </div>
@@ -262,19 +283,7 @@ Profile
                 　　</div>
                 </div>
             </div>        
-            <div>
-                <p><u>ニックネーム</u></p>
-                <p class="nickname">{{ user_profile[1] }}</p>
-            </div>
-                <div class ="flex">
-                    {% if isFollow2 == 0 %}
-                        <input type="submit" name="follow" value="フォロー">
-                    {% else %}
-                        <input type="submit" name="unfollow" value="フォローをやめる">
-                    {% endif %}
-                    <input readonly id ="talk_id" type ="hidden" name ="talk_id" value="{{ session['profile_id'] }}">
-                    <input type="submit" name="talk" value="トーク">
-                </div>
+            
             <p><u>コメント</u></p>
             <textarea class="msg-text" readonly name ="comment" rows ="5"　cols="40">{{ user_profile[4] }}</textarea>
         </div>
