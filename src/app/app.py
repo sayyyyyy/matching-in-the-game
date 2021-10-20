@@ -910,6 +910,15 @@ def top():
         if request.form.get("profile") == "プロフを表示する":
           session["profile_id"] = request.form.get("friend_id")
           session["profile_id"] = int(session["profile_id"])
+
+          # clickの情報を保存する------------------------------------------------------------------------------------------
+          if session["profile_id"] != session['user_id']:
+              add_click = db.cursor()
+              add_click.execute("INSERT INTO Clicks (click_id, clicked_id) VALUES (%s, %s)",
+                                (session['user_id'], session['profile_id'],))
+              db.commit()
+          # ------------------------------------------------------------------------------------------------------------
+
           return redirect("/profile")
 
         elif request.form.get("myprofile") == "マイプロフを表示する":

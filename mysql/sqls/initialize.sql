@@ -61,6 +61,16 @@ CREATE TABLE IF NOT EXISTS Messages (
   FOREIGN KEY(group_id) REFERENCES Groups(id)
 );
 
+CREATE TABLE IF NOT EXISTS Clicks (
+  id int PRIMARY KEY AUTO_INCREMENT,
+  click_id int NOT NULL,
+  clicked_id int NOT NULL,
+  time timestamp,
+  FOREIGN KEY(click_id) REFERENCES Profiles(id),
+  FOREIGN KEY(clicked_id) REFERENCES Profiles(id)
+);
+
+
 INSERT INTO Profiles (nickname, password, email) VALUES("test_user1", "password", "test1@email.com");
 INSERT INTO Profiles (nickname, password, email) VALUES("test_user2", "password", "test2@email.com");
 INSERT INTO Profiles (nickname, password, email) VALUES("test_user3", "password", "test3@email.com");
