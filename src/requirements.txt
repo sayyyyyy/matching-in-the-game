@@ -10,3 +10,6 @@ python-SocketIO
 python-engineio
 Flask-Session
 eventlet
+torch
+pandas
+numpy

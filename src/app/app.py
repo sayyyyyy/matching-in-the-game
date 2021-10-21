@@ -17,6 +17,8 @@ from flask_socketio import SocketIO, join_room, leave_room, emit
 import smtplib
 from email.mime.text import MIMEText
 
+from GMF import aaa, data_1
+
 app = Flask(__name__)
 
 # セッション設定
@@ -1226,6 +1228,15 @@ def group_edit():
       return render_template('group_edit.html', group=group, current=current,
                              not_invited_=not_invited_, group_joined=group_joined,
                              already_invited=already_invited)
+
+
+@app.route('/test')
+def test():
+    a = 1
+    b = 2
+    c = aaa(a, b)
+    data = data_1(b)
+    return render_template('test.html', c=c, data=data)
 
 
 if __name__ == '__main__':
