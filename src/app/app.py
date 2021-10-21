@@ -1238,8 +1238,7 @@ def test():
   sample_generator = SampleGenerator(ratings=df)
   eval_data = sample_generator.evaluate_data
   GMF_model = model()
-  train_loader = sample_generator.instance_a_train_loader(
-    config['num_negative'], config['batch_size'])
+  train_loader = sample_generator.instance_a_train_loader(config['num_negative'], config['batch_size'])
   return render_template('test.html', model_1=GMF_model)
 
 

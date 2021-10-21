@@ -143,6 +143,39 @@ INSERT INTO Follows (follow_id, followed_id) VALUES(8, 1);
 INSERT INTO Follows (follow_id, followed_id) VALUES(3, 2);
 
 
+-- timeにinsertは無理っぽい
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (1, 3, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (2, 6, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (3, 5);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (4, 13, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (5, 14, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (6, 7, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (7, 13, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (8, 3, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (9, 5, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (10, 13, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (11, 21, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (12, 14, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (13, 14, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (14, 15, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (15, 14, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (16, 18, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (17, 19, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (18, 3, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (19, 19, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (20, 29, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (21, 28, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (22, 28, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (23, 22, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (24, 28, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (25, 24, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (26, 24, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (27, 13, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (28, 28, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (29, 29, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (30, 26, 1);
+INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (31, 24, 1);
+
 INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (1, 2, 1);
 INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (1, 5, 1);
 INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (1, 4, 1);
