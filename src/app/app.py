@@ -1081,7 +1081,7 @@ def group_pre():
   db = cdb()
   if request.method == 'POST' and 'edit' in request.form:
       session["group_id"] = request.form.get("edit")
-      session["group_id"] = int(session["group_id"])
+      # session["group_id"] = int(session["group_id"])
       if request.form.get("to_talk") == "トークルームに行く":
         session['room_id'] = int(request.form.get("edit"))
 
