@@ -17,7 +17,7 @@ from flask_socketio import SocketIO, join_room, leave_room, emit
 import smtplib
 from email.mime.text import MIMEText
 
-from GMF import aaa, data_1
+from GMF import get_data, preprocess_dataset, SampleGenerator, model
 
 app = Flask(__name__)
 
@@ -916,8 +916,8 @@ def top():
           # clickの情報を保存する------------------------------------------------------------------------------------------
           if session["profile_id"] != session['user_id']:
               add_click = db.cursor()
-              add_click.execute("INSERT INTO Clicks (click_id, clicked_id) VALUES (%s, %s)",
-                                (session['user_id'], session['profile_id'],))
+              add_click.execute("INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (%s, %s, %s)",
+                                (session['user_id'], session['profile_id'], 1,))
               db.commit()
           # ------------------------------------------------------------------------------------------------------------
 
@@ -1232,11 +1232,15 @@ def group_edit():
 
 @app.route('/test')
 def test():
-    a = 1
-    b = 2
-    c = aaa(a, b)
-    data = data_1(b)
-    return render_template('test.html', c=c, data=data)
+  config = {'batch_size': 1024, 'num_negative': 4}
+  bbb = get_data()
+  df = preprocess_dataset(bbb)
+  sample_generator = SampleGenerator(ratings=df)
+  eval_data = sample_generator.evaluate_data
+  GMF_model = model()
+  train_loader = sample_generator.instance_a_train_loader(
+    config['num_negative'], config['batch_size'])
+  return render_template('test.html', model_1=GMF_model)
 
 
 if __name__ == '__main__':
