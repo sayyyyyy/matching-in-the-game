@@ -30,3 +30,26 @@ def data_1(b):
     a.execute('SELECT * FROM Profiles')
     a = a.fetchall()
     return a
+
+
+config = {'alias': 'gmf_factor8neg4-implict',
+              'num_epoch': 100, # 200
+              'batch_size': 1024,
+              # 'optimizer': 'sgd',
+              # 'sgd_lr': 1e-3,
+              # 'sgd_momentum': 0.9,
+              # 'optimizer': 'rmsprop',
+              # 'rmsprop_lr': 1e-3,
+              # 'rmsprop_alpha': 0.99,
+              # 'rmsprop_momentum': 0,
+              'optimizer': 'adam',
+              'adam_lr': 1e-3,
+              'num_users': 6040,
+              'num_items': 3706,
+              'latent_dim': 8,
+              'num_negative': 4,
+              'l2_regularization': 0, # 0.01
+              'use_cuda': True,
+              'device_id': 0,
+              'model_dir':'checkpoints/{}_Epoch{}_HR{:.4f}_NDCG{:.4f}.model'}
+
