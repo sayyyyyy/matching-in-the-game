@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 from datetime import timedelta
+import datetime
 import mysql.connector
 import re
 import MySQLdb.cursors
@@ -17,7 +18,8 @@ from flask_socketio import SocketIO, join_room, leave_room, emit
 import smtplib
 from email.mime.text import MIMEText
 
-from GMF import get_data, preprocess_dataset, SampleGenerator, model
+from GMF import get_data, preprocess_dataset, SampleGenerator, model, setting, test_
+
 
 app = Flask(__name__)
 
@@ -915,10 +917,13 @@ def top():
 
           # clickの情報を保存する------------------------------------------------------------------------------------------
           if session["profile_id"] != session['user_id']:
-              add_click = db.cursor()
-              add_click.execute("INSERT INTO Clicks (click_id, clicked_id, flag) VALUES (%s, %s, %s)",
-                                (session['user_id'], session['profile_id'], 1,))
-              db.commit()
+            date = datetime.date.today()
+            date = str(date)
+            date = date.replace("-", "")
+            add_click = db.cursor()
+            add_click.execute("INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (%s, %s, %s, %s)",
+                              (session['user_id'], session['profile_id'], 1, date))
+            db.commit()
           # ------------------------------------------------------------------------------------------------------------
 
           return redirect("/profile")
@@ -1232,14 +1237,32 @@ def group_edit():
 
 @app.route('/test')
 def test():
-  config = {'batch_size': 1024, 'num_negative': 4}
-  bbb = get_data()
-  df = preprocess_dataset(bbb)
+  num_users, num_items = setting()
+  config = {'batch_size': 31, 'num_negative': 4,
+            'num_users':num_users, 'num_items':num_items,
+            'latent_dim': 4, 'alias': 'gmf_factor8neg4-implict',
+            'num_epoch': 100, 'l2_regularization': 0,
+            }
+  data = get_data()
+  df = preprocess_dataset(data)
   sample_generator = SampleGenerator(ratings=df)
   eval_data = sample_generator.evaluate_data
-  GMF_model = model()
+  GMF_model = model(config)
   train_loader = sample_generator.instance_a_train_loader(config['num_negative'], config['batch_size'])
-  return render_template('test.html', model_1=GMF_model)
+  test_users, test_items = eval_data[0], eval_data[1]
+  test_users = len(test_users)
+  test_items = len(test_items)
+  a, b = eval_data[2], eval_data[3]
+  a = len(a)
+  b = len(b)
+
+  # c = test_(GMF_model, eval_data)
+
+
+  return render_template('test.html', GMF_model=GMF_model, eval_data=eval_data,
+                         train_loader=train_loader, test_users=test_users,
+                         test_items=test_items, a=a, b=b, num_users=num_users,
+                         num_items=num_items)
 
 
 if __name__ == '__main__':

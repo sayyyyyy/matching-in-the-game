@@ -20,36 +20,31 @@ def cdb():
   )
   return db
 
-config = {'alias': 'gmf_factor8neg4-implict',
-              'num_epoch': 100, # 200
-              'batch_size': 1024,
-              'optimizer': 'adam',
-              'adam_lr': 1e-3,
-              'num_users': 6040,
-              'num_items': 3706,
-              'latent_dim': 8,
-              'num_negative': 4,
-              'l2_regularization': 0, # 0.01
-              'use_cuda': True,
-              'device_id': 0,
-              'model_dir':'checkpoints/{}_Epoch{}_HR{:.4f}_NDCG{:.4f}.model'}
+def setting():
+  db = cdb()
+  data_frame = pd.read_sql('SELECT click_id, clicked_id FROM Clicks', db)
+  click_id = data_frame[['click_id']].drop_duplicates()
+  clicked_id = data_frame[['clicked_id']].drop_duplicates()
+  num_user = len(click_id)
+  num_item = len(clicked_id)
+  return num_user, num_item
 
 
 def get_data():
   db = cdb()
-  df = pd.read_sql('SELECT click_id, clicked_id, flag, time FROM Clicks', db)
+  df = pd.read_sql('SELECT click_id, clicked_id, flag, time_ FROM Clicks', db)
+  pd.to_datetime(df['time_'], format='%Y%m%d')
 
   return df
 
-
 def preprocess_dataset(df):
-  user_id = df[['click_id']].drop_duplicates().reindex()  # ['uid']で取るとSeries型になるので[['uid']]で取得
+  user_id = df[['click_id']].drop_duplicates().reindex()
   user_id['click_id'] = np.arange(len(user_id))
   df = pd.merge(df, user_id, on=['click_id'], how='left')
   clicked_id = df[['clicked_id']].drop_duplicates()
   clicked_id['clicked_id'] = np.arange(len(clicked_id))
   df = pd.merge(df, clicked_id, on='clicked_id', how='left')
-  df = df[['click_id', 'clicked_id', 'flag', 'time']]
+  df = df[['click_id', 'clicked_id', 'flag', 'time_']]
 
   return df
 
@@ -72,19 +67,19 @@ class SampleGenerator(object):
     return ratings
 
   def _sample_negative(self, ratings):
-    interact_status = ratings.groupby('click_id')['time'].apply(
+    interact_status = ratings.groupby('click_id')['time_'].apply(
       set).reset_index().rename(
       columns={
-        'time': 'interacted_items'})  # interacted_itemsにレビューしたitemIdの集合体が入る
+        'time_': 'interacted_items'})  # interacted_itemsにレビューしたitemIdの集合体が入る
     interact_status['negative_items'] = interact_status[
       'interacted_items'].apply(lambda x: self.item_pool - x)
     interact_status['negative_samples'] = interact_status[
-      'negative_items'].apply(lambda x: random.sample(x, 10)) # 99だった
+      'negative_items'].apply(lambda x: random.sample(x, 7)) # 99だった
 
     return interact_status[['click_id', 'negative_items', 'negative_samples']]
 
   def _split_train_test(self, ratings):
-    ratings['rank_latest'] = ratings.groupby(['click_id'])['time'].rank(
+    ratings['rank_latest'] = ratings.groupby(['click_id'])['time_'].rank(
       method='first', ascending=False)
     test = ratings[ratings['rank_latest'] == 1]
     train = ratings[ratings['rank_latest'] > 1]
@@ -157,9 +152,9 @@ class GMF(torch.nn.Module):
     self.num_users = config['num_users']
     self.num_items = config['num_items']
     self.latent_dim = config['latent_dim']
-    self.embedding_user = torch.nn.Embedding(num_embeddings=self.num_users,
+    self.embedding_user = torch.nn.Embedding(num_embeddings = self.num_users,
                                              embedding_dim=self.latent_dim)
-    self.embedding_item = torch.nn.Embedding(num_embeddings=self.num_items,
+    self.embedding_item = torch.nn.Embedding(num_embeddings = self.num_items,
                                              embedding_dim=self.latent_dim)
     self.affine_output = torch.nn.Linear(in_features=self.latent_dim,
                                          out_features=1)
@@ -174,7 +169,7 @@ class GMF(torch.nn.Module):
     return rating
 
 
-def model():
+def model(config):
   device = 'cuda' if torch.cuda.is_available() else 'cpu'
   model = GMF(config).to(device)
   return model
@@ -201,7 +196,7 @@ def train(train_loader):
     total_loss += loss
 
 
-def test(eval_data):
+def test_(model, eval_data):
   model.eval()
   test_users, test_items = eval_data[0], eval_data[1]
   negative_users, negative_items = eval_data[2], eval_data[3]
@@ -209,4 +204,3 @@ def test(eval_data):
   negative_scores = model(negative_users, negative_items)
 
   return test_scores, negative_scores
-
