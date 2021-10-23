@@ -63,6 +63,7 @@
 <body>
     <div class="talk_content_all">
         <p><a class="back" href="top"><i class="fas fa-arrow-circle-left"></i>戻る</a></p>
+        
         <div class="talk_content">
             <div class="group">
                 <div class="group_name">
@@ -99,12 +100,13 @@
                 </div>
                 <div class="scroll">
                     {% for i in follow_id_list %}
+                
                     <div class="list_form">
                         <form action="/talk" method="POST">
                             <div class="friend_container" >
-                                <img class="friend_icon" src ="{{ i[2] }}">  
-                                <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ i[0] }}">
-                                <input type="submit" name="friend_talk" class="friend_btn" value="{{ i[1] }}">
+                                <img class="friend_icon" src ="{{ i[0][2] }}">  
+                                <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ i[0][0] }}">
+                                <input type="submit" name="friend_talk" class="friend_btn" value="{{ i[0][1] }}">
                             </div>
                         </form>
                     </div>             
