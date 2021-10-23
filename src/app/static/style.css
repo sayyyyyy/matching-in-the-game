@@ -37,8 +37,9 @@
 *.top_title {
 	font-family: 'Comic Sans MS', 'SimSun';
 	text-align: center;
-	font-size: 36px;
-	color: white;
+	font-size: 40px;
+	color: lightblue;
+};
 }
 *.addmsg {
 	display: block;
