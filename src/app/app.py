@@ -1217,10 +1217,17 @@ def group_edit():
       for i in invited:
         i = i[0]
         list_invited.append(i)
+      
 
-      group_related = list_invited + list_group_except_me
+      group_related = list_invited + list_group_except_me #list_group_except_me -> 自分以外のすでに入っている人 list_invited -> いま招待されている人
       temp_1 = list(set(Mutuals)) + list(set(group_related))
+      fix = []
+      
       not_invited = [x for x in set(temp_1) if temp_1.count(x) == 1]
+      
+      results = tuple(set(not_invited) - set(list_invited))
+
+      not_invited = list(results)
 
       current = db.cursor()
       current.execute("SELECT icon, nickname, id from Profiles where id = %s",
