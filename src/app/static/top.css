@@ -270,10 +270,14 @@ header {
  .body-flex {
      display: flex;
      justify-content: space-around;
+     margin: 0 auto;
+     text-align: center;
+     width: 100%;
+     max-width: 980px;
  }
- .friend_list {
+ /* .friend_list {
      width: 35%;
- }
+ } */
  .search {
      width: 65%;
  }
@@ -281,6 +285,7 @@ header {
  .link {
      display: flex;
      flex-direction: column;
+     margin: auto;
  }
 
  .friend_img {
@@ -292,42 +297,47 @@ header {
     border: solid 3px black;
  }
 
- .friends {
+.friends {
      display: flex;
      justify-content: space-between;
      margin: 10px 20px;
      align-items: center;
  }
 
- .myprof {
+.myprof {
      border: solid 0;
  }
 
- .group_and_friend {
+.group_and_friend {
     display: flex;
     flex-direction: column;
+    margin: 0 auto;
+    width: 35%;
+    margin-right: 30px;
+    margin-left: -90px;
 }
 
 #group-box {
-    width: 350px;
-    height: 200px;
-    overflow: scroll;
+    width: 90%;
+    height: 90%;
+    overflow-x: hidden;
+    overflow-y: scroll;
     background: var(--main-color);
-    margin: 10px;
+    margin: 10px 0;
+    
 }
 
 #friend-box {
-    width: 350px;
-    height: 200px;
-    overflow: scroll;
+    width: 90%;
+    height: 90%;
+    overflow-x: hidden;
+    overflow-y: scroll;
     background: var(--main-color);
-    margin: 10px;
 }
 
 #modalOpen {
     width: 100px;
     height: auto;
-    margin: 0 auto;
 }
 
 #search_result {

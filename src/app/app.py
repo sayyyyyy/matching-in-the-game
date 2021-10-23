@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 from datetime import timedelta
+import datetime
 import mysql.connector
 import re
 import MySQLdb.cursors
@@ -16,6 +17,9 @@ from requests_oauthlib import OAuth1Session
 from flask_socketio import SocketIO, join_room, leave_room, emit
 import smtplib
 from email.mime.text import MIMEText
+
+from GMF import get_data, preprocess_dataset, SampleGenerator, model, setting, test_
+
 
 app = Flask(__name__)
 
@@ -540,8 +544,7 @@ def edit():
 
       if request.method == "POST":
         # 画像変更
-        #if 'up_file' in request.files:
-        if request.form.get("up_file"):
+        try:
           img_file = request.files['up_file']
           filename = secure_filename(img_file.filename)
           img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -550,6 +553,8 @@ def edit():
           cursor = db.cursor(buffered=True)
           cursor.execute("UPDATE Profiles SET icon = %s WHERE id = %s", (UPLOAD_FOLDER + filename, session['user_id']))
           db.commit()
+        except:
+          pass
 
         # ゲーム変更
         if request.form.get("game1"):
@@ -910,6 +915,18 @@ def top():
         if request.form.get("profile") == "プロフを表示する":
           session["profile_id"] = request.form.get("friend_id")
           session["profile_id"] = int(session["profile_id"])
+
+          # clickの情報を保存する------------------------------------------------------------------------------------------
+          if session["profile_id"] != session['user_id']:
+            date = datetime.date.today()
+            date = str(date)
+            date = date.replace("-", "")
+            add_click = db.cursor()
+            add_click.execute("INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (%s, %s, %s, %s)",
+                              (session['user_id'], session['profile_id'], 1, date))
+            db.commit()
+          # ------------------------------------------------------------------------------------------------------------
+
           return redirect("/profile")
 
         elif request.form.get("myprofile") == "マイプロフを表示する":
@@ -920,16 +937,15 @@ def top():
         elif request.form.get("talk") == "トークルームに行く":
           try:
             get_group = db.cursor()
-            get_group.execute("SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1", (session['user_id'], request.form.get('talk_id')))
+            get_group.execute("SELECT id FROM Groups flag_talk = %s AND id = (SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1)", (0, session['user_id'], request.form.get('talk_id')))
             
-            #isOneonOne = db.cursor()
-            #isOneonOne.execute("SELECT * FROM Groups WHERE %s = (SELECT COUNT(*) FROM Members WHERE group_id =)")
             session['room_id'] = get_group.fetchall()[0][0]
             get_group_name = db.cursor()
             get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
             session['room_name'] = get_group_name.fetchall()[0][0]
             
           except:
+            return "a"
             session['room_id'] = request.form.get("talk_id") #グループidにしたい
             set_name = find_user(session['user_id']) + find_user(session['room_id']) + "のトーク"
             
@@ -1070,7 +1086,7 @@ def group_pre():
   db = cdb()
   if request.method == 'POST' and 'edit' in request.form:
       session["group_id"] = request.form.get("edit")
-      session["group_id"] = int(session["group_id"])
+      # session["group_id"] = int(session["group_id"])
       if request.form.get("to_talk") == "トークルームに行く":
         session['room_id'] = int(request.form.get("edit"))
 
@@ -1127,22 +1143,26 @@ def group_edit():
 
 
     if request.method == "POST":
-      img_file = request.files['up_file']
-      filename = secure_filename(img_file.filename)
-      img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-      img_file.save(img_url)
+        try:
+          img_file = request.files['up_file']
+          filename = secure_filename(img_file.filename)
+          img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+          img_file.save(img_url)
 
-      cursor = db.cursor()
-      cursor.execute("UPDATE Groups SET group_icon = %s WHERE id = %s",
-                       (UPLOAD_FOLDER + filename, session['group_id']))
-      db.commit()
+          cursor = db.cursor()
+          cursor.execute("UPDATE Groups SET group_icon = %s WHERE id = %s",
+                           (UPLOAD_FOLDER + filename, session['group_id']))
+          db.commit()
+        except:
+          pass
 
-      set_name = db.cursor()
-      set_name.execute("UPDATE Groups SET group_name = %s WHERE id = %s",
-                       (request.form.get("group_name"), session['group_id'],))
-      db.commit()
+        if "group_name" in request.form:
+          set_name = db.cursor()
+          set_name.execute("UPDATE Groups SET group_name = %s WHERE id = %s",
+                           (request.form.get("group_name"), session['group_id'],))
+          db.commit()
 
-      return redirect('/group_edit')
+        return redirect('/group_edit')
 
 
     else:
@@ -1213,6 +1233,36 @@ def group_edit():
       return render_template('group_edit.html', group=group, current=current,
                              not_invited_=not_invited_, group_joined=group_joined,
                              already_invited=already_invited)
+
+
+@app.route('/test')
+def test():
+  num_users, num_items = setting()
+  config = {'batch_size': 31, 'num_negative': 4,
+            'num_users':num_users, 'num_items':num_items,
+            'latent_dim': 4, 'alias': 'gmf_factor8neg4-implict',
+            'num_epoch': 100, 'l2_regularization': 0,
+            }
+  data = get_data()
+  df = preprocess_dataset(data)
+  sample_generator = SampleGenerator(ratings=df)
+  eval_data = sample_generator.evaluate_data
+  GMF_model = model(config)
+  train_loader = sample_generator.instance_a_train_loader(config['num_negative'], config['batch_size'])
+  test_users, test_items = eval_data[0], eval_data[1]
+  test_users = len(test_users)
+  test_items = len(test_items)
+  a, b = eval_data[2], eval_data[3]
+  a = len(a)
+  b = len(b)
+
+  # c = test_(GMF_model, eval_data)
+
+
+  return render_template('test.html', GMF_model=GMF_model, eval_data=eval_data,
+                         train_loader=train_loader, test_users=test_users,
+                         test_items=test_items, a=a, b=b, num_users=num_users,
+                         num_items=num_items)
 
 
 if __name__ == '__main__':

@@ -4,32 +4,34 @@
     --background-color: white;
     --text-color: white;
 }
-
 body {
     background-color: var(--background-color);
 }
-
 .top_title {
     font-size: 8vh;
+    padding-top: 50px;
 }
 .center {
     background-color: black;
     position: relative;
     top: 20vh;
 }
-
 .login {
     width: 20vw;
     position: relative;
     left: 20vw;
 }
-
 .register {
     width: 20vw;
     position: relative;
     left: 40vw;
 }
-
 .button_follow {
     font-size: 2vw;
+}
+p.top_comment {
+    padding-top: 200px;
+    text-align: center;
+    font-size: 28px;
+    font-family: monospace;
 }

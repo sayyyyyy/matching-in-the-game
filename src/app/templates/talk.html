@@ -62,11 +62,11 @@
 
 <body>
     <p><a class="back" href="top">戻る</a></p>
-    <div class="flex">
+    <div class="flex" style="display:inline-flex">
         <div class="group">
             <div class="flex">
                 <i class="fas fa-users"></i>
-                <p>グループ</p>
+                <p class="group_friend">グループ</p>
             </div>
             <div class="scroll">
                 {% for i in group_list %}
@@ -79,7 +79,7 @@
         </div>
         <div class="space"></div>
         <div>
-            <h2>{{session['room_name']}}</h2>
+            <h2 class="talk_who">{{session['room_name']}}</h2>
             <ul id="chat">
             </ul>
             <form id="form" action="">
@@ -92,7 +92,7 @@
         <div class="friend">
             <div  class="flex">
                 <i class="fas fa-user-friends"></i>
-                <p>友達</p>
+                <p class="group_friend">友達</p>
             </div>
             <div class="scroll">
                 {% for i in follow_id_list %}                 
