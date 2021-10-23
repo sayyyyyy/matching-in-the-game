@@ -61,51 +61,58 @@
 </head>
 
 <body>
-    <p><a class="back" href="top">戻る</a></p>
-    <div class="flex" style="display:inline-flex">
-        <div class="group">
-            <div class="flex">
-                <i class="fas fa-users"></i>
-                <p class="group_friend">グループ</p>
+    <div class="talk_content_all">
+        <p><a class="back" href="top"><i class="fas fa-arrow-circle-left"></i>戻る</a></p>
+        <div class="talk_content">
+            <div class="group">
+                <div class="group_name">
+                    <!-- <p><i class="fas fa-users"></i></p> -->
+                    <p class="group_friend">グループ</p>
+                </div>
+                <div class="scroll">
+                    {% for i in group_list %}
+                    <div class="list_form">
+                        <form action="/talk" method="POST">  
+                            <input readonly id ="group_id" type ="hidden" name ="group_id" value="{{ i[0] }}">
+                            <input type="submit" name="group_talk" class="group_btn" value="{{ i[1] }}">
+                        </form>
+                    </div>
+                        
+                    {% endfor %}
+                </div>
             </div>
-            <div class="scroll">
-                {% for i in group_list %}
-                    <form action="/talk" method="POST">  
-                        <input readonly id ="group_id" type ="hidden" name ="group_id" value="{{ i[0] }}">
-                        <input type="submit" name="group_talk" class="group_btn" value="{{ i[1] }}">
-                    </form>
-                {% endfor %}
+            <div class="space"></div>
+            <div class="talk_space">
+                <h2 class="talk_who">{{session['room_name']}}</h2>
+                <ul id="chat">
+                </ul>
+                <form id="form" action="">
+                    <input type="text" id="text" placeholder="メッセージを入力してください" />
+                    <button>送信</button>
+                </form>
             </div>
-        </div>
-        <div class="space"></div>
-        <div>
-            <h2 class="talk_who">{{session['room_name']}}</h2>
-            <ul id="chat">
-            </ul>
-            <form id="form" action="">
-                <input type="text" id="text" placeholder="メッセージを入力してください" />
-                <button>送信</button>
-            </form>
-
-        </div>
-        <div class="space"></div>
-        <div class="friend">
-            <div  class="flex">
-                <i class="fas fa-user-friends"></i>
-                <p class="group_friend">友達</p>
-            </div>
-            <div class="scroll">
-                {% for i in follow_id_list %}                 
-                    <form action="/talk" method="POST">
-                        <div class="flex friend_container" >
-                            <img class="friend_icon" src ="{{ i[2] }}">  
-                            <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ i[0] }}">
-                            <input type="submit" name="friend_talk" class="friend_btn" value="{{ i[1] }}">
-                        </div>
-                    </form>
-                {% endfor %}
+            <div class="space"></div>
+            <div class="friend">
+                <div  class="group_name">
+                    <!-- <i class="fas fa-user-friends"></i> -->
+                    <p class="group_friend">友達</p>
+                </div>
+                <div class="scroll">
+                    {% for i in follow_id_list %}
+                    <div class="list_form">
+                        <form action="/talk" method="POST">
+                            <div class="friend_container" >
+                                <img class="friend_icon" src ="{{ i[2] }}">  
+                                <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ i[0] }}">
+                                <input type="submit" name="friend_talk" class="friend_btn" value="{{ i[1] }}">
+                            </div>
+                        </form>
+                    </div>             
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
+</body>
 
 </html>
