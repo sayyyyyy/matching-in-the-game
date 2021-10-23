@@ -712,14 +712,24 @@ def talk():
       return redirect("/talk")
     else:
       db = cdb()
-      follow = db.cursor()
-      follow.execute("SELECT id, nickname, icon FROM Profiles WHERE id IN (SELECT followed_id FROM Follows WHERE follow_id = %s)", (session['user_id'], ))
-      follow_id_list = follow.fetchall()
+      # follow = db.cursor()
+      # follow.execute("SELECT id, nickname, icon FROM Profiles WHERE id IN (SELECT followed_id FROM Follows WHERE follow_id = %s)", (session['user_id'], ))
+      # follow_id_list = follow.fetchall()
+      Mutual_talk = []
+      Mutuals, Mutual_friends, followed_li = mutual_friend()
+
+      for Mutual in Mutuals:
+        list_friends = db.cursor(buffered=True)
+        list_friends.execute("SELECT id, nickname, icon from Profiles where id = %s", (Mutual,))
+        m = list_friends.fetchall()
+        Mutual_talk.append(m)
+      
+
       group = db.cursor()
       group.execute("SELECT id, group_name FROM Groups WHERE id IN (SELECT group_id FROM Members WHERE member_id = %s) AND flag_group = %s", (session['user_id'], 1))
       group_list = group.fetchall()
 
-      return render_template("talk.html", session=session, follow_id_list=follow_id_list, group_list=group_list)
+      return render_template("talk.html", session=session, follow_id_list=Mutual_talk, group_list=group_list)
 
   else:
     return redirect(url_for('login'))

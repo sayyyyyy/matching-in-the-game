@@ -48,17 +48,17 @@
                 </div>
 
                 <div class="modal-body_">
-                    <div class="follows">
+                    <div class="invite">
                         
                         {% for i in followed_info %}
                         <form action='/top' method='POST'>
                             <div class="information">
-                                <label class="label_information">
+                                <div class="label_information">
                                     <img src ="{{ i[0][0] }}" class ="is-circle">
                                     {{ i[0][1] }}
                                     <input type="hidden" name="follow" value="{{i[0][2]}}">
                                     <button type="submit">フォローする</button>
-                                </label>
+                                </div>
                                 <p></p>
                             </div>
                         </form>
@@ -66,25 +66,22 @@
                         
                     </div>
 
-                    <div class="groups">
+                    <div class="invite">
+
+                        {% for i in group_list %}
                         <form action='/top' method='POST'>
-
-                            {% for i in group_list %}
-                            <form action='/top' method='POST'>
-                                <div class="information">
-                                    <label class="label_information">
-                                        <img src ="{{ i[0][1] }}" class ="is-circle">
-                                        {{i[0][0]}}
-                                    
-                                        <input type="hidden" name="join_group" value="{{i[0][2]}}">
-                                        <button type="submit">グループ参加</button>
-                                        <p></p>
-                                    </label>
+                            <div class="information">
+                                <div class="label_information">
+                                    <img src ="{{ i[0][1] }}" class ="is-circle">
+                                    {{i[0][0]}}
+                                    <input type="hidden" name="join_group" value="{{i[0][2]}}">
+                                    <button type="submit">グループ参加</button>
                                 </div>
-                            </form>
-                            {% endfor %}
-
+                                <p></p>
+                            </div>
                         </form>
+                        {% endfor %}
+
                     </div>
                 </div>
             </div>
@@ -144,15 +141,15 @@
 
             <div id="group-box" class="friend-list">
                 {% for i in group_list_join %}
-                <div class="friends">
+                <div class="groups">
                  
                     <img src="{{ i[1] }}" class="friend_img">         
                     <p>{{ i[0] }}</p>
-                    <div class="link">
-                        <form action="/group_pre" method="POST">
+                    <div class="group_link">
+                        <form action="/group_pre" method="POST" class="group_link_content">
                             <input readonly id ="group_id" type="hidden" name="edit" value="{{ i[2] }}">
-                            <input readonly type="submit" name="to_group_talk" value="トークルームに行く">
                             <input readonly id ="group_id_submit" type="submit" name="edit-group" value="編集する">
+                            <input readonly type="submit" name="to_group_talk" value="トークルームに行く">
                         </form>
                     </div>
                     
@@ -168,7 +165,7 @@
                     <p>{{ friend[0][1] }}</p>
                     <div class="link">
     
-                        <form action="/top" method="POST">
+                        <form action="/top" method="POST" class="group_link_content">
                             <input readonly id ="friend_id" type ="hidden" name ="friend_id" value="{{ friend[0][2] }}">
                             <input class="input_css" type="submit" name="profile" value="プロフを表示する">       
                         </form>
