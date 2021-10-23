@@ -550,8 +550,7 @@ def edit():
 
       if request.method == "POST":
         # 画像変更
-        #if 'up_file' in request.files:
-        if request.form.get("up_file"):
+        try:
           img_file = request.files['up_file']
           filename = secure_filename(img_file.filename)
           img_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -560,6 +559,8 @@ def edit():
           cursor = db.cursor(buffered=True)
           cursor.execute("UPDATE Profiles SET icon = %s WHERE id = %s", (UPLOAD_FOLDER + filename, session['user_id']))
           db.commit()
+        except:
+          pass
 
         # ゲーム変更
         if request.form.get("game1"):
@@ -957,7 +958,6 @@ def top():
             get_group = db.cursor()
             get_group.execute("SELECT id FROM Groups flag_talk = %s AND id = (SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1)", (0, session['user_id'], request.form.get('talk_id')))
             
-
             session['room_id'] = get_group.fetchall()[0][0]
             get_group_name = db.cursor()
             get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))

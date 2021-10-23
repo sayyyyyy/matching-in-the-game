@@ -145,12 +145,10 @@
             <div id="group-box" class="friend-list">
                 {% for i in group_list_join %}
                 <div class="friends">
-
-                    <img src="{{ i[1] }}" class="friend_img">
-
+                 
+                    <img src="{{ i[1] }}" class="friend_img">         
                     <p>{{ i[0] }}</p>
-
-                    <div class="link-group">
+                    <div class="link">
                         <form action="/group_pre" method="POST">
                             <input readonly id ="group_id" type="hidden" name="edit" value="{{ i[2] }}">
                             <input readonly type="submit" name="to_group_talk" value="トークルームに行く">
@@ -165,9 +163,9 @@
             <div id="friend-box" class="friend_list">
                 {% for friend in Mutual_friends %}
                 <div class="friends">
+
                     <img src ="{{ friend[0][0] }}" class ="friend_img">
                     <p>{{ friend[0][1] }}</p>
-                    
                     <div class="link">
     
                         <form action="/top" method="POST">

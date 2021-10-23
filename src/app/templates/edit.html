@@ -4,6 +4,11 @@
 <link rel ="stylesheet" href ="../static/profile.css">
 {% endblock %}
 
+{% block js %}
+<script src ="../static/main.js"></script>
+{% endblock %}
+
+
 {% block title %}
 Home
 {% endblock %}
@@ -16,13 +21,13 @@ Home
     <div class="flex">
 
         <div class="edit_left">
-            <img src ="{{ user_profile[5] }}" class ="user-icon edit_icon">
+            <img id="icon" src="{{ user_profile[5] }}" class="user-icon edit_icon">
             <div class="flex_file">
-                <input type ="file" id="up_file" name ="up_file" accept="image/*" onchange="setImage(this)">
+                <input type="file" id="up_file" name="up_file" accept="image/*" onchange="setImage(this)">
             </div>
             <div class="follow_followed">
                 <p>メール</p>
-                <div class ="flex">
+                <div class="flex">
                     
                     <input readonly id ="email" type ="email" name ="email" value="{{ user_profile[3] }}">
                     <button type ="button" onclick="edit('email')">編集する</button>

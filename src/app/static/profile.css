@@ -1,12 +1,12 @@
 :root {
-    --main-color: lightcoral;
+    --main-color: #cccccc;
     --sub-color: lightblue;
     --background-color: white;
     /* --text-color: white; */
 }
 
 body {
-    background-color: var(--background-color);
+    background-color: var(--main-color);
     color: var(--text-color);
     margin: 0 auto;
     width: auto;

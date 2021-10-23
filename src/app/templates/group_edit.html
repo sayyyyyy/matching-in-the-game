@@ -1,13 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
-    <link rel="stylesheet" href="../static/group_edit.css" />
-</head>
-<body>
+{% extends "layout.html" %}
 
+{% block css %}
+<link rel="stylesheet" href="../static/group_edit.css" />
+{% endblock %}
+
+{% block js %}
+<script src ="../static/main.js"></script>
+{% endblock %}
+
+
+{% block title %}
+Group Edit
+{% endblock %}
+
+{% block main %}  
 <div class="nav">
   <p><a href ="top" class=back><i class="fas fa-arrow-circle-left"></i>戻る</a></p>
 </div>
@@ -16,7 +22,7 @@
     <form action ="/group_edit" method ="POST" enctype="multipart/form-data">
         <div class="group_edit_flex">
           <div class="group_edit_left">
-            <img src ="{{ group[0][1] }}" class ="is-circle_m">
+            <img id="icon" src ="{{ group[0][1] }}" class ="is-circle_m">
             <input type="submit" value ="保存">
           </div>
           
@@ -129,5 +135,4 @@
 　　<script src="../static/group_edit.js"></script>
 </div>
 
-</body>
-</html>
+{% endblock %}
