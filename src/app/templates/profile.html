@@ -176,8 +176,11 @@ Profile
                 {% else %}
                     <input type="submit" name="unfollow" value="フォローをやめる">
                 {% endif %}
-                <input readonly id ="talk_id" type ="hidden" name ="talk_id" value="{{ session['profile_id'] }}">
-                <input type="submit" name="talk" value="トーク">
+                {% if is_mutual_follow != 0 %}
+                    <input readonly id ="talk_id" type ="hidden" name ="talk_id" value="{{ session['profile_id'] }}">
+                    <input type="submit" name="talk" value="トーク">
+                {% endif %}
+                {{is_mutual_follow}}
             </div>
         </div>
         

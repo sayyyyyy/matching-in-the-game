@@ -411,12 +411,13 @@ def profile():
             user_unfollow = db.cursor()
             user_unfollow.execute("DELETE FROM Follows WHERE follow_id = %s AND followed_id = %s", (session['user_id'], session['profile_id']))
             db.commit()
-          elif request.form.get("talk") == "トーク":
+
+          elif request.form.get("talk") != None:
             db = cdb()
             try:
               get_group = db.cursor()
-              get_group.execute("SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1", (session['user_id'], request.form.get('talk_id')))
-              #get_group.execute("SELECT group_id FROM Members WHERE member_id IN (%s, %s)", (session['user_id'], request.form.get('talk_id')))
+              get_group.execute("SELECT id FROM Groups flag_talk = %s AND id = (SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1)", (0, session['user_id'], request.form.get('talk_id')))  
+              
               session['room_id'] = get_group.fetchall()[0][0]
             except:
               session['room_id'] = request.form.get("talk_id") 
@@ -431,20 +432,22 @@ def profile():
               group = group_id.fetchall()[0][0]
 
               into_group_user = db.cursor()
-              into_group_user.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (session['user_id'], group))
+              into_group_user.execute("INSERT INTO Members (member_id, group_id, flag_join) VALUES (%s, %s, %s)", (session['user_id'], group, 1))
               db.commit()
 
               into_group_follower = db.cursor()
-              into_group_follower.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (request.form.get('talk_id'), group))
+              into_group_follower.execute("INSERT INTO Members (member_id, group_id, flag_join) VALUES (%s, %s, %s)", (request.form.get('talk_id'), group, 1))
               db.commit()
               session['room_id'] = group
 
             get_group_name = db.cursor()
             get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
             session['room_name'] = get_group_name.fetchall()[0][0]
-            return redirect("/talk")       
-          
+            return redirect("/talk")
+
           return redirect("/profile")
+          
+          
 
         else:
             cursor = db.cursor(buffered=True)
@@ -493,6 +496,9 @@ def profile():
             except:
                 game_name3 = "ゲームが選択されていません"
 
+            mutual_follow_cursor = db.cursor()
+            mutual_follow_cursor.execute("SELECT COUNT(*) FROM Follows WHERE followed_id = %s AND follow_id = %s AND follow_id IN (SELECT followed_id FROM Follows WHERE follow_id = %s AND followed_id = %s)", (session['user_id'], session['profile_id'], session['user_id'], session['profile_id']))
+            is_mutual_follow = mutual_follow_cursor.fetchall()[0][0]
 
             follow = db.cursor()
             follow.execute("SELECT COUNT(*) FROM Follows WHERE follow_id = %s", (session['profile_id'], ))
@@ -531,7 +537,7 @@ def profile():
         return render_template("profile.html", user_profile=user_profile,
                                star1=star1, star2=star2, star3=star3, game_name1=game_name1, game_name2=game_name2,
                                game_name3=game_name3, follow_count=follow_count, followed_count=followed_count,
-                                isFollow2=isFollow2, session=session, modal_follow_list=follow_list, modal_followed_list=followed_list)
+                                isFollow2=isFollow2, is_mutual_follow=is_mutual_follow, session=session, modal_follow_list=follow_list, modal_followed_list=followed_list)
 
     return redirect(url_for('login'))
 
@@ -813,6 +819,7 @@ def top():
                 "SELECT group_name, group_icon, id from Groups where id = %s", (i,))
             m = id.fetchall()
             group_list.append(m)
+        
         # ここまで------------------------------------------------------------------------------------------------------
 
         """
@@ -933,13 +940,24 @@ def top():
           session["profile_id"] = int(session["profile_id"])
           return redirect("/profile")
 
-        elif request.form.get("talk") == "トークルームに行く":
+        # elif request.form.get("to_group_talk") != None:
+        #   session['room_id'] = request.form.get("group_id")
+        #   db = cdb()
+        #   get_group_name = db.cursor()
+        #   get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
+        #   session['room_name'] = get_group_name.fetchall()[0][0]
+
+        #   get_group_name = db.cursor()
+        #   get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
+        #   session['room_name'] = get_group_name.fetchall()[0][0]
+        #   return redirect("/talk")
+
+        elif request.form.get("to_friend_talk") != None:
           try:
             get_group = db.cursor()
-            get_group.execute("SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1", (session['user_id'], request.form.get('talk_id')))
+            get_group.execute("SELECT id FROM Groups flag_talk = %s AND id = (SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1)", (0, session['user_id'], request.form.get('talk_id')))
             
-            #isOneonOne = db.cursor()
-            #isOneonOne.execute("SELECT * FROM Groups WHERE %s = (SELECT COUNT(*) FROM Members WHERE group_id =)")
+
             session['room_id'] = get_group.fetchall()[0][0]
             get_group_name = db.cursor()
             get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
@@ -965,11 +983,11 @@ def top():
             into_group_follower.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (request.form.get('talk_id'), group))
             db.commit()
 
-            session['room_id'] = group
+          session['room_id'] = group
 
-            get_group_name = db.cursor()
-            get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
-            session['room_name'] = get_group_name.fetchall()[0][0]
+          get_group_name = db.cursor()
+          get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
+          session['room_name'] = get_group_name.fetchall()[0][0]
           return redirect("/talk")   
         
         return "error"
@@ -1087,7 +1105,7 @@ def group_pre():
   if request.method == 'POST' and 'edit' in request.form:
       session["group_id"] = request.form.get("edit")
       # session["group_id"] = int(session["group_id"])
-      if request.form.get("to_talk") == "トークルームに行く":
+      if request.form.get("to_group_talk") != None:
         session['room_id'] = int(request.form.get("edit"))
 
         get_group_name = db.cursor()

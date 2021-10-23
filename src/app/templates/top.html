@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel ="stylesheet" href ="../static/top.css">
-    <title>Docker Test{% block title %} {% endblock %}</title>
+    <title>Main</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     
 </head>
@@ -153,7 +153,7 @@
                     <div class="link-group">
                         <form action="/group_pre" method="POST">
                             <input readonly id ="group_id" type="hidden" name="edit" value="{{ i[2] }}">
-                            <input readonly type="submit" name="to_talk" value="トークルームに行く">
+                            <input readonly type="submit" name="to_group_talk" value="トークルームに行く">
                             <input readonly id ="group_id_submit" type="submit" name="edit-group" value="編集する">
                         </form>
                     </div>
@@ -176,7 +176,7 @@
                         </form>
                         <form action="/top" method="POST">
                             <input readonly id ="talk_id" type ="hidden" name ="talk_id" value="{{ friend[0][2] }}">
-                            <input class="input_css" type="submit" name="talk" value="トークルームに行く">          
+                            <input class="input_css" type="submit" name="to_friend_talk" value="トークルームに行く">          
                         </form>
         
                     </div>
