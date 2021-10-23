@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block js %}
-<script src ="../static/main.js"></script>
+<!-- <script src ="../static/main.js"></script> -->
 {% endblock %}
 
 
@@ -37,7 +37,7 @@ Group Edit
               <p>アイコンを編集する</p>
               <input type ="file" name ="up_file" accept="image/*" onchange="setImage(this)">
             </div>
-          
+            
             <button id="modalOpen" type="button" class="button">メンバー詳細</button>
           </div>
         </div>
@@ -47,92 +47,91 @@ Group Edit
 
 
 <div class="modal__">
+
+  <div id="easyModal" class="modal">
     
+    <div class="modal-content">
 
-　　<div id="easyModal" class="modal">
+<!------------------------------------->
+      <div class="modal-header">
+        <h1>メンバー</h1>
+        <span class="modalClose">×</span>
+      </div>
+<!------------------------------------->
+      <div class="modal-body">
 
-　　　　<div class="modal-content">
+        <p>あなた</p>
+        <img src ="{{ current[0][0] }}" class ="is-circle">
+        {{current[0][1]}}
+        <p></p>
 
-<!--    ----------------------------------->
-　　　　　　<div class="modal-header">
-　　　　　　　　<h1>メンバー</h1>
-　　　　　　　　<span class="modalClose">×</span>
-　　　　　　</div>
-<!--    ----------------------------------->
+        <div class="group_info">
 
-　　　　　　<div class="modal-body">
-　　　　　　　　<form action='/group_edit' method='POST'>
+          <div class="group_info_content">
 
-                <p>あなた</p>
-                <img src ="{{ current[0][0] }}" class ="is-circle">
-                {{current[0][1]}}
-                <p></p>
+            <p>グループ参加者</p>
 
-                <div class="group_info">
+            <div class="group_info_box">
 
-                  <div class="group_info_content">
-                    <p>グループ参加者</p>
+              {% for i in group_joined %}
 
-                    <div class="group_info_box">
-
-                      {% for i in group_joined %}
-                      <label>
-                      <img src ="{{ i[0][0] }}" class ="is-circle">
-                      {{ i[0][1] }}
-                      <input type="hidden" name="kick" value="{{i[0][2]}}">
-                      <button type="submit">キックする</button>
-                      </label>
-                      <p></p>
-                      {% endfor %}
-
-                    </div>
-                    
-                  </div>
-                  
-                  <div class="group_info_content">
-
-                    <p>招待可能</p>
-
-                    <div class="group_info_box">
-                      {% for i in not_invited_ %}
-                      <label>
-                      <img src ="{{ i[0][0] }}" class ="is-circle">
-                      {{ i[0][1] }}
-                      <input type="hidden" name="invite" value="{{i[0][2]}}">
-                      <button type="submit">招待する</button>
-                      </label>
-                      <p></p>
-                      {% endfor %}
-                    </div>
-
-                  </div>
-                
-                  <div class="group_info_content">
-
-                    <p>招待済み</p>
-
-                    <div class="group_info_box">
-                      {% for i in  already_invited %}
-                      <label>
-                      <img src ="{{ i[0][0] }}" class ="is-circle">
-                      {{ i[0][1] }}
-                      </label>
-                      <p></p>
-                      {% endfor %}
-                    </div>
-
-                  </div>
-
+              <form action='/group_edit' method='POST'>
+                <div class="group_info_box_content">
+                  <img src ="{{ i[0][0] }}" class ="is-circle">
+                  {{ i[0][1] }}
+                  <input type="hidden" name="kick" value="{{i[0][2]}}">
+                  <button type="submit">キックする</button>
                 </div>
-                
+                <p></p>
               </form>
+              
+              {% endfor %}
 
-    　　　　</div>
-　　　　　　</div>
+            </div>
+                  
+          </div>
+                
+          <div class="group_info_content">
 
-　　　　</div>
-　　</div>
-　　<script src="../static/group_edit.js"></script>
+            <p>招待可能</p>
+
+            <div class="group_info_box">
+              {% for i in not_invited_ %}
+
+              <form action='/group_edit' method='POST'>
+                <div class="group_info_box_content">
+                  <img src ="{{ i[0][0] }}" class ="is-circle">
+                  {{ i[0][1] }}
+                  <input type="hidden" name="invite" value="{{i[0][2]}}">
+                  <button type="submit">招待する</button>
+                </div>
+                <p></p>
+              </form>
+  
+              {% endfor %}
+            </div>
+
+          </div>
+              
+          <div class="group_info_content">
+
+            <p>招待済み</p>
+
+            <div class="group_info_box">
+              {% for i in  already_invited %}
+              <div class="group_info_box_content_invited">
+                <img src ="{{ i[0][0] }}" class ="is-circle">
+                {{ i[0][1] }}
+              </div>
+              <p></p>
+              {% endfor %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
+<script src="../static/group_edit.js"></script>
 {% endblock %}

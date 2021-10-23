@@ -6,8 +6,8 @@
 }
 
 .is-circle {
-    width:  20px;       /* ※縦横を同値に */
-    height: 20px;       /* ※縦横を同値に */
+    width:  30px;       /* ※縦横を同値に */
+    height: 30px;       /* ※縦横を同値に */
     border-radius: 50%;  /* 角丸半径を50%にする(=円形にする) */
     background-position: left top;  /* 横長画像の左上を基準に表示 */
     display: inline-block;
@@ -167,6 +167,9 @@ body {
 /*---------------------
 みや追加分
 ---------------------*/
+.group_info_content {
+  width: 33%;
+}
 .editedit {
   margin: 0 auto;
   text-align: center;
@@ -211,22 +214,24 @@ body {
 
 .group_info {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
 }
-
-.group_info_content {
-  width: 33%;
-}
-
 .group_info_box {
   width: 100%;
-  height: auto;
+  height: 300px;
   overflow-y: scroll;
   overflow-x: hidden;
   margin: 0 10px;
 }
 
-.group_info_box label {
+.group_info_box_content_invited {
+  display: flex;
+  justify-content: center;
+}
+.group_info_box_content_invited img {
+  margin-right: 30px;
+}
+.group_info_box_content {
   display: flex;
   justify-content: space-around;
   align-items: center;
