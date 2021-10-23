@@ -1165,7 +1165,7 @@ def group_edit():
       id = request.form.get('invite')
       invite = db.cursor()
       invite.execute("INSERT INTO Members (member_id, flag_join, group_id) "
-                     "VALUES(%s, %s, %s)", (id, 0,session['group_id'], ))
+                     "VALUES(%s, %s, %s)", (id, 0, session['group_id'], ))
       db.commit()
       return redirect('/group_edit')
 
