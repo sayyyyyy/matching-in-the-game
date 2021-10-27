@@ -732,18 +732,18 @@ def talk():
                 get_group_name = db.cursor()
                 get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
                 session['room_name'] = get_group_name.fetchall()[0][0]
+
             elif request.form.get("friend_talk") != None:
                 db = cdb()
                 try:
                     get_group = db.cursor()
                     get_group.execute(
-                        "SELECT id FROM Groups Where flag_group = %s AND id = (SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1)",
-                        (0, session['user_id'], request.form.get('friend_id')))
+                        "SELECT id FROM Groups Where flag_group = %s AND id IN (SELECT group_id FROM Members WHERE member_id = %s AND member_id =  %s)", (0, session['user_id'], request.form.get('friend_id')))
 
                     session['room_id'] = get_group.fetchall()[0][0]
                 except:
                     session['room_id'] = request.form.get("friend_id")
-                    set_name = find_user(session['user_id']) + find_user(session['room_id']) + "のトーク"
+                    set_name = find_user(session['user_id']) + find_user(session['room_id'])
 
                     set_group = db.cursor()
                     set_group.execute("INSERT INTO Groups (group_name) VALUES (%s)", (set_name,))
@@ -1023,7 +1023,7 @@ def top():
             #   session['room_name'] = get_group_name.fetchall()[0][0]
             #   return redirect("/talk")
 
-            elif request.form.get("to_friend_talk") != None:
+            elif request.form.get("to_friend_talk") == "トークルームに行く":
                 try:
                     get_group = db.cursor()
                     get_group.execute(
@@ -1037,24 +1037,24 @@ def top():
 
                 except:
                     session['room_id'] = request.form.get("talk_id")  # グループidにしたい
-                    set_name = find_user(session['user_id']) + find_user(session['room_id']) + "のトーク"
+                    set_name = find_user(session['user_id']) + find_user(session['room_id'])
 
                     set_group = db.cursor()
-                    set_group.execute("INSERT INTO Groups (group_name) VALUES (%s)", (set_name,))
+                    set_group.execute("INSERT INTO Groups (group_name, flag_group) VALUES (%s)", (set_name, 0))
                     db.commit()
 
                     group_id = db.cursor()
-                    group_id.execute("SELECT id FROM Groups WHERE group_name = %s", (set_name,))
+                    group_id.execute("SELECT id FROM Groups WHERE group_name = %s AND flag_group = %s", (set_name,0))
                     group = group_id.fetchall()[0][0]
 
                     into_group_user = db.cursor()
-                    into_group_user.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)",
-                                            (session['user_id'], group))
+                    into_group_user.execute("INSERT INTO Members (member_id, group_id, flag_join) VALUES (%s, %s, %s)",
+                                            (session['user_id'], group, 1))
                     db.commit()
 
                     into_group_follower = db.cursor()
-                    into_group_follower.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)",
-                                                (request.form.get('talk_id'), group))
+                    into_group_follower.execute("INSERT INTO Members (member_id, group_id, flag_join) VALUES (%s, %s, %s)",
+                                                (request.form.get('talk_id'), group, 1))
                     db.commit()
 
                     session['room_id'] = group
