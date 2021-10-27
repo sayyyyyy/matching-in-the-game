@@ -20,11 +20,16 @@ def cdb():
   )
   return db
 
+def minus1(x):
+  return x - 1
+
+
 def setting():
   db = cdb()
   data_frame = pd.read_sql('SELECT click_id, clicked_id FROM Clicks', db)
-  click_id = data_frame[['click_id']].drop_duplicates()
-  clicked_id = data_frame[['clicked_id']].drop_duplicates()
+  # 後でこれで正しいか確認する必要がある(unique)
+  click_id = data_frame['click_id'].unique()
+  clicked_id = data_frame['clicked_id'].unique()
   num_user = len(click_id)
   num_item = len(clicked_id)
   return num_user, num_item
@@ -34,7 +39,6 @@ def get_data():
   db = cdb()
   df = pd.read_sql('SELECT click_id, clicked_id, flag, time_ FROM Clicks', db)
   pd.to_datetime(df['time_'], format='%Y%m%d')
-
   return df
 
 def preprocess_dataset(df):
@@ -46,6 +50,9 @@ def preprocess_dataset(df):
   df = pd.merge(df, clicked_id, on='clicked_id', how='left')
   df = df[['click_id', 'clicked_id', 'flag', 'time_']]
 
+  # user_idをマイナス1してindexを0からスタートにした
+  df[['click_id']] = df[['click_id']].applymap(minus1)
+  df[['clicked_id']] = df[['clicked_id']].applymap(minus1)
   return df
 
 
@@ -56,7 +63,7 @@ class SampleGenerator(object):
     self.user_pool = set(self.ratings['click_id'].unique())  # ユーザーの集合体の作成
     self.item_pool = set(self.ratings['clicked_id'].unique())  # アイテムの集合体の作成
     self.negatives = self._sample_negative(
-      ratings)  # 反応していないitemIdと99個のランダムに抽出されたitemIdをくっつける
+      ratings)
     self.train_ratings, self.test_ratings = self._split_train_test(
       self.preprocess_ratings)  # 最新のレビューがテスト/それ以外がtrain
 
@@ -70,11 +77,11 @@ class SampleGenerator(object):
     interact_status = ratings.groupby('click_id')['time_'].apply(
       set).reset_index().rename(
       columns={
-        'time_': 'interacted_items'})  # interacted_itemsにレビューしたitemIdの集合体が入る
+        'time_': 'interacted_items'})
     interact_status['negative_items'] = interact_status[
       'interacted_items'].apply(lambda x: self.item_pool - x)
     interact_status['negative_samples'] = interact_status[
-      'negative_items'].apply(lambda x: random.sample(x, 7)) # 99だった
+      'negative_items'].apply(lambda x: random.sample(x, 10))
 
     return interact_status[['click_id', 'negative_items', 'negative_samples']]
 
@@ -119,6 +126,10 @@ class SampleGenerator(object):
       for i in range(len(row.negative_samples)):
         negative_users.append(int(row.click_id))
         negative_items.append(int(row.negative_samples[i]))
+    # # eval_data[0][1]を調節する
+    # test_users.append(0)
+    # test_users.sort()
+    # test_users.remove(test_users[-1])
 
     return [torch.LongTensor(test_users), torch.LongTensor(test_items),
             torch.LongTensor(negative_users),
@@ -175,7 +186,7 @@ def model(config):
   return model
 
 
-def train(train_loader):
+def train(model, train_loader):
   model.train()
   total_loss = 0
   # 誤差関数の設定
@@ -204,3 +215,17 @@ def test_(model, eval_data):
   negative_scores = model(negative_users, negative_items)
 
   return test_scores, negative_scores
+
+
+def check_1(num_users, eval_data):
+  embedding_user = torch.nn.Embedding(num_users,
+                                           embedding_dim=4)
+  words = torch.tensor(eval_data[0])
+  user_embedding = embedding_user(words)
+  return user_embedding
+
+def check_2(num_items, eval_data):
+  embedding_item = torch.nn.Embedding(num_items, 4)
+  item_indices = eval_data[1]
+  item_embedding = embedding_item(item_indices)
+  return item_embedding

@@ -3,11 +3,11 @@ USE app;
 
 
 CREATE TABLE IF NOT EXISTS Profiles(
-  id int PRIMARY KEY AUTO_INCREMENT, 
-  nickname varchar(20) NOT NULL, 
-  password varchar(20) NOT NULL, 
-  email varchar(50) NOT NULL, 
-  comment varchar(500) DEFAULT "Hello World!", 
+  id int PRIMARY KEY AUTO_INCREMENT,
+  nickname varchar(20) NOT NULL,
+  password varchar(20) NOT NULL,
+  email varchar(50) NOT NULL,
+  comment varchar(500) DEFAULT "Hello World!",
   icon varchar(100) DEFAULT "static/default_user_icon.png"
 );
 
@@ -18,17 +18,17 @@ CREATE TABLE IF NOT EXISTS Game_names (
 );
 
 CREATE TABLE IF NOT EXISTS Games (
-  id int PRIMARY KEY AUTO_INCREMENT, 
+  id int PRIMARY KEY AUTO_INCREMENT,
   user_id int NOT NULL,
   game_id int NOT NULL,
-  FOREIGN KEY(user_id) REFERENCES Profiles(id), 
-  FOREIGN KEY(game_id) REFERENCES Game_names(id), 
+  FOREIGN KEY(user_id) REFERENCES Profiles(id),
+  FOREIGN KEY(game_id) REFERENCES Game_names(id),
   game_level int DEFAULT 0,
   game_order int DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS Follows (
-  id int PRIMARY KEY AUTO_INCREMENT, 
+  id int PRIMARY KEY AUTO_INCREMENT,
   follow_id int NOT NULL,
   followed_id int NOT NULL,
   FOREIGN KEY(follow_id) REFERENCES Profiles(id),
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS Follows (
 );
 
 CREATE TABLE IF NOT EXISTS Groups (
-  id int PRIMARY KEY AUTO_INCREMENT, 
+  id int PRIMARY KEY AUTO_INCREMENT,
   group_name varchar(100),
   group_icon varchar(100),
   flag_group boolean DEFAULT false
@@ -103,7 +103,7 @@ INSERT INTO Profiles (nickname, password, email) VALUES("test_user28", "password
 INSERT INTO Profiles (nickname, password, email) VALUES("test_user29", "password", "test29@email.com");
 INSERT INTO Profiles (nickname, password, email) VALUES("test_user30", "password", "test30@email.com");
 INSERT INTO Profiles (nickname, password, email) VALUES("test_user31", "password", "test31@email.com");
-INSERT INTO Profiles (nickname, password, email) VALUES("test_user32", "password", "test32@email.com");
+INSERT INTO Profiles (nickname, password, email) VALUES("test_user32", "password", "test31@email.com");
 
 
 INSERT INTO Game_names (game_name) VALUES("APEX LEGENDS");
@@ -129,6 +129,84 @@ INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(5, 3, 3, 3);
 INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(6, 1, 1, 1);
 INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(6, 2, 2, 2);
 INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(6, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(7, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(7, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(7, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(8, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(8, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(8, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(9, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(9, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(9, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(10, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(10, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(10, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(11, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(11, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(11, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(12, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(12, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(12, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(13, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(13, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(13, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(14, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(14, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(14, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(15, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(15, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(15, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(16, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(16, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(16, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(17, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(17, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(17, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(18, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(18, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(18, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(19, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(19, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(19, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(20, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(20, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(20, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(21, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(21, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(21, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(22, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(22, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(22, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(23, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(23, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(23, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(24, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(24, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(24, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(25, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(25, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(25, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(26, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(26, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(26, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(27, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(27, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(27, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(28, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(28, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(28, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(29, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(29, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(29, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(30, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(30, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(30, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(31, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(31, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(31, 3, 3, 3);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(32, 1, 1, 1);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(32, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(32, 3, 3, 3);
 
 INSERT INTO Follows (follow_id, followed_id) VALUES(1, 2);
 INSERT INTO Follows (follow_id, followed_id) VALUES(2, 1);
@@ -144,12 +222,15 @@ INSERT INTO Follows (follow_id, followed_id) VALUES(3, 2);
 
 
 -- timeにinsertは無理っぽい
+-- INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (0, 24, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (1, 2, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (1, 5, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (1, 4, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (1, 12, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (1, 27, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (2, 8, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (2, 1, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (2, 3, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (2, 12, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (3, 2, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (3, 4, 1, 20201020);
@@ -157,45 +238,63 @@ INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (4, 12, 1, 2020102
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (4, 2, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (5, 2, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (5, 19, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (5, 14, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (6, 9, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (6, 13, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (6, 5, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (7, 15, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (7, 18, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (8, 2, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (9, 17, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (9, 8, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (10, 27, 1, 20201020);
-INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (11, 27, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (11, 28, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (12, 21, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (12, 27, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (13, 23, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (13, 25, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (14, 23, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (15, 2, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (16, 27, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (17, 23, 1, 20201020);
-INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (17, 23, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (17, 22, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (17, 31, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (17, 21, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (17, 2, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (17, 18, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (18, 2, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (18, 7, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (18, 20, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (19, 27, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (20, 29, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (20, 10, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (21, 2, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (21, 13, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (22, 27, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (23, 29, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (23, 17, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (23, 19, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (24, 2, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (24, 16, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (25, 2, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (25, 6, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (26, 29, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (26, 21, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (26, 24, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (26, 18, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (27, 2, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (27, 11, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (27, 17, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (28, 2, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (28, 26, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (29, 2, 1, 20201020);
+INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (29, 30, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (30, 9, 1, 20201020);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (31, 21, 1, 20201020);
 
 
 -- こっちはevalで使いたいデータ
+-- INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (0, 13, 1, 20201021);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (1, 3, 1, 20201021);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (2, 6, 1, 20201021);
 INSERT INTO Clicks (click_id, clicked_id, flag, time_) VALUES (3, 5, 1, 20201021);
