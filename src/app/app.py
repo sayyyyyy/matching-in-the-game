@@ -17,12 +17,30 @@ from requests_oauthlib import OAuth1Session
 from flask_socketio import SocketIO, join_room, leave_room, emit
 import smtplib
 from email.mime.text import MIMEText
-from collections import OrderedDict
 
 from GMF import get_data, preprocess_dataset, \
     SampleGenerator, setting, GMF, check_1, train, minus1, check_2, model, test_
 
 app = Flask(__name__)
+
+# セッション設定
+# app.config['SECRET_KEY'] = b'aaalllaa' # これが暗号化／復号のための鍵になる
+
+# Googleの設定
+client_id = ''
+client_secret = ''
+redirect_uri = ''
+state = ''  # 本当はランダム
+
+# Twitterでのログイン認証
+api_key = ""
+api_secret = ""
+
+# Twitter Endpoint
+twitter_base_url = ''
+authorization_endpoint = twitter_base_url + ''
+request_token_endpoint = twitter_base_url + ''
+token_endpoint = twitter_base_url + ''
 
 # ファイルアップロード設定
 UPLOAD_FOLDER = './static/images/'
@@ -161,9 +179,15 @@ def logout():
     return redirect(url_for('login'))
 
 
-def register_interface(words, limit_words):
-    if len(words) < limit_words:
-        return False
+def register_interface(type, words, limit_words):
+    if type == "nickname":
+        if len(words) < limit_words:
+            return False
+        else:
+            return True
+    elif type == "password":
+        if len(words) < limit_words:
+            return False
     is_match = [0, 0, 0]  # 大文字、小文字、数字なら各要素に1をセット
     for c in words:
         if re.match(r'[A-Z]', c):
@@ -190,11 +214,11 @@ def register2():
         if (nickname is None) or (password is None) or (email is None):
             pass
         else:
-            if register_interface(password, 8) == False:
-                msg = 'パスワード入力に誤りがあります'
+            if register_interface("password", password, 8) == False:
+                msg = 'A-Z, a-z, 0-9をそれぞれ１字以上を含め、合計8文字以上で入力してください'
                 return render_template('register2.html', msg=msg)
-            if register_interface(nickname, 4) == False:
-                msg = 'ニックネーム入力に誤りがあります'
+            if register_interface("nickname", nickname, 1) == False:
+                msg = 'ニックネームは1文字以上で入力してください'
                 return render_template('register2.html', msg=msg)
 
         db = cdb()
@@ -882,7 +906,6 @@ def top():
             for i in group_id_join:
               i = i[0]
               list_i_join.append(i)
-    
             # groupで取ったidでGroupsテーブルからGroup_nameとGroup_iconを取得----------------
             group_list_join = []
             for i in list_i_join:
@@ -1075,8 +1098,9 @@ def asyncdata():
 
                 # ゲーム名とレベルで検索し、該当するIDを取得
                 game_search = db.cursor(buffered=True)
-                game_search.execute("SELECT user_id FROM Games INNER JOIN Game_names on Games.game_id = Game_names.id "
-                                    "WHERE game_name = %s AND game_level = %s", (game_name, game_level,))
+                game_search.execute(
+                    "SELECT user_id FROM Games INNER JOIN Game_names on Games.game_id = Game_names.id WHERE game_name = %s AND game_level = %s",
+                    (game_name, game_level,))
                 id_search = game_search.fetchall()
 
                 # 取得したIDの中でログインユーザーとログインユーザーがフォローしている人のIDを抜き取る
@@ -1104,8 +1128,8 @@ def asyncdata():
 
                         game_search = db.cursor(buffered=True)
                         game_search.execute(
-                            "SELECT G.game_order, G.game_level, N.Game_name from Games as G INNER JOIN Game_names "
-                            "as N ON G.game_id = N.id where G.user_id = %s and G.game_order = %s", (result, i,))
+                            "SELECT G.game_order, G.game_level, N.Game_name from Games as G INNER JOIN Game_names as N ON G.game_id = N.id where G.user_id = %s and G.game_order = %s",
+                            (result, i,))
                         g_list = game_search.fetchall()
                         g_list = list(g_list[0])
 
@@ -1232,6 +1256,7 @@ def asyncdata():
                 search_result.append(p)
 
             return render_template('search.html', id_search=search_result)
+
 
 
 @app.route('/group_pre', methods=['GET', 'POST'])
