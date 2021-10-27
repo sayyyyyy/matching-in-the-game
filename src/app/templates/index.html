@@ -9,13 +9,18 @@ Home
 {% endblock %}
 
 {% block main %}
-<div class="center">
-    <h1 class="top_title"> ~ Welcome to "Matching in the game" ~ </h1>
-    <div class="flex" style="display:inline-flex">
-        <form action="/login" method="GET"><input class="login button_follow" type="submit" value="login"></form>
-        <form action="/register2" method="GET"><input class="register button_follow" type="submit" value="register"></form>
-    </div>
-</div>
-<p class="top_comment">※このサービスは、あらかじめ好きなゲームを登録しておくと、<br>同じゲーム仲間とつながれるサービスです</p>
+<div class="index_content">
 
+    <div class="center">
+        <h1 class="top_title"> ~ゲームでマッチング！！~ </h1>
+        <div class="flex" style="display:inline-flex">
+            <form action="/login" method="GET"><input class="login button_follow" type="submit" value="login"></form>
+            <form action="/register2" method="GET"><input class="register button_follow" type="submit" value="register"></form>
+        </div>
+    </div>
+    <div>
+        <p class="top_comment">※このサービスは、あらかじめ好きなゲームを登録しておくと、<br>同じゲーム仲間とつながれるサービスです</p>
+    </div>
+    
+</div>
 {% endblock %}
