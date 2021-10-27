@@ -171,9 +171,15 @@ def logout():
   return redirect(url_for('login'))
 
 
-def register_interface(words, limit_words):
-  if len(words) < limit_words:
-    return False
+def register_interface(type, words, limit_words):
+  if type == "nickname":
+    if len(words) < limit_words:
+      return False
+    else:
+      return True
+  elif type == "password":
+    if len(words) < limit_words:
+      return False
   is_match = [0,0,0] # 大文字、小文字、数字なら各要素に1をセット
   for c in words:
     if re.match(r'[A-Z]',c):
@@ -200,11 +206,11 @@ def register2():
     if (nickname is None) or (password is None) or (email is None):
       pass
     else:
-      if register_interface(password, 8) == False:
-        msg = 'パスワード入力に誤りがあります'
+      if register_interface("password", password, 8) == False:
+        msg = 'A-Z, a-z, 0-9をそれぞれ１字以上を含め、合計8文字以上で入力してください'
         return render_template('register2.html', msg=msg)
-      if register_interface(nickname, 4) == False:
-        msg = 'ニックネーム入力に誤りがあります'
+      if register_interface("nickname", nickname, 1) == False:
+        msg = 'ニックネームは1文字以上で入力してください'
         return render_template('register2.html', msg=msg)
 
     db = cdb()
