@@ -1025,10 +1025,12 @@ def top():
 
             elif request.form.get("to_friend_talk") == "トークルームに行く":
                 try:
-                    get_group = db.cursor()
-                    get_group.execute(
-                        "SELECT id FROM Groups WHERE flag_group = %s AND id = (SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1)",
-                        (0, session['user_id'], request.form.get('talk_id')))
+                    # get_group = db.cursor()
+                    # get_group.execute(
+                    #     "SELECT id FROM Groups WHERE flag_group = %s AND id = (SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1)",
+                    #     (0, session['user_id'], request.form.get('talk_id')))
+
+                    miya = db.cursor()
 
                     session['room_id'] = get_group.fetchall()[0][0]
                     get_group_name = db.cursor()
@@ -1040,7 +1042,7 @@ def top():
                     set_name = find_user(session['user_id']) + find_user(session['room_id'])
 
                     set_group = db.cursor()
-                    set_group.execute("INSERT INTO Groups (group_name, flag_group) VALUES (%s)", (set_name, 0))
+                    set_group.execute("INSERT INTO Groups (group_name, flag_group) VALUES (%s, %s)", (set_name, 0))
                     db.commit()
 
                     group_id = db.cursor()
