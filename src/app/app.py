@@ -688,7 +688,7 @@ def talk():
         db = cdb()
         try:
           get_group = db.cursor()
-          get_group.execute("SELECT id FROM Groups flag_talk = %s AND id = (SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1)", (0, session['user_id'], request.form.get('friend_id')))  
+          get_group.execute("SELECT id FROM Groups Where flag_group = %s AND id = (SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1)", (0, session['user_id'], request.form.get('friend_id')))  
           
           session['room_id'] = get_group.fetchall()[0][0]
         except:
@@ -732,7 +732,7 @@ def talk():
       
 
       group = db.cursor()
-      group.execute("SELECT id, group_name FROM Groups WHERE id IN (SELECT group_id FROM Members WHERE member_id = %s) AND flag_group = %s", (session['user_id'], 1))
+      group.execute("SELECT id, group_name FROM Groups WHERE id IN (SELECT group_id FROM Members WHERE member_id = %s AND flag_join = %s) AND flag_group = %s", (session['user_id'], 1, 1))
       group_list = group.fetchall()
 
       return render_template("talk.html", session=session, follow_id_list=Mutual_talk, group_list=group_list)
@@ -818,8 +818,7 @@ def top():
         # グループの部分--------------------------------------------------------------
         # 通知のグループを取得
         group_not_join = db.cursor()
-        group_not_join.execute("SELECT group_id FROM Members WHERE member_id= %s AND "
-                      "flag_join= %s", (session['user_id'], 0,))
+        group_not_join.execute("SELECT id FROM Groups WHERE id in (SELECT group_id FROM Members WHERE member_id= %s AND flag_join= %s) AND flag_group = %s", (session['user_id'], 0, 1))
         group_not_join = group_not_join.fetchall()
 
         # gropはリストの中が()になっているからリストにする---------------------------------
@@ -972,7 +971,7 @@ def top():
         elif request.form.get("to_friend_talk") != None:
           try:
             get_group = db.cursor()
-            get_group.execute("SELECT id FROM Groups flag_talk = %s AND id = (SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1)", (0, session['user_id'], request.form.get('talk_id')))
+            get_group.execute("SELECT id FROM Groups WHERE flag_group = %s AND id = (SELECT group_id FROM Members WHERE member_id IN (%s, %s) GROUP BY group_id HAVING COUNT(group_id) > 1)", (0, session['user_id'], request.form.get('talk_id')))
             
             session['room_id'] = get_group.fetchall()[0][0]
             get_group_name = db.cursor()
@@ -999,7 +998,7 @@ def top():
             into_group_follower.execute("INSERT INTO Members (member_id, group_id) VALUES (%s, %s)", (request.form.get('talk_id'), group))
             db.commit()
 
-          session['room_id'] = group
+            session['room_id'] = group
 
           get_group_name = db.cursor()
           get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))

@@ -1,18 +1,21 @@
+@charset UTF-8;
+
 :root {
-    --main-color: lightcoral;
-    --sub-color: lightblue;
-    --background-color: white;
-    --text-color: white;
+    --main-color: #cccccc;
+    --sub-color: #9999ff;
 }
+
 body {
-    background-color: var(--background-color);
+   background-color: white;
 }
 .top_title {
     font-size: 8vh;
-    padding-top: 50px;
+    /* padding-top: 50px; */
+    color: var(--sub-color);
+    font-family:'Times New Roman', Times, serif;
 }
 .center {
-    background-color: black;
+    background-color: var(--main-color);
     position: relative;
     top: 20vh;
 }
@@ -30,8 +33,9 @@ body {
     font-size: 2vw;
 }
 p.top_comment {
-    padding-top: 200px;
+    padding-top: 150px;
     text-align: center;
     font-size: 28px;
     font-family: monospace;
 }
+
