@@ -1514,5 +1514,24 @@ def group_edit():
                                already_invited=already_invited)
 
 
+@app.route("/admin", methods=['GET', 'POST'])
+def admin():
+    db = cdb()
+    if request.method == "POST":
+        set_prof = db.cursor(buffered=True)
+        set_prof.execute("UPDATE Profiles SET nickname = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("userid")))
+        db.commit()
+
+        show_user = db.cursor(buffered=True)
+        show_user.execute("SELECT nickname FROM Profiles")
+        show_users = show_user.fetchall()
+        return render_template("admin.html", show_users=show_users)
+    else:
+        show_user = db.cursor(buffered=True)
+        show_user.execute("SELECT nickname FROM Profiles")
+        show_users = show_user.fetchall()
+        return render_template("admin.html", show_users=show_users)
+
+
 if __name__ == '__main__':
     socketio.run(app, debug=True)
