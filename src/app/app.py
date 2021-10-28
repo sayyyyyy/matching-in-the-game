@@ -804,13 +804,12 @@ def join(message):
     get_msg.execute("SELECT message FROM Messages WHERE group_id = %s", (session['room_id'],))
     view_msg = get_msg.fetchall()
 
+    # ------------------------------------------
+    # miya
     get_sender_id = db.cursor(buffered=True)
     get_sender_id.execute("SELECT sender_id FROM Messages WHERE group_id = %s", (session['room_id'],))
     view_sender_id = get_sender_id.fetchall()
-
-    # ------------------------------------------
-    # miya
-
+    
     sender_li = [i[0] for i in view_sender_id]
     sender = []
 
@@ -820,8 +819,6 @@ def join(message):
         m = list_sender.fetchall()
         sender.append(m)
     # ------------------------------------------
-
-
 
     user_info = db.cursor(buffered=True)
     user_info.execute("SELECT nickname, icon FROM Profiles WHERE id = %s", (session['user_id'],))
