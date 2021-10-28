@@ -110,9 +110,14 @@ INSERT INTO Game_names (game_name) VALUES("APEX LEGENDS");
 INSERT INTO Game_names (game_name) VALUES("Minecraft");
 INSERT INTO Game_names (game_name) VALUES("Pokemon");
 INSERT INTO Game_names (game_name) VALUES("Fortnite");
+INSERT INTO Game_names (game_name) VALUES("Mario Kart");
+INSERT INTO Game_names (game_name) VALUES("COD");
+INSERT INTO Game_names (game_name) VALUES("Phasmophobia");
+INSERT INTO Game_names (game_name) VALUES("Splitgate");
+INSERT INTO Game_names (game_name) VALUES("Smash Brothers");
 
 INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(1, 1, 1, 1);
-INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(1, 2, 2, 2);
+INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(1, 1, 2, 2);
 INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(1, 3, 3, 3);
 INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(2, 1, 1, 1);
 INSERT INTO Games (user_id, game_id, game_level, game_order) VALUES(2, 2, 2, 2);
