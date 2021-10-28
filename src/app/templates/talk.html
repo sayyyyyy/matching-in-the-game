@@ -28,8 +28,6 @@
 
                 for (let i = 0; i < data['msg'].length; i++) {
 
-                    console.log(data['msg']);
-                    console.log(data['sender_id'][i])
 
                     var item = document.createElement('li');
                     item.textContent = data['sender_id'][i] + ':' + data['msg'][i];

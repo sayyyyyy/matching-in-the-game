@@ -888,7 +888,7 @@ def join(message):
     get_sender_id = db.cursor(buffered=True)
     get_sender_id.execute("SELECT sender_id FROM Messages WHERE group_id = %s", (session['room_id'],))
     view_sender_id = get_sender_id.fetchall()
-    
+
     sender_li = [i[0] for i in view_sender_id]
     sender = []
 
@@ -1130,10 +1130,9 @@ def top():
                     get_group_name = db.cursor()
                     get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
                     session['room_name'] = get_group_name.fetchall()[0][0]
-
                 except:
                     session['room_id'] = request.form.get("talk_id")  # グループidにしたい
-                    set_name = find_user(session['user_id']) + find_user(session['room_id'])
+                    set_name = find_user(session['user_id']) + '&' + find_user(session['room_id'])
 
                     set_group = db.cursor(buffered=True)
                     set_group.execute("INSERT INTO Groups (group_name, flag_group) VALUES (%s, %s)", (set_name, 0))
