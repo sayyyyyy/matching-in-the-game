@@ -27,10 +27,14 @@
                 var item = document.createElement('li');
 
                 for (let i = 0; i < data['msg'].length; i++) {
+
+                    console.log(data['msg']);
+                    console.log(data['sender_id'][i])
+
                     var item = document.createElement('li');
-                    item.textContent = data['user'][0][0] + ':' + data['msg'][i];
+                    item.textContent = data['sender_id'][i] + ':' + data['msg'][i];
                     //item.style.listStyleImage = "url('" + data['user'][0][1] + "')";
-                    item.style.listStyle = None;
+                    // item.style.listStyle = none;
                     chat.appendChild(item);
 
                 }

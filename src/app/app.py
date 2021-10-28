@@ -804,12 +804,31 @@ def join(message):
     get_msg.execute("SELECT message FROM Messages WHERE group_id = %s", (session['room_id'],))
     view_msg = get_msg.fetchall()
 
+    get_sender_id = db.cursor(buffered=True)
+    get_sender_id.execute("SELECT sender_id FROM Messages WHERE group_id = %s", (session['room_id'],))
+    view_sender_id = get_sender_id.fetchall()
+
+    # ------------------------------------------
+    # miya
+
+    sender_li = [i[0] for i in view_sender_id]
+    sender = []
+
+    for l in sender_li:
+        list_sender = db.cursor(buffered=True)
+        list_sender.execute("SELECT nickname from Profiles where id = %s", (l,))
+        m = list_sender.fetchall()
+        sender.append(m)
+    # ------------------------------------------
+
+
+
     user_info = db.cursor(buffered=True)
     user_info.execute("SELECT nickname, icon FROM Profiles WHERE id = %s", (session['user_id'],))
     user = user_info.fetchall()
 
     join_room(room)
-    emit('status', {'msg': view_msg, 'user': user}, room=room)
+    emit('status', {'msg': view_msg, 'sender_id': sender, 'user': user}, room=room)
 
 
 @socketio.on('text', namespace='/talk')
@@ -1032,7 +1051,7 @@ def top():
                         (0, session['user_id'], request.form.get('talk_id')))
 
                     session['room_id'] = get_group.fetchall()[0][0]
-                    get_group_name = db.cursor(buffered=True)
+                    get_group_name = db.cursor()
                     get_group_name.execute("SELECT group_name FROM Groups WHERE id = %s", (session['room_id'],))
                     session['room_name'] = get_group_name.fetchall()[0][0]
 
