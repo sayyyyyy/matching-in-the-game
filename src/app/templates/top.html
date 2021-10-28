@@ -105,7 +105,7 @@
 
                         <div class="group_make">
 
-                            <input type="text" name="group_name" placeholder="グループネームを入力">
+                            <input id="group_input" type="text" name="group_name" placeholder="グループネームを入力">
 
                             <div class="scroll-invite">
 
@@ -124,7 +124,7 @@
 
                             </div>
 
-                            <input type="submit" name="create_group" value="グループ作成">
+                            <input onClick=buttonClick() type="submit" name="create_group" value="グループ作成">
 
                         </div>
                     </form>
@@ -256,6 +256,13 @@
         event.preventDefault();
       });
     });
+    
+    const textbox = document.getElementById('group_input');
+    function buttonClick() {
+        if (textbox.value.length > 20) {
+            alert('現在' + textbox.value.length + '文字で入力しています。20文字以下で入力してください。');
+        }
+    }
     </script>
 
 </body>
