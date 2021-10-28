@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS Clicks (
 );
 
 
-INSERT INTO Profiles (nickname, password, email, icon) VALUES("斉藤 聡", "password", "test1@email.com", "static/images/icon1.png");
+INSERT INTO Profiles (nickname, password, email, icon) VALUES("斉藤 聡", "password", "test1@email.com", "static/images/img1.jpg");
 INSERT INTO Profiles (nickname, password, email) VALUES("高橋 梓", "password", "test2@email.com");
 INSERT INTO Profiles (nickname, password, email) VALUES("林 正人", "password", "test3@email.com");
 INSERT INTO Profiles (nickname, password, email) VALUES("佐々木 綾子", "password", "test4@email.com");
