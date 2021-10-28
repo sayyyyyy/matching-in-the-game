@@ -1132,7 +1132,7 @@ def top():
                     session['room_name'] = get_group_name.fetchall()[0][0]
                 except:
                     session['room_id'] = request.form.get("talk_id")  # グループidにしたい
-                    set_name = find_user(session['user_id']) + find_user(session['room_id'])
+                    set_name = find_user(session['user_id']) + '&' + find_user(session['room_id'])
 
                     set_group = db.cursor(buffered=True)
                     set_group.execute("INSERT INTO Groups (group_name, flag_group) VALUES (%s, %s)", (set_name, 0))
