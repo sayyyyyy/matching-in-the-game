@@ -24,23 +24,25 @@ from GMF import get_data, preprocess_dataset, SampleGenerator, model, setting, t
 app = Flask(__name__)
 
 # セッション設定
-#app.config['SECRET_KEY'] = b'aaalllaa' # これが暗号化／復号のための鍵になる
+app.secret_key = 'user_id'
+app.config['SECRET_KEY'] = 'aaalllaa' # これが暗号化／復号のための鍵になる
+app.config['SESSION_TYPE'] = 'filesystem'
 
 # Googleの設定
-client_id = ''
-client_secret = ''
-redirect_uri = ''
-state = ''  # 本当はランダム
+client_id = '532442940249-02c2sn5k8u70jc5disk70ktc9hhnb52o.apps.googleusercontent.com'
+client_secret = 'C_htqdZDcvnin4hFx2pn95mG'
+redirect_uri = 'http://localhost:5000/login/check'
+state = 'this is test'  # 本当はランダム
 
 # Twitterでのログイン認証
-api_key = ""
-api_secret = ""
+api_key = "SOS03OguJLOigL4RecJrgricQ"
+api_secret = "dLjOyJ6LI6RZeAjT63QPXYBl6WokAaMhgEAYFzD6IcyxkkeM1O"
 
 # Twitter Endpoint
-twitter_base_url = ''
-authorization_endpoint = twitter_base_url + ''
-request_token_endpoint = twitter_base_url + ''
-token_endpoint = twitter_base_url + ''
+twitter_base_url = 'https://api.twitter.com'
+authorization_endpoint = twitter_base_url + '/oauth/authenticate'
+request_token_endpoint = twitter_base_url + '/oauth/request_token'
+token_endpoint = twitter_base_url + '/oauth/access_token'
 
 # ファイルアップロード設定
 UPLOAD_FOLDER ='./static/images/'
@@ -639,9 +641,9 @@ def edit():
             pass
 
         # その他変更
-          set_prof = db.cursor(buffered=True)
-          set_prof.execute("UPDATE Profiles SET nickname = %s, password = %s, email = %s, comment = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("password"), request.form.get("email"), request.form.get("comment"), session['user_id']))
-          db.commit()
+        set_prof = db.cursor(buffered=True)
+        set_prof.execute("UPDATE Profiles SET nickname = %s, password = %s, email = %s, comment = %s WHERE id = %s", (request.form.get("nickname"), request.form.get("password"), request.form.get("email"), request.form.get("comment"), session['user_id']))
+        db.commit()
         return redirect("/edit")
       else:
 
